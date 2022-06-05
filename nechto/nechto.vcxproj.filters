@@ -15,22 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vertex.ixx">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="allocatedStorage.ixx">
+    <ClInclude Include="node.ixx">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="staticAllocator.ixx">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="lowLevelGraphOperations.ixx">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="cutype.ixx">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="nException.ixx">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

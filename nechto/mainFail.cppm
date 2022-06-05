@@ -1,6 +1,5 @@
-import vertex;
+import node;
 import lowLevelGraphOperations;
-import nException;
 
 import <iostream>;
 import <exception>;
@@ -10,7 +9,7 @@ int main()
 {
 	try
 	{
-		vertexPtr a = newVertex();
+		nodePtr a = newVertex();
 		addHub(a);
 	}
 	catch (std::exception exc)
