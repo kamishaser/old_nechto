@@ -1,13 +1,14 @@
-export module node;
-import staticAllocator;
+#pragma once
 
-import <memory>;
-import <vector>;
-import <atomic>;
-import <mutex>;
-import <thread>;
-import <cassert>;
-import <iostream>;
+#include "staticAllocator.h"
+
+#include <memory>
+#include <vector>
+#include <atomic>
+#include <mutex>
+#include <thread>
+#include <cassert>
+#include <iostream>
 
 namespace nechto
 {
@@ -41,7 +42,8 @@ namespace nechto
 		};
 		
 		std::atomic<size_t> data = 0;
-		std::atomic<std::pair<ushort, ushort>> type;
+		std::atomic<ushort> type;
+		std::atomic<ushort> subtype;
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 
@@ -60,24 +62,44 @@ namespace nechto
 			data.store(temp);
 		}
 
+		bool hasConnection(int number)
+		{
+			assert(number < 4);
+			return (connection[number].load());
+		}
+		int connectionType(int number)
+		{
+			assert(hasConnection(number));
+			return connection[number].load()->type;
+		}
+		int connectionSubtype(int number)
+		{
+			assert(hasConnection(number));
+			return connection[number].load()->subtype;
+		}
+
 		enum Type
 		{
 			Empty,					//пустой объект
 			Hub,					//разветвитель
-			Tag,					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
-									//(о метке знает только один объект))
 			Variable,				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
-			Pointer,				//указатель на объект
-			Assignment,				//оператор присваивани€ (отличаетс€ от обычного математического)
-			Function,				//функци€, не €вл€юща€с€ частью nechto
+			TypeCastOperator,		//оператор преобразовани€ типа данных
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
+			Pointer,				//указатель на объект
+			Function,				//функци€, не €вл€юща€с€ частью nechto
 			BranchingMerge,			//сли€ние ветвей
-			Segment,				//определЄнный отрезок алгоритма, вход и выход из которого осуществл€етс€ только в одном месте
+			Tag,					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
+									//(о метке знает только один объект))
 			TagCall,				//вызов алгоритма по тегу
 			NumberOfTypes			//не объект. „исло, обозначающее количество типов
 		};
+		
 	};
+
+	using nodePtr = node::ptr;
+
+	const nodePtr nullNodePtr(0, 0);
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -159,18 +181,17 @@ namespace nechto
 			{
 				for (auto i = localAllocatorSet.begin(); i != localAllocatorSet.end(); ++i)
 				{
-					if (allocatedStorage<node>::getAllocator(*i)->freeSpace() > 256)
+					if (getAllocator(*i)->freeSpace() > 256)
 					{
 						currentAllocatorNumber = *i;
 
-						currentAllocator = allocatedStorage<node>::getAllocator(*i);
+						currentAllocator = getAllocator(*i);
 						return;
 					}
 				}
 
-				currentAllocatorNumber = allocatedStorage<node>::getFreeAllocator();
-				std::cout << currentAllocatorNumber << std::endl;
-				currentAllocator = allocatedStorage<node>::getAllocator(currentAllocatorNumber);
+				currentAllocatorNumber = getFreeAllocator();
+				currentAllocator = getAllocator(currentAllocatorNumber);
 				localAllocatorSet.push_back(currentAllocatorNumber);
 			}//сменить текущий контейнер
 			static bool isFistTerminal;//первый терминал перезагружает хранилище
@@ -180,8 +201,8 @@ namespace nechto
 			{
 				if (isFistTerminal)
 				{
-					allocatedStorage<node>::reset();
 					isFistTerminal = false;
+					reset();
 				}
 				changeCurrentAllocator();
 			}
@@ -189,10 +210,10 @@ namespace nechto
 			{
 				for (auto i = localAllocatorSet.begin(); i != localAllocatorSet.end(); ++i)
 				{
-					allocatedStorage<node>::toFreeAllocator(*i);//высвобождает используемые контейнеры, дела€ их доступными дл€ других терминалов
+					toFreeAllocator(*i);//высвобождает используемые контейнеры, дела€ их доступными дл€ других терминалов
 				}
 			}
-			const std::pair<ushort, ushort> allocate()
+			const nodePtr allocate()
 			{
 				assert(currentAllocator != nullptr);
 				if (currentAllocator->freeSpace() <= static_cast<ushort>(256))
@@ -202,28 +223,24 @@ namespace nechto
 				id.second = currentAllocator->allocate();
 				return id;
 			}
-			void deallocate(const std::pair<ushort, ushort> id)
+			void deallocate(const nodePtr id)
 			{
-				allocatedStorage<node>::getAllocator(id.first)->deallocate(id.second);
+				getAllocator(id.first)->deallocate(id.second);
 			}
 		};
-
+		bool Terminal::isFistTerminal = true;
 		thread_local Terminal terminal;
 
-	};
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	node* vertex::ptr::operator-> () const
+	node* node::ptr::operator-> () const
 	{
 		return nodeStorage::getAllocator(first)->get(second);
 	}
-	node* vertex::ptr::operator* () const
+	node* node::ptr::operator* () const
 	{
 		return nodeStorage::getAllocator(first)->get(second);
 	}
-
-	using nodePtr = node::ptr;
-
-	const nodePtr nullNodePtr(0, 0);
 }

@@ -1,7 +1,7 @@
-export module staticAllocator;
-import <atomic>;
+#pragma once
+#include <atomic>
 
-export namespace nechto
+ namespace nechto
 {
 	using ushort = unsigned short;
 	template <class TCon>

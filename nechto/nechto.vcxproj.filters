@@ -13,20 +13,32 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\node">
+      <UniqueIdentifier>{39f351ef-f5ac-4d1f-ae3a-7fb78155b9cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="node.ixx">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="lowLevelGraphOperations.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="staticAllocator.ixx">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="staticAllocator.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="lowLevelGraphOperations.ixx">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="node.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="baseValueTypes.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="exception.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="mathOperator.h">
+      <Filter>Исходные файлы\node</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mainFail.cppm">
+    <ClCompile Include="mainFail.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
