@@ -16,6 +16,9 @@
     <Filter Include="Исходные файлы\node">
       <UniqueIdentifier>{39f351ef-f5ac-4d1f-ae3a-7fb78155b9cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\text">
+      <UniqueIdentifier>{f2d5d061-d8a1-4759-94dd-02d52e96f2a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lowLevelGraphOperations.h">
@@ -34,6 +37,18 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="mathOperator.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="typeNames.h">
+      <Filter>Исходные файлы\text</Filter>
+    </ClInclude>
+    <ClInclude Include="textOut.h">
+      <Filter>Исходные файлы\text</Filter>
+    </ClInclude>
+    <ClInclude Include="commandLine.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="checkAndStep.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
   </ItemGroup>

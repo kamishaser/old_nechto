@@ -9,6 +9,7 @@ namespace nechto
 	{
 		enum Type
 		{
+			Error,
 			Bool,
 
 			Int8,
@@ -21,14 +22,14 @@ namespace nechto
 			uInt64,
 
 			Float,
-			Double,
+			Double
 		};
 	}
 
 	void typeCast(nodePtr typeCastOperator)
 	{
 		assert(isTypeCastOperatorCorrect(typeCastOperator));
-		size_t buffer;
+		size_t buffer = 0;
 		ushort varType[2];
 		buffer = typeCastOperator->connection[1].load()->data.load();
 		varType[0] = typeCastOperator->connection[0].load()->subtype;
@@ -51,6 +52,40 @@ namespace nechto
 			|| typeCastOperator->connection[1].load()->type != node::Variable)
 			return false;
 		return true;
+	}
+
+	bool boolCast(nodePtr Variable)
+	{
+		assert(Variable->type = node::Variable);
+		size_t buffer = Variable->data;
+		void* temprt = &buffer;
+		switch (Variable->subtype)
+		{
+		case baseValueType::Bool:
+			return static_cast<bool>(*static_cast<bool*>(temprt));
+		case baseValueType::Int8:
+			return static_cast<bool>(*static_cast<signed char*>(temprt));
+		case baseValueType::uInt8:
+			return static_cast<bool>(*static_cast<unsigned char*>(temprt));
+		case baseValueType::Int16:
+			return static_cast<bool>(*static_cast<short*>(temprt));
+		case baseValueType::uInt16:
+			return static_cast<bool>(*static_cast<ushort*>(temprt));
+		case baseValueType::Int32:
+			return static_cast<bool>(*static_cast<long*>(temprt));
+		case baseValueType::uInt32:
+			return static_cast<bool>(*static_cast<unsigned long*>(temprt));
+		case baseValueType::Int64:
+			return static_cast<bool>(*static_cast<long long*>(temprt));
+		case baseValueType::uInt64:
+			return static_cast<bool>(*static_cast<size_t*>(temprt));
+		case baseValueType::Float:
+			return static_cast<bool>(*static_cast<float*>(temprt));
+		case baseValueType::Double:
+			return static_cast<bool>(*static_cast<double*>(temprt));
+		default:
+			throw;
+		}
 	}
 
 	void typeCast(void* from, void* to, int fromType, int toType)

@@ -91,12 +91,14 @@ namespace nechto
 	bool NumConnect(nodePtr v1, nodePtr v2, ushort conNumber)
 	{//безопасное добавление односторонней связи
 		//осуществляется привязка v2 к v1 по номеру conNumber
+		assert((v1 != nullNodePtr) && (v2 != nullNodePtr));
 		nodePtr temp = nullNodePtr;
 		return v1->hubConnection.compare_exchange_strong(temp, v2);
 	}//возвращает true, если связь добавить удалось и false в противном случае
 
 	void HubConnect(nodePtr v1, nodePtr v2)
 	{//добавление связи в первое попавшееся свободное место в хабе
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
 		if (!v1->hubConnection.load().exist())
 			addHub(v1);
 		v1=v1->hubConnection;
@@ -120,6 +122,7 @@ namespace nechto
 
 	bool NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2)
 	{
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
 		if (!NumConnect(v1, v2, number1))
 			return false;
 		if (!NumConnect(v2, v1, number2))
@@ -132,6 +135,7 @@ namespace nechto
 	}
 	bool NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
 		if (!NumConnect(v1, v2, number1))
 			return false;
 		HubConnect(v2, v1);
@@ -139,6 +143,7 @@ namespace nechto
 	}
 	void HubHubConnect(nodePtr v1, nodePtr v2)
 	{
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
 		HubConnect(v1, v2);
 		HubConnect(v2, v1);
 	}
@@ -148,6 +153,7 @@ namespace nechto
 
 	void oneSideDisconnect(nodePtr v1, nodePtr v2)
 	{//односторонне отстоединяет v2 от v1 (v1 не будет знать о v2)
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
 		nodePtr temp = v2;
 		while (true)
 		{

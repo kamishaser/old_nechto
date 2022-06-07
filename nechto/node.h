@@ -80,7 +80,7 @@ namespace nechto
 
 		enum Type
 		{
-			Empty,					//пустой объект
+			Error,
 			Hub,					//разветвитель
 			Variable,				//объект-переменная базового типа, хнанящаяся внутри алгоритма (одинаков для всех исполнителей)
 			TypeCastOperator,		//оператор преобразования типа данных
@@ -91,8 +91,6 @@ namespace nechto
 			BranchingMerge,			//слияние ветвей
 			Tag,					//помечнный извне объект (односторонняя связь может быть только к метке 
 									//(о метке знает только один объект))
-			TagCall,				//вызов алгоритма по тегу
-			NumberOfTypes			//не объект. Число, обозначающее количество типов
 		};
 		
 	};
@@ -225,6 +223,7 @@ namespace nechto
 			}
 			void deallocate(const nodePtr id)
 			{
+				assert(getAllocator(id.first) != nullptr);
 				getAllocator(id.first)->deallocate(id.second);
 			}
 		};
@@ -237,10 +236,12 @@ namespace nechto
 
 	node* node::ptr::operator-> () const
 	{
+		assert(*this != nullNodePtr);
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 	node* node::ptr::operator* () const
 	{
+		assert(*this != nullNodePtr);
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 }

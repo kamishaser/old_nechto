@@ -131,12 +131,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="checkAndStep.h" />
+    <ClInclude Include="commandLine.h" />
     <ClInclude Include="exception.h" />
     <ClInclude Include="lowLevelGraphOperations.h" />
     <ClInclude Include="mathOperator.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="staticAllocator.h" />
     <ClInclude Include="baseValueTypes.h" />
+    <ClInclude Include="textOut.h" />
+    <ClInclude Include="typeNames.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />

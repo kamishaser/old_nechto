@@ -8,6 +8,7 @@ namespace nechto
 	{
 		enum Types
 		{
+			Error,
 			Assigment,		// =		
 			UnaryMinus,		// -
 
@@ -41,7 +42,7 @@ namespace nechto
 		template <class TCon>
 		size_t unaryMinus(void* firstValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) = -(*static_cast<TCon*>(firstValue));
 			return temp;
@@ -49,7 +50,7 @@ namespace nechto
 		template <class TCon>
 		size_t logicNegation(void* firstValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) = !(*static_cast<TCon*>(firstValue));
 			return temp;
@@ -58,7 +59,7 @@ namespace nechto
 		template <class TCon>
 		size_t addition(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) + (*static_cast<TCon*>(secondValue));
@@ -67,7 +68,7 @@ namespace nechto
 		template <class TCon>
 		size_t substraction(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0; temp;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) - (*static_cast<TCon*>(secondValue));
@@ -76,7 +77,7 @@ namespace nechto
 		template <class TCon>
 		size_t multiplication(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) * (*static_cast<TCon*>(secondValue));
@@ -85,7 +86,7 @@ namespace nechto
 		template <class TCon>
 		size_t division(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) / (*static_cast<TCon*>(secondValue));
@@ -94,7 +95,7 @@ namespace nechto
 		template <class TCon>
 		size_t equal(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) == (*static_cast<TCon*>(secondValue));
@@ -103,7 +104,7 @@ namespace nechto
 		template <class TCon>
 		size_t notEqual(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) != (*static_cast<TCon*>(secondValue));
@@ -112,7 +113,7 @@ namespace nechto
 		template <class TCon>
 		size_t less(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) < (*static_cast<TCon*>(secondValue));
@@ -121,7 +122,7 @@ namespace nechto
 		template <class TCon>
 		size_t greater(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) > (*static_cast<TCon*>(secondValue));
@@ -130,7 +131,7 @@ namespace nechto
 		template <class TCon>
 		size_t lessOrEqual(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) <= (*static_cast<TCon*>(secondValue));
@@ -139,7 +140,7 @@ namespace nechto
 		template <class TCon>
 		size_t greaterOrEqual(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) >= (*static_cast<TCon*>(secondValue));
@@ -149,7 +150,7 @@ namespace nechto
 		template <class TCon>
 		size_t logicAnd(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) && (*static_cast<TCon*>(secondValue));
@@ -158,7 +159,7 @@ namespace nechto
 		template <class TCon>
 		size_t logicOr(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) || (*static_cast<TCon*>(secondValue));
@@ -167,7 +168,7 @@ namespace nechto
 		template <class TCon>
 		size_t logicExclusive(void* firstValue, void* secondValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<bool*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) ^ (*static_cast<TCon*>(secondValue));
@@ -177,7 +178,7 @@ namespace nechto
 		template <class TCon>
 		size_t increment(void* firstValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) = *static_cast<TCon*>(firstValue) + 1;
 			return temp;
@@ -185,7 +186,7 @@ namespace nechto
 		template <class TCon>
 		size_t decrement(void* firstValue)
 		{
-			size_t temp;
+			size_t temp = 0;
 			void* temptr = &temp;
 			*static_cast<TCon*>(temptr) = *static_cast<TCon*>(firstValue) - 1;
 			return temp;
