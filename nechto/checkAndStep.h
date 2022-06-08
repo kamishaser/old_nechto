@@ -56,7 +56,7 @@ namespace nechto
 		switch (flag->type)
 		{
 		case node::MathOperator:
-			mathOperator::mathOperation();
+			mathOperator::mathOperation(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
 				return false;
@@ -71,7 +71,6 @@ namespace nechto
 			return true;
 		case node::ConditionalBranching:
 			nextPosition = (boolCast(flag->connection[0])) ? flag->connection[1] : flag->connection[2];
-			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
 				return false;
 			flag = nextPosition;

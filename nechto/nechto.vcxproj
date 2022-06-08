@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="additionalCreationFunctions.h" />
     <ClInclude Include="checkAndStep.h" />
     <ClInclude Include="commandLine.h" />
     <ClInclude Include="exception.h" />

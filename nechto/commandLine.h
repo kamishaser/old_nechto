@@ -124,7 +124,7 @@ std::string commandLine::commandSetType(std::string& line)
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + line);
 	v1->type = type;
-	std::string temp = to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
+	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
 }
 std::string commandLine::commandSetSubtype(std::string& line)
 {
@@ -134,7 +134,7 @@ std::string commandLine::commandSetSubtype(std::string& line)
 	if (type == 0)
 		return (to_string(v1) + "unknownSubype: " + line);
 	v1->subtype = type;
-	std::string temp = to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
+	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
 }
 std::string commandLine::commandHubHub(std::string& line)
 {

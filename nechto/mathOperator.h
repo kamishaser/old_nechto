@@ -844,7 +844,7 @@ namespace nechto
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case  Increment:
-				firstValue = operatorNode->connection[1].load()->data.load();
+				firstValue = operatorNode->connection[0].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int8:
@@ -877,7 +877,7 @@ namespace nechto
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  Decrement:
-				firstValue = operatorNode->connection[1].load()->data.load();
+				firstValue = operatorNode->connection[0].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int8:
@@ -1009,7 +1009,7 @@ namespace nechto
 				break;
 
 			case  Division://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
+				if (   !operatorNode->hasConnection(0)//наличие соединения
 					|| !operatorNode->hasConnection(1)
 					|| !operatorNode->hasConnection(2))
 					return false;

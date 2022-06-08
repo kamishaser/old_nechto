@@ -93,7 +93,7 @@ namespace nechto
 		//осуществляется привязка v2 к v1 по номеру conNumber
 		assert((v1 != nullNodePtr) && (v2 != nullNodePtr));
 		nodePtr temp = nullNodePtr;
-		return v1->hubConnection.compare_exchange_strong(temp, v2);
+		return (!v1->connection[conNumber].compare_exchange_strong(temp, v2));
 	}//возвращает true, если связь добавить удалось и false в противном случае
 
 	void HubConnect(nodePtr v1, nodePtr v2)
