@@ -32,7 +32,7 @@ namespace nechto
 			LogicExclusive,	// ^
 
 			Increment,		// ++
-			Decrement		// --
+			Decrement,		// --
 		};
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) = !(*static_cast<TCon*>(firstValue));
+			*static_cast<int64_t*>(temptr) = !(*static_cast<TCon*>(firstValue));
 			return temp;
 		}
 
@@ -97,7 +97,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) == (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -106,7 +106,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) != (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -115,7 +115,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) < (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -124,7 +124,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) > (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -133,7 +133,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) <= (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -142,7 +142,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) >= (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -152,7 +152,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) && (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -161,7 +161,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) || (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -170,7 +170,7 @@ namespace nechto
 		{
 			size_t temp = 0;
 			void* temptr = &temp;
-			*static_cast<bool*>(temptr) =
+			*static_cast<int64_t*>(temptr) =
 				(*static_cast<TCon*>(firstValue)) ^ (*static_cast<TCon*>(secondValue));
 			return temp;
 		}
@@ -217,17 +217,8 @@ namespace nechto
 				firstValue = operatorNode->connection[1].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = unaryMinus<signed char>(&firstValue);
-					break;
-				case baseValueType::Int16:
-					temp = unaryMinus<short>(&firstValue);
-					break;
-				case baseValueType::Int32:
-					temp = unaryMinus<long>(&firstValue);
-					break;
 				case baseValueType::Int64:
-					temp = unaryMinus<long long>(&firstValue);
+					temp = unaryMinus<int64_t>(&firstValue);
 					break;
 				case baseValueType::Float:
 					temp = unaryMinus<float>(&firstValue);
@@ -247,29 +238,8 @@ namespace nechto
 				secondValue = operatorNode->connection[2].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = addition<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = addition<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = addition<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = addition<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = addition<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = addition<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = addition<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = addition<size_t>(&firstValue, &secondValue);
+					temp = addition<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = addition<float>(&firstValue, &secondValue);
@@ -287,29 +257,8 @@ namespace nechto
 				secondValue = operatorNode->connection[2].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = substraction<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = substraction<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = substraction<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = substraction<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = substraction<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = substraction<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = substraction<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = substraction<size_t>(&firstValue, &secondValue);
+					temp = substraction<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = substraction<float>(&firstValue, &secondValue);
@@ -327,29 +276,8 @@ namespace nechto
 				secondValue = operatorNode->connection[2].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = multiplication<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = multiplication<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = multiplication<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = multiplication<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = multiplication<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = multiplication<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = multiplication<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = multiplication<size_t>(&firstValue, &secondValue);
+					temp = multiplication<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = multiplication<float>(&firstValue, &secondValue);
@@ -367,29 +295,8 @@ namespace nechto
 				secondValue = operatorNode->connection[2].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = division<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = division<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = division<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = division<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = division<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = division<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = division<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = division<size_t>(&firstValue, &secondValue);
+					temp = division<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = division<float>(&firstValue, &secondValue);
@@ -410,32 +317,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = equal<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = equal<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = equal<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = equal<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = equal<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = equal<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = equal<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = equal<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = equal<size_t>(&firstValue, &secondValue);
+					temp = equal<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = equal<float>(&firstValue, &secondValue);
@@ -446,8 +329,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  NotEqual:
@@ -456,32 +339,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = notEqual<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = notEqual<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = notEqual<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = notEqual<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = notEqual<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = notEqual<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = notEqual<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = notEqual<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = notEqual<size_t>(&firstValue, &secondValue);
+					temp = notEqual<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = notEqual<float>(&firstValue, &secondValue);
@@ -492,8 +351,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  Less:
@@ -502,32 +361,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = less<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = less<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = less<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = less<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = less<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = less<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = less<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = less<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = less<size_t>(&firstValue, &secondValue);
+					temp = less<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = less<float>(&firstValue, &secondValue);
@@ -538,8 +373,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  Greater:
@@ -548,32 +383,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = greater<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = greater<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = greater<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = greater<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = greater<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = greater<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = greater<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = greater<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = greater<size_t>(&firstValue, &secondValue);
+					temp = greater<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = greater<float>(&firstValue, &secondValue);
@@ -584,8 +395,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  LessOrEqual:
@@ -594,32 +405,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = lessOrEqual<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = lessOrEqual<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = lessOrEqual<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = lessOrEqual<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = lessOrEqual<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = lessOrEqual<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = lessOrEqual<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = lessOrEqual<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = lessOrEqual<size_t>(&firstValue, &secondValue);
+					temp = lessOrEqual<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = lessOrEqual<float>(&firstValue, &secondValue);
@@ -630,8 +417,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  GreaterOrEqual:
@@ -640,32 +427,8 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = greaterOrEqual<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = greaterOrEqual<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = greaterOrEqual<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = greaterOrEqual<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = greaterOrEqual<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = greaterOrEqual<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = greaterOrEqual<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = greaterOrEqual<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = greaterOrEqual<size_t>(&firstValue, &secondValue);
+					temp = greaterOrEqual<int64_t>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Float:
 					temp = greaterOrEqual<float>(&firstValue, &secondValue);
@@ -676,8 +439,8 @@ namespace nechto
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -687,38 +450,14 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = logicNegation<bool>(&firstValue);
-					break;
-				case baseValueType::Int8:
-					temp = logicNegation<signed char>(&firstValue);
-					break;
-				case baseValueType::uInt8:
-					temp = logicNegation<char>(&firstValue);
-					break;
-				case baseValueType::Int16:
-					temp = logicNegation<short>(&firstValue);
-					break;
-				case baseValueType::uInt16:
-					temp = logicNegation<ushort>(&firstValue);
-					break;
-				case baseValueType::Int32:
-					temp = logicNegation<long>(&firstValue);
-					break;
-				case baseValueType::uInt32:
-					temp = logicNegation<unsigned long>(&firstValue);
-					break;
 				case baseValueType::Int64:
-					temp = logicNegation<long long>(&firstValue);
-					break;
-				case baseValueType::uInt64:
-					temp = logicNegation<size_t>(&firstValue);
-					break;
+					temp = logicNegation<int64_t>(&firstValue);
+					break;	
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  LogicAnd:
@@ -727,38 +466,14 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = logicAnd<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = logicAnd<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = logicAnd<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = logicAnd<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = logicAnd<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = logicAnd<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = logicAnd<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = logicAnd<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = logicAnd<size_t>(&firstValue, &secondValue);
+					temp = logicAnd<int64_t>(&firstValue, &secondValue);
 					break;
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  LogicOr:
@@ -767,38 +482,14 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = logicOr<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = logicOr<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = logicOr<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = logicOr<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = logicOr<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = logicOr<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = logicOr<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = logicOr<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = logicOr<size_t>(&firstValue, &secondValue);
+					temp = logicOr<int64_t>(&firstValue, &secondValue);
 					break;
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 			case  LogicExclusive:
@@ -807,38 +498,14 @@ namespace nechto
 				comVarType = operatorNode->connection[1].load()->subtype;
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Bool:
-					temp = logicExclusive<bool>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int8:
-					temp = logicExclusive<signed char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt8:
-					temp = logicExclusive<char>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int16:
-					temp = logicExclusive<short>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt16:
-					temp = logicExclusive<ushort>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Int32:
-					temp = logicExclusive<long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt32:
-					temp = logicExclusive<unsigned long>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Int64:
-					temp = logicExclusive<long long>(&firstValue, &secondValue);
-					break;
-				case baseValueType::uInt64:
-					temp = logicExclusive<size_t>(&firstValue, &secondValue);
+					temp = logicExclusive<int64_t>(&firstValue, &secondValue);
 					break;
 				default:
 					throw;
 				}
-				if (resultType != baseValueType::Bool)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Bool, resultType);
+				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
+					typeCast(&temp, &temp, baseValueType::Int64, resultType);
 				operatorNode->connection[0].load()->data.store(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -847,29 +514,8 @@ namespace nechto
 				firstValue = operatorNode->connection[0].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = increment<signed char>(&firstValue);
-					break;
-				case baseValueType::uInt8:
-					temp = increment<char>(&firstValue);
-					break;
-				case baseValueType::Int16:
-					temp = increment<short>(&firstValue);
-					break;
-				case baseValueType::uInt16:
-					temp = increment<ushort>(&firstValue);
-					break;
-				case baseValueType::Int32:
-					temp = increment<long>(&firstValue);
-					break;
-				case baseValueType::uInt32:
-					temp = increment<unsigned long>(&firstValue);
-					break;
 				case baseValueType::Int64:
-					temp = increment<long long>(&firstValue);
-					break;
-				case baseValueType::uInt64:
-					temp = increment<size_t>(&firstValue);
+					temp = increment<int64_t>(&firstValue);
 					break;
 				default:
 					throw;
@@ -880,29 +526,8 @@ namespace nechto
 				firstValue = operatorNode->connection[0].load()->data.load();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int8:
-					temp = decrement<signed char>(&firstValue);
-					break;
-				case baseValueType::uInt8:
-					temp = decrement<char>(&firstValue);
-					break;
-				case baseValueType::Int16:
-					temp = decrement<short>(&firstValue);
-					break;
-				case baseValueType::uInt16:
-					temp = decrement<ushort>(&firstValue);
-					break;
-				case baseValueType::Int32:
-					temp = decrement<long>(&firstValue);
-					break;
-				case baseValueType::uInt32:
-					temp = decrement<unsigned long>(&firstValue);
-					break;
 				case baseValueType::Int64:
-					temp = decrement<long long>(&firstValue);
-					break;
-				case baseValueType::uInt64:
-					temp = decrement<size_t>(&firstValue);
+					temp = decrement<int64_t>(&firstValue);
 					break;
 				default:
 					throw;
@@ -917,6 +542,10 @@ namespace nechto
 		bool isCorrect(nodePtr operatorNode)
 		{
 			assert(operatorNode->type == node::MathOperator);
+			if (!operatorNode->hasConnection(0))
+				return false;
+			if (operatorNode->connectionSubtype(0) == baseValueType::NodePtr)
+				return false;
 			switch (operatorNode->subtype)
 			{
 			case  Assigment://////////////////////////////////////////////
@@ -941,16 +570,6 @@ namespace nechto
 				if (operatorNode->connectionSubtype(0)
 					!= operatorNode->connectionSubtype(1))
 					return false;//соответствие типов данных
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;//только signed
-				if (operatorNode->connectionSubtype(0) == baseValueType::uInt8)
-					return false;//только signed
-				if (operatorNode->connectionSubtype(0) == baseValueType::uInt16)
-					return false;//только signed
-				if (operatorNode->connectionSubtype(0) == baseValueType::uInt32)
-					return false;//только signed
-				if (operatorNode->connectionSubtype(0) == baseValueType::uInt64)
-					return false;//только signed
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -968,8 +587,6 @@ namespace nechto
 					|| operatorNode->connectionSubtype(0)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов данных
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 
 			case  Subtraction://////////////////////////////////////////////
@@ -986,8 +603,6 @@ namespace nechto
 					|| operatorNode->connectionSubtype(0)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов данных
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 
 			case  Multiplication://////////////////////////////////////////////
@@ -1004,8 +619,6 @@ namespace nechto
 					|| operatorNode->connectionSubtype(0)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов данных
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 
 			case  Division://////////////////////////////////////////////
@@ -1022,8 +635,6 @@ namespace nechto
 					|| operatorNode->connectionSubtype(0)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов данных
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1191,8 +802,6 @@ namespace nechto
 					return false;//проверка типа (только переменные)
 				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
 					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 			case  Decrement://////////////////////////////////////////////
 				if (!operatorNode->hasConnection(0))//наличие соединения
@@ -1201,8 +810,6 @@ namespace nechto
 					return false;//проверка типа (только переменные)
 				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
 					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(0) == baseValueType::Bool)
-					return false;
 				break;
 			default:
 				throw;

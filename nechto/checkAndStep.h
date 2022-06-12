@@ -3,6 +3,7 @@
 #include "mathOperator.h"
 #include "baseValueTypes.h"
 #include "lowLevelGraphOperations.h"
+#include "function.h"
 
 namespace nechto
 {
@@ -36,12 +37,14 @@ namespace nechto
 		case node::TypeCastOperator:
 			return isTypeCastOperatorCorrect(v1);
 		case node::MathOperator:
-			mathOperator::isCorrect(v1);
+			return mathOperator::isCorrect(v1);
 		case node::ConditionalBranching:
 			return ((v1->hasConnection(0)) && (v1->connection[0].load()->type == node::Variable));
-		case node::Pointer:
 		case node::Function:
-		case node::BranchingMerge:
+			if (v1->getData<function*>()->isCorrect != nullptr
+				&& v1->getData<function*>()->Func != nullptr
+				&& v1->getData<function*>()->isCorrect(v1))
+				return true;
 		default:
 			return false;
 		}
@@ -71,6 +74,13 @@ namespace nechto
 			return true;
 		case node::ConditionalBranching:
 			nextPosition = (boolCast(flag->connection[0])) ? flag->connection[1] : flag->connection[2];
+			if (!nextPosition.exist())
+				return false;
+			flag = nextPosition;
+			return true;
+		case node::Function:
+			(flag->getData<function*>())->Func(flag);
+			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
 				return false;
 			flag = nextPosition;

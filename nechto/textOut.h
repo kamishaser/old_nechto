@@ -25,6 +25,8 @@ namespace nechto
 	}
 	const std::string nodeData(nodePtr v1)
 	{
+		if (v1 == nullNodePtr)
+			return "error";
 		size_t data = v1->data.load();
 		void* temptr = &data;
 		switch (v1->type)
@@ -32,33 +34,19 @@ namespace nechto
 		case node::Variable:
 			switch (v1->subtype)
 			{
-			case baseValueType::Bool:
-				return std::to_string(*static_cast<bool*>(temptr));
-			case baseValueType::Int8:
-				return std::to_string(*static_cast<signed char*>(temptr));
-			case baseValueType::uInt8:
-				return std::to_string(*static_cast<char*>(temptr));
-			case baseValueType::Int16:
-				return std::to_string(*static_cast<short*>(temptr));
-			case baseValueType::uInt16:
-				return std::to_string(*static_cast<ushort*>(temptr));
-			case baseValueType::Int32:
-				return std::to_string(*static_cast<long*>(temptr));
-			case baseValueType::uInt32:
-				return std::to_string(*static_cast<unsigned long*>(temptr));
 			case baseValueType::Int64:
-				return std::to_string(*static_cast<long long*>(temptr));
-			case baseValueType::uInt64:
-				return std::to_string(*static_cast<size_t*>(temptr));
+				return std::to_string(*static_cast<int64_t*>(temptr));
 			case baseValueType::Float:
 				return std::to_string(*static_cast<float*>(temptr));
 			case baseValueType::Double:
 				return std::to_string(*static_cast<double*>(temptr));
+			case baseValueType::NodePtr:
+				return to_string(*static_cast<nodePtr*>(temptr));
 			default:
-				throw;
+				return "error";
 			}
 		}
-		return std::string(" ");
+		return "error";
 	}
 
 	std::string nodeProperties(const nodePtr v1)

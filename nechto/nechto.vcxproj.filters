@@ -54,6 +54,12 @@
     <ClInclude Include="additionalCreationFunctions.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="function.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="tag.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

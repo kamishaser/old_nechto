@@ -21,15 +21,13 @@ namespace nechto
 		}
 		const std::vector<std::string> nodeT
 		{
-			"Error",
+			"Error",				
 			"Hub",					//разветвитель
 			"Variable",				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
 			"TypeCastOperator",		//оператор преобразовани€ типа данных
 			"MathOperator",			//математический оператор
 			"ConditionalBranching",	//if
-			"Pointer",				//указатель на объект
 			"Function",				//функци€, не €вл€юща€с€ частью nechto
-			"BranchingMerge",		//сли€ние ветвей
 			"Tag",					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
 									//(о метке знает только один объект))
 		};
@@ -37,19 +35,11 @@ namespace nechto
 		const std::vector<std::string> variableT
 		{
 			"Error",
+			"NodePtr",
 			"Bool",
-
-			"Int8",
-			"uInt8",
-			"Int16",
-			"uInt16",
-			"Int32",
-			"uInt32",
 			"Int64",
-			"uInt64",
-
 			"Float",
-			"Double"
+			"Double",
 		};
 		
 		const std::vector<std::string> mathOperatorT

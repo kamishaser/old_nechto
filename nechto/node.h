@@ -9,6 +9,7 @@
 #include <thread>
 #include <cassert>
 #include <iostream>
+#include <string>
 
 namespace nechto
 {
@@ -69,12 +70,12 @@ namespace nechto
 		}
 		int connectionType(int number)
 		{
-			assert(hasConnection(number));
+			if (!hasConnection(number)) return 0;
 			return connection[number].load()->type;
 		}
 		int connectionSubtype(int number)
 		{
-			assert(hasConnection(number));
+			if (!hasConnection(number)) return 0;
 			return connection[number].load()->subtype;
 		}
 
@@ -82,21 +83,17 @@ namespace nechto
 		{
 			Error,
 			Hub,					//разветвитель
-			Variable,				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
+			Variable,				//объект-переменна€ базового типа, хран€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
 			TypeCastOperator,		//оператор преобразовани€ типа данных
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
-			Pointer,				//указатель на объект
 			Function,				//функци€, не €вл€юща€с€ частью nechto
-			BranchingMerge,			//сли€ние ветвей
-			Tag,					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
-									//(о метке знает только один объект))
+			Tag,					//метка
 		};
 		
 	};
 
 	using nodePtr = node::ptr;
-
 	const nodePtr nullNodePtr(0, 0);
 
 	//////////////////////////////////////////////////////////////////////////////////////////

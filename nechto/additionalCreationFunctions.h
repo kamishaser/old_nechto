@@ -1,6 +1,7 @@
 #pragma once
 #include "lowLevelGraphOperations.h"
 #include "checkAndStep.h"
+#include "tag.h"
 #include <type_traits>
 
 namespace nechto
@@ -12,11 +13,19 @@ namespace nechto
 		temp->subtype = subtype;
 		return temp;
 	}
+	nodePtr createFunction(function* Func)
+	{
+		nodePtr temp = newNode();
+		temp->type = node::Function;
+		temp->setData(Func);
+		return temp;
+	}
 	nodePtr createTypeCastOperator(nodePtr from, nodePtr to)
 	{
 		nodePtr temp = newNode();
 		assert(from->type.load() == node::Variable);
 		assert(to->type.load() == node::Variable);
+		temp->type = node::TypeCastOperator;
 		NumHubConnect(temp, from, 1);
 		NumHubConnect(temp, to, 0);
 		return temp;
@@ -47,17 +56,17 @@ namespace nechto
 		return temp;
 	}
 
-	bool serialConnection(nodePtr first, nodePtr second, bool conditiion = true)
+	void serialConnection(nodePtr first, nodePtr second, bool conditiion = true)
 	{
 		assert(isAction(first));
 		assert(isAction(second));
 
 		if (first->type != node::ConditionalBranching)
-			return NumHubConnect(first, second, 3);
-		if (conditiion)
+			NumHubConnect(first, second, 3);
+		else if (conditiion)
 			return NumHubConnect(first, second, 1);
 		else
-			return NumHubConnect(first, second, 2);
+			NumHubConnect(first, second, 2);
 	}
 
 	template<class TCon>
@@ -67,72 +76,34 @@ namespace nechto
 		temp->type = node::Variable;
 		if (std::is_same<TCon, bool>())
 		{
-			temp->subtype.store(baseValueType::Bool);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, signed char>())
-		{
-			temp->subtype.store(baseValueType::Int8);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, unsigned char>())
-		{
-			temp->subtype.store(baseValueType::uInt8);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, short>())
-		{
-			temp->subtype.store(baseValueType::Int16);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, unsigned short>())
-		{
-			temp->subtype.store(baseValueType::uInt16);
-			temp->setData(startValue);
+			temp->subtype.store(baseValueType::Int64);
+			temp->setData<int64_t>(startValue);
 			return temp;
 		}
 		if (std::is_same<TCon, long>())
 		{
 			assert(sizeof(TCon) == 4);
-			temp->subtype.store(baseValueType::Int32);
-			temp->setData(startValue);
+			temp->subtype.store(baseValueType::Int64);
+			temp->setData<int64_t>(startValue);
 			return temp;
 		}
 		if (std::is_same<TCon, int>())
 		{
 			assert(sizeof(TCon) == 4);
-			temp->subtype.store(baseValueType::Int32);
-			temp->setData(startValue);
+			temp->subtype.store(baseValueType::Int64);
+			temp->setData<int64_t>(startValue);
 			return temp;
 		}
-		if (std::is_same<TCon, unsigned long>())
-		{
-			assert(sizeof(TCon) == 4);
-			temp->subtype.store(baseValueType::uInt32);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, unsigned int>())
-		{
-			assert(sizeof(TCon) == 4);
-			temp->subtype.store(baseValueType::uInt32);
-			temp->setData(startValue);
-			return temp;
-		}
-		if (std::is_same<TCon, long long>())
+		if (std::is_same<TCon, int64_t>())
 		{
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData(startValue);
+			temp->setData<int64_t>(startValue);
 			return temp;
 		}
 		if (std::is_same<TCon, size_t>())
 		{
-			temp->subtype.store(baseValueType::uInt64);
-			temp->setData(startValue);
+			temp->subtype.store(baseValueType::Int64);
+			temp->setData<int64_t>(startValue);
 			return temp;
 		}
 		if (std::is_same<TCon, float>())
