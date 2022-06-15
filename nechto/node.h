@@ -48,38 +48,39 @@ namespace nechto
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 
+
 		template <class TCon>
-		const TCon getData() const
+		const TCon getData() const //получение данных в формате <TCon>
 		{
 			assert(sizeof(TCon) <= sizeof(size_t));
 			size_t temp = data.load();
 			return *static_cast<TCon*>(static_cast<void*>(&temp));
 		}
 		template <class TCon>
-		void setData(TCon Data)
+		void setData(TCon Data) //запись данных в формате TCon
 		{
 			assert(sizeof(TCon) <= sizeof(size_t));
 			size_t temp = *static_cast<size_t*>(static_cast<void*>(&Data));
 			data.store(temp);
 		}
 
-		bool hasConnection(int number)
+		bool hasConnection(int number) //проверка наличия соединения по номеру	
 		{
 			assert(number < 4);
 			return (connection[number].load());
 		}
-		int connectionType(int number)
+		int connectionType(int number) //получение типа ноды подключённой по номеру
 		{
 			if (!hasConnection(number)) return 0;
 			return connection[number].load()->type;
 		}
-		int connectionSubtype(int number)
+		int connectionSubtype(int number)//получение подтипа ноды подключённой по номеру
 		{
 			if (!hasConnection(number)) return 0;
 			return connection[number].load()->subtype;
 		}
 
-		enum Type
+		enum Type //список типов нод
 		{
 			Error,
 			Hub,					//разветвитель
@@ -94,15 +95,15 @@ namespace nechto
 	};
 
 	using nodePtr = node::ptr;
-	const nodePtr nullNodePtr(0, 0);
+	const nodePtr nullNodePtr(0, 0); //аналог nullptr
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
-	const int maxNumOfAllocators = 16;
+	//всё, что ниже этой строки тебе не понадобится
 
 	namespace nodeStorage
 	{
-		static_assert(maxNumOfAllocators <= 65536, "65536 is maximum");
+		const int maxNumOfAllocators = 16; //максимальное количество выделяемых аллокаторов
 		std::unique_ptr<staticAllocator<node>> content[maxNumOfAllocators]; //массив контейнеров
 		ushort occupancy[maxNumOfAllocators]; //массив занятости
 		std::atomic<ushort> sflag; //номер занимаемого контейнера
@@ -213,7 +214,7 @@ namespace nechto
 				assert(currentAllocator != nullptr);
 				if (currentAllocator->freeSpace() <= static_cast<ushort>(256))
 					changeCurrentAllocator();
-				std::pair<ushort, ushort> id;
+				nodePtr id;
 				id.first = currentAllocatorNumber;
 				id.second = currentAllocator->allocate();
 				return id;

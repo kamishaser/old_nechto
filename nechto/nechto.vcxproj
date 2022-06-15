@@ -134,8 +134,7 @@
     <ClInclude Include="additionalCreationFunctions.h" />
     <ClInclude Include="checkAndStep.h" />
     <ClInclude Include="commandLine.h" />
-    <ClInclude Include="exception.h" />
-    <ClInclude Include="function.h" />
+    <ClInclude Include="externalFunction.h" />
     <ClInclude Include="lowLevelGraphOperations.h" />
     <ClInclude Include="mathOperator.h" />
     <ClInclude Include="node.h" />

@@ -13,7 +13,7 @@ namespace nechto
 		temp->subtype = subtype;
 		return temp;
 	}
-	nodePtr createFunction(function* Func)
+	nodePtr createFunction(externalFunction* Func)
 	{
 		nodePtr temp = newNode();
 		temp->type = node::Function;

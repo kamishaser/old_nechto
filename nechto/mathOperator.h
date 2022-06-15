@@ -544,8 +544,6 @@ namespace nechto
 			assert(operatorNode->type == node::MathOperator);
 			if (!operatorNode->hasConnection(0))
 				return false;
-			if (operatorNode->connectionSubtype(0) == baseValueType::NodePtr)
-				return false;
 			switch (operatorNode->subtype)
 			{
 			case  Assigment://////////////////////////////////////////////

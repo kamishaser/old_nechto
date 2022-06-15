@@ -3,7 +3,7 @@
 #include "mathOperator.h"
 #include "baseValueTypes.h"
 #include "lowLevelGraphOperations.h"
-#include "function.h"
+#include "externalFunction.h"
 
 namespace nechto
 {
@@ -41,9 +41,9 @@ namespace nechto
 		case node::ConditionalBranching:
 			return ((v1->hasConnection(0)) && (v1->connection[0].load()->type == node::Variable));
 		case node::Function:
-			if (v1->getData<function*>()->isCorrect != nullptr
-				&& v1->getData<function*>()->Func != nullptr
-				&& v1->getData<function*>()->isCorrect(v1))
+			if (v1->getData<externalFunction*>()->isCorrect != nullptr
+				&& v1->getData<externalFunction*>()->Func != nullptr
+				&& v1->getData<externalFunction*>()->isCorrect(v1))
 				return true;
 		default:
 			return false;
@@ -79,7 +79,7 @@ namespace nechto
 			flag = nextPosition;
 			return true;
 		case node::Function:
-			(flag->getData<function*>())->Func(flag);
+			(flag->getData<externalFunction*>())->Func(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
 				return false;

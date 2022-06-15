@@ -1,6 +1,7 @@
 #pragma once
 #include <atomic>
 
+//сей файл точно тебе не понадобится
  namespace nechto
 {
 	using ushort = unsigned short;

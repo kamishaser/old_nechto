@@ -27,7 +27,7 @@ namespace nechto
 			"TypeCastOperator",		//оператор преобразовани€ типа данных
 			"MathOperator",			//математический оператор
 			"ConditionalBranching",	//if
-			"Function",				//функци€, не €вл€юща€с€ частью nechto
+			"ExternalFunction",				//функци€, не €вл€юща€с€ частью nechto
 			"Tag",					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
 									//(о метке знает только один объект))
 		};
@@ -35,8 +35,6 @@ namespace nechto
 		const std::vector<std::string> variableT
 		{
 			"Error",
-			"NodePtr",
-			"Bool",
 			"Int64",
 			"Float",
 			"Double",

@@ -15,7 +15,7 @@ using namespace nechto;
 
 int main()
 {
-	function print
+	externalFunction print
 	{
 		//уникальное имя
 		"print",
@@ -24,7 +24,7 @@ int main()
 		//сама функция
 		[](nodePtr v1) {std::cout << nodeData(v1->connection[0].load()) << std::endl; }
 	};
-	function intRead
+	externalFunction intRead
 	{
 		//уникальное имя
 		"print",
@@ -61,6 +61,7 @@ int main()
 	std::cout << nodeData(Variable) << std::endl;
 	std::cout << to_string(temp) << std::endl;
 	commandLine c;
+
 	while (true)
 	{
 		try

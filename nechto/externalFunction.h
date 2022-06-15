@@ -6,7 +6,7 @@
 
 namespace nechto
 {
-	struct function
+	struct externalFunction
 	{
 		std::string uniqueName;
 		std::function<bool(nodePtr)> isCorrect  = nullptr;

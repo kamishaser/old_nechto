@@ -3,6 +3,8 @@
 
 namespace nechto
 {
+	//сей файл аписывает используемые типы переменных, преобразование типов
+	//а также работу оператора преобразование типа
 	void typeCast(void* from, void* to, int fromType, int toType);
 	bool isTypeCastOperatorCorrect(nodePtr typeCastOperator);
 	namespace baseValueType
@@ -10,7 +12,6 @@ namespace nechto
 		enum Type
 		{
 			Error,
-			NodePtr,
 			Int64,
 			Float,
 			Double,
@@ -42,8 +43,6 @@ namespace nechto
 		if (typeCastOperator->connection[0].load()->type != node::Variable
 			|| typeCastOperator->connection[1].load()->type != node::Variable)
 			return false;
-		if (typeCastOperator->connection[0].load()->subtype == baseValueType::NodePtr)
-			return false;
 		return true;
 	}
 
@@ -60,8 +59,6 @@ namespace nechto
 			return static_cast<bool>(*static_cast<float*>(temprt));
 		case baseValueType::Double:
 			return static_cast<bool>(*static_cast<double*>(temprt));
-		case baseValueType::NodePtr:
-			return static_cast<bool>(*static_cast<nodePtr*>(temprt));
 		default:
 			throw;
 		}
@@ -69,7 +66,7 @@ namespace nechto
 
 	void typeCast(void* from, void* to, int fromType, int toType)
 	{
-		
+		//функция преобразования
 		switch (toType)
 		{
 		case baseValueType::Int64:
@@ -84,9 +81,6 @@ namespace nechto
 			case baseValueType::Double:
 				*static_cast<int64_t*>(to) = static_cast<int64_t>(*static_cast<double*>(from));
 				return;
-			case baseValueType::NodePtr:
-				*static_cast<int64_t*>(to) = static_cast<bool>(static_cast<long>(*static_cast<double*>(from)));
-				return;
 			}
 		case baseValueType::Float:
 			switch (fromType)
@@ -100,9 +94,6 @@ namespace nechto
 			case baseValueType::Double:
 				*static_cast<float*>(to) = static_cast<float>(*static_cast<double*>(from));
 				return;
-			case baseValueType::NodePtr:
-				*static_cast<float*>(to) = static_cast<bool>(static_cast<long>(*static_cast<double*>(from)));
-				return;
 			}
 		case baseValueType::Double:
 			switch (fromType)
@@ -115,9 +106,6 @@ namespace nechto
 				return;
 			case baseValueType::Double:
 				*static_cast<double*>(to) = static_cast<double>(*static_cast<double*>(from));
-				return;
-			case baseValueType::NodePtr:
-				*static_cast<double*>(to) = static_cast<bool>(static_cast<long>(*static_cast<double*>(from)));
 				return;
 			}
 		default: throw;

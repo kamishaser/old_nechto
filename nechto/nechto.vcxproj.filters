@@ -33,9 +33,6 @@
     <ClInclude Include="baseValueTypes.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="exception.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="mathOperator.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
@@ -54,7 +51,7 @@
     <ClInclude Include="additionalCreationFunctions.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="function.h">
+    <ClInclude Include="externalFunction.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="tag.h">

@@ -148,10 +148,6 @@ std::string commandLine::commandSetData(std::string& line)
 	case node::Variable:
 		switch (v1->subtype)
 		{
-		case baseValueType::NodePtr:
-			ptemp = stoptr(line);
-			v1->setData<nodePtr>(ptemp);
-			return commandThis(line);
 		case baseValueType::Int64:
 			try { itemp = std::stoll(line); }
 			catch (...) { return "error"; }

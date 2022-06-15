@@ -40,8 +40,6 @@ namespace nechto
 				return std::to_string(*static_cast<float*>(temptr));
 			case baseValueType::Double:
 				return std::to_string(*static_cast<double*>(temptr));
-			case baseValueType::NodePtr:
-				return to_string(*static_cast<nodePtr*>(temptr));
 			default:
 				return "error";
 			}
