@@ -130,12 +130,16 @@ namespace nechto
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
 		assert(v1 != nullNodePtr && v2 != nullNodePtr);
+		assert(v1->type != node::Hub);
+		assert(v2->type != node::Hub);
 		NumConnect(v1, v2, number1);
 		HubConnect(v2, v1);
 	}
 	void HubHubConnect(nodePtr v1, nodePtr v2)
 	{
 		assert(v1 != nullNodePtr && v2 != nullNodePtr);
+		assert(v1->type != node::Hub);
+		assert(v2->type != node::Hub);
 		HubConnect(v1, v2);
 		HubConnect(v2, v1);
 	}
@@ -187,6 +191,7 @@ namespace nechto
 				}
 			if (!vTemp->hubConnection.load().exist())
 				break;
+
 			nodePtr vHub = vTemp->hubConnection;
 			nodeStorage::terminal.deallocate(vTemp);
 			vTemp = vHub;

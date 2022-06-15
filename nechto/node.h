@@ -88,7 +88,7 @@ namespace nechto
 			TypeCastOperator,		//оператор преобразовани€ типа данных
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
-			Function,				//функци€, не €вл€юща€с€ частью nechto
+			ExteralFunction,		//функци€, не €вл€юща€с€ частью nechto
 			Tag,					//метка
 		};
 		

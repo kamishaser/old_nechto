@@ -5,21 +5,27 @@ namespace nechto
 {
 	namespace tag
 	{
-		size_t getUniqueID()
-		{
-			static size_t ID = 0;
-			return ++ID;
-		}
 		enum Type
 		{
 			Error,
 			Comment, //стандартный текстовый комментарий
-			Part,    //часть алгоритма имеющая один вход и один выход
 		};
+		bool isCorrect(nodePtr tag)
+		{
+			assert(tag->type == node::Tag);
+			
+			switch (tag->subtype.load())
+			{
+			case Comment:
+				if (!tag->hasConnection(0))//наличие соединения)
+					return false;
+				break;
+			default:
+				return false;
+			}
+			return true;
+		}
 	}
-	0) вход
-	1) выход
-
 	//std::function<void(nodePtr, size_t)>addTag;
 	//std::function<nodePtr(size_t)> GetAddressByID;
 	//std::function<>

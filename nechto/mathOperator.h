@@ -810,7 +810,7 @@ namespace nechto
 					return false;//только целочисленное возвращаемое значение
 				break;
 			default:
-				throw;
+				return false;
 			}
 			return true;
 		}

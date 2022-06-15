@@ -169,6 +169,7 @@ std::string commandLine::commandSetData(std::string& line)
 	default:
 		break;
 	}
+	return commandThis(line);
 }
 std::string commandLine::commandHubHub(std::string& line)
 {

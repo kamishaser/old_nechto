@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+#include "tag.h"
 #include "mathOperator.h"
 #include "baseValueTypes.h"
 #include "lowLevelGraphOperations.h"
@@ -14,7 +15,7 @@ namespace nechto
 		case node::MathOperator:
 		case node::TypeCastOperator:
 		case node::ConditionalBranching:
-		case node::Function:
+		case node::ExteralFunction:
 			return true;
 		default:
 			return false;
@@ -38,9 +39,11 @@ namespace nechto
 			return isTypeCastOperatorCorrect(v1);
 		case node::MathOperator:
 			return mathOperator::isCorrect(v1);
+		case node::Tag:
+			return tag::isCorrect(v1);
 		case node::ConditionalBranching:
 			return ((v1->hasConnection(0)) && (v1->connection[0].load()->type == node::Variable));
-		case node::Function:
+		case node::ExteralFunction:
 			if (v1->getData<externalFunction*>()->isCorrect != nullptr
 				&& v1->getData<externalFunction*>()->Func != nullptr
 				&& v1->getData<externalFunction*>()->isCorrect(v1))
@@ -55,7 +58,6 @@ namespace nechto
 		assert(isCorrect(flag));
 		assert(isAction(flag));
 		nodePtr nextPosition;
-		size_t buffer;
 		switch (flag->type)
 		{
 		case node::MathOperator:
@@ -78,7 +80,7 @@ namespace nechto
 				return false;
 			flag = nextPosition;
 			return true;
-		case node::Function:
+		case node::ExteralFunction:
 			(flag->getData<externalFunction*>())->Func(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())

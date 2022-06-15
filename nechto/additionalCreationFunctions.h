@@ -16,7 +16,7 @@ namespace nechto
 	nodePtr createFunction(externalFunction* Func)
 	{
 		nodePtr temp = newNode();
-		temp->type = node::Function;
+		temp->type = node::ExteralFunction;
 		temp->setData(Func);
 		return temp;
 	}
