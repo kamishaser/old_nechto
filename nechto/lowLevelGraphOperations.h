@@ -14,6 +14,7 @@ namespace nechto
 	bool isNodeHasConnections(nodePtr v1);
 	//создание
 	const nodePtr newNode();
+	const nodePtr newNode(ushort type, ushort subtype = 0, size_t data = 0);
 	
 	//операции с хабами
 	void addHub(nodePtr v1);
@@ -55,6 +56,7 @@ namespace nechto
 		if (isHubExist(v1)) return true;
 		return false;
 	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
 	const nodePtr newNode()
@@ -63,6 +65,17 @@ namespace nechto
 		nodePtr temp = nodeStorage::terminal.allocate();
 		v.first  = temp.first;
 		v.second = temp.second;
+		return v;
+	}
+	const nodePtr newNode(ushort type, ushort subtype, size_t data)
+	{
+		nodePtr v;
+		nodePtr temp = nodeStorage::terminal.allocate();
+		v.first = temp.first;
+		v.second = temp.second;
+		v->type = type;
+		v->subtype = subtype;
+		v->data = data;
 		return v;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////

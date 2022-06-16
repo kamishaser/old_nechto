@@ -77,7 +77,4 @@ int main()
 	//		std::cout << e.what() << std::endl;
 	//	}
 	//}
-
-	int большаялажа = 5;
-	std::cout << большаялажа << std::endl;
 }

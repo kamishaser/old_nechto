@@ -69,6 +69,10 @@ namespace nechto
 			assert(number < 4);
 			return (connection[number].load());
 		}
+		bool hasHub() //проверка наличия соединения по номеру	
+		{
+			return (hubConnection.load());
+		}
 		int connectionType(int number) //получение типа ноды подключённой по номеру
 		{
 			if (!hasConnection(number)) return 0;
