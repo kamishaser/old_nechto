@@ -23,6 +23,7 @@ namespace nechto
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
 	void HubConnect(nodePtr v1, nodePtr v2);
 	//создание двухстороннего соединени
+	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
 	//разрыв соединения
@@ -139,7 +140,14 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание двухстороннего соединения
-
+	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2)
+	{
+		assert(v1 != nullNodePtr && v2 != nullNodePtr);
+		assert(v1->type != node::Hub);
+		assert(v2->type != node::Hub);
+		NumConnect(v1, v2, number1);
+		NumConnect(v2, v1, number2);
+	}
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
 		assert(v1 != nullNodePtr && v2 != nullNodePtr);

@@ -1,5 +1,6 @@
 #pragma once
 #include "textOut.h"
+#include "stream.h"
 
 using namespace nechto;
 
@@ -22,6 +23,7 @@ class commandLine
 	std::string commandIsCorrect	(std::string& line);
 	std::string commandConnections	(std::string& line);
 	std::string commandDisconnect	(std::string& line);
+	std::string commandStartSave(std::string& line);
 public:
 	nodePtr stoptr(std::string& line);
 

@@ -57,7 +57,10 @@
     <ClInclude Include="tag.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="nechtoFileStream.h">
+    <ClInclude Include="stream.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="fileSave.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

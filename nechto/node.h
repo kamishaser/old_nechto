@@ -41,7 +41,7 @@ namespace nechto
 			node* operator-> () const;
 			node* operator* () const;
 		};
-		
+		//внимание при смени типа, не забыть поменять в stream
 		std::atomic<size_t> data = 0;
 		std::atomic<ushort> type;
 		std::atomic<ushort> subtype;

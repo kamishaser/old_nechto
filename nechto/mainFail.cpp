@@ -5,7 +5,7 @@
 #include "typeNames.h"
 #include "commandLine.h"
 #include "tag.h"
-#include "nechtoFileStream.h"
+#include "stream.h"
 
 #include <iostream>
 #include <exception>
@@ -13,6 +13,50 @@
 
 using namespace nechto;
 
+/*
+	* попытка описать способ храниени€ информации в json стиле
+	"nodeList":
+	[
+		"node":
+		{
+			"address": ... ...
+			"type":    ...
+			"subtype": ...
+			"data":    ...
+
+			"additionalDataLenght": ... //uint32_t
+			//дополнительные данные ноды. „то там записано сей алгоритм не знает
+			"addeteionalData": "...",
+
+			"numberedConnections":
+			[
+				"con0":
+				{
+				"address": ... ...
+				"backNumber":  ...
+				},
+				"con1": ...
+				"con2": ...
+				"con3": ...
+			],
+			"hubConnections":
+			//соединени€ только с теми объектами, которые уже сохранены
+			[
+				"hubcon":
+				{
+				"address": ... ...
+				"backNumber":  ...
+				},
+				"hubcon": ...,
+				...
+				nullNodePtr //разделитель
+			]
+		}
+		...
+	]
+	nullNodePtr
+	}
+	*/
 
 int main()
 {
