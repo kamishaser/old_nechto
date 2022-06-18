@@ -1,6 +1,8 @@
 #pragma once
 #include "node.h"
-#include <filesystem>
+#include "nodeTypeProperties.h"
+
+#include "textOut.h"
 #include <functional>
 #include <map>
 #include <set>
@@ -73,9 +75,10 @@ namespace nechto
 		//то есть на второй сохраняемой ноде
 	private:
 		const char hubBack = -1;
+
 		std::set<nodePtr> savedNodes;//список сохранённых нод
 
-
+		
 		//std::ofstream out;//поток файлового сохранения
 		
 		
@@ -133,7 +136,8 @@ namespace nechto
 		}
 		void save(const nodePtr v1)
 		{//сохранение ноды
-			if (savedNodes.contains(v1))
+			assert(v1->type != node::Hub);
+			if (isSaved(v1))
 				return;
 			savedNodes.insert(v1);//добавление в список сохранённых
 			
@@ -143,15 +147,22 @@ namespace nechto
 			auto data    = v1->data.load();
 			writeElement(&v1);		//адрес
 			writeElement(&type);
-			writeElement(&subtype);
-			writeElement(&data);
-			std::string adData = getAdditionalNodeData(v1);
-			const uint32_t adDataSize = adData.size();
-			writeElement(&adDataSize);
-			for (uint32_t i = 0; i < adDataSize; i++)
+			if(hasSubType(v1))
+				writeElement(&subtype);
+			if(hasStaticData(v1))
+				writeElement(&data);
+			if (hasStaticAdData(v1))
 			{
-				char temp = adData[i];
-				writeElement(&temp);
+				std::string adData;
+				if (getAdditionalNodeData != nullptr)
+					adData = getAdditionalNodeData(v1);
+				const uint32_t adDataSize = static_cast<uint32_t>(adData.size());
+				writeElement(&adDataSize);
+				for (uint32_t i = 0; i < adDataSize; i++)
+				{
+					char temp = adData[i];
+					writeElement(&temp);
+				}
 			}
 
 			//2)сохранение нумерованных соединений
@@ -202,53 +213,72 @@ namespace nechto
 			//однако при загрузке им выдают новые адреса, по которым и надо коннектиться
 			while (true)
 			{
-				nodePtr conAddress;//адрес соединения
-				char backNumber;   //обратный номер
+				
 				ushort typeBuffer, subtypeBuffer;
 				size_t dataBuffer;
 				nodePtr oldAddress;
 				oldAddress = readAddress();
 				if (!oldAddress.exist())
 					break;
-				read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
-				read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
-				read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
-				nodePtr vload = newNode(typeBuffer, subtypeBuffer, dataBuffer);
+				nodePtr vload = newNode();
 				loadedNodes.emplace(oldAddress, vload);
-				int32_t adDataSize;
-				read(reinterpret_cast<char*>(&adDataSize), sizeof(adDataSize));
-				std::string adData;
-				if (adDataSize != 0)
+				read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
+				vload->type = typeBuffer;
+				if (hasSubType(vload))
 				{
-					adData.resize(adDataSize);
-					for (uint32_t i = 0; i < adDataSize; i++)
+					read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
+					vload->subtype = subtypeBuffer;
+				}
+				if (hasStaticData(vload))
+				{
+					read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
+					vload->data = dataBuffer;
+				}
+				std::string adData;
+				if (hasStaticAdData(vload))
+				{
+					uint32_t adDataSize;
+					read(reinterpret_cast<char*>(&adDataSize), sizeof(adDataSize));
+
+					if (adDataSize != 0)
 					{
-						char temp;
-						read(&temp, 1);
-						adData[i] = temp;
+						adData.resize(adDataSize);
+						for (uint32_t i = 0; i < adDataSize; i++)
+						{
+							char temp;
+							read(&temp, 1);
+							adData[i] = temp;
+						}
 					}
 				}
-				setAdditionalNodeData(vload, adData);
+				if(setAdditionalNodeData != nullptr)
+					setAdditionalNodeData(vload, adData);
 				for (int i = 0; i < 4; i++)
 				{
 					nodePtr conAddress = readAddress();
-					assert(loadedNodes.contains(conAddress));
-					conAddress = loadedNodes.at(conAddress);
 					char backNumber = readBackNumber();
+					
 					if (conAddress.exist())
-						if (backNumber == hubBack)
-							NumHubConnect(vload, conAddress, i);
-						else
-							NumNumConnect(vload, conAddress, i, backNumber);
+					{
+						assert(loadedNodes.contains(conAddress));
+						conAddress = loadedNodes.at(conAddress);
+						
+						if (conAddress.exist())
+							if (backNumber == hubBack)
+								NumHubConnect(vload, conAddress, i);
+							else
+								NumNumConnect(vload, conAddress, i, backNumber);
+					}
 
 				}
 				while (true)
 				{
 					nodePtr conAddress = readAddress();
-					assert(loadedNodes.contains(conAddress));
-					conAddress = loadedNodes.at(conAddress);
+					std::cout << to_string(conAddress) << std::endl;
 					if (!conAddress.exist())
 						break;
+					assert(loadedNodes.contains(conAddress));
+					conAddress = loadedNodes.at(conAddress);
 					char backNumber = readBackNumber();
 					if (backNumber != hubBack)
 						NumHubConnect(conAddress, vload, backNumber);

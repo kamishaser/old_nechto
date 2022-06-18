@@ -137,8 +137,9 @@
     <ClInclude Include="externalFunction.h" />
     <ClInclude Include="lowLevelGraphOperations.h" />
     <ClInclude Include="mathOperator.h" />
+    <ClInclude Include="nodeTypeProperties.h" />
     <ClInclude Include="stream.h" />
-    <ClInclude Include="fileSave.h" />
+    <ClInclude Include="fileStream.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="staticAllocator.h" />
     <ClInclude Include="baseValueTypes.h" />

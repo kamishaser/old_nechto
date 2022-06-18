@@ -60,7 +60,10 @@
     <ClInclude Include="stream.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="fileSave.h">
+    <ClInclude Include="fileStream.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeTypeProperties.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

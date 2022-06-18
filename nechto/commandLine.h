@@ -1,9 +1,14 @@
 #pragma once
 #include "textOut.h"
-#include "stream.h"
+#include "fileStream.h"
+#include <filesystem>
 
 using namespace nechto;
 
+void loadNode(nodePtr v1, std::string trash)
+{
+	std::cout << nodeProperties(v1) << std::endl;
+}
 class commandLine
 {
 	nodePtr v1;
@@ -23,11 +28,18 @@ class commandLine
 	std::string commandIsCorrect	(std::string& line);
 	std::string commandConnections	(std::string& line);
 	std::string commandDisconnect	(std::string& line);
-	std::string commandStartSave(std::string& line);
+
+	const std::filesystem::path filePath;
+	fileStream filehan;
+	std::string commandSave			(std::string& line);
+	std::string commandIsSaved		(std::string& line);
+	std::string commandEndSave		(std::string& line);
+	std::string commandLoad			(std::string& line);
 public:
 	nodePtr stoptr(std::string& line);
 
 	commandLine()
+		:filehan(nullptr, loadNode), filePath("conSave.nechto")
 	{
 		v1 = newNode();
 	}
@@ -45,10 +57,17 @@ public:
 		if (command == "go")			return commandGo(line);
 		if (command == "this")			return commandThis(line);
 		if (command == "step") 			return commandStep(line);
-		if (command == "setData") 			return commandSetData(line);
+		if (command == "setData") 		return commandSetData(line);
 		if (command == "setType")		return commandSetType(line);
 		if (command == "setSubtype")	return commandSetSubtype(line);
 		if (command == "isCorrect")		return commandIsCorrect(line);
+
+		if (command == "save")			return commandSave(line);
+		if (command == "isSaved")		return commandIsSaved(line);
+		if (command == "endSave")		return commandEndSave(line);
+		if (command == "load")			return commandLoad(line);
+
+		
 		return "unknown command";
 
 	}
@@ -258,4 +277,37 @@ std::string commandLine::commandIsCorrect(std::string& line)
 		return "the node is correct";
 	else
 		return "the node isn't correct";
+}
+
+std::string commandLine::commandSave(std::string& line)
+{
+	if (!filehan.isOpen())
+		filehan.sOpen(filePath);
+	if (!filehan.isOpen())
+		return "error";
+	if (!filehan.isSaved(v1))
+		filehan.save(v1);
+	else return "error";
+	return "success";
+}
+std::string commandLine::commandEndSave(std::string& line)
+{
+	if (!filehan.isOpen())
+		return "error";
+	filehan.close();
+	return "success";
+}
+std::string commandLine::commandLoad(std::string& line)
+{
+	if (filehan.load(filePath))
+		return "success";
+	else
+		return "error";
+}
+std::string commandLine::commandIsSaved(std::string& line)
+{
+	if (filehan.isSaved(v1))
+		return "true";
+	else
+		return "false";
 }

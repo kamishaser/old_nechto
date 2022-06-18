@@ -9,9 +9,10 @@ namespace nechto
 	//сравнение типов
 	bool typeCompare(nodePtr v1, ushort type);
 	//проверка наличия соединения
-	bool isConnectionForNumberExist(nodePtr v1, ushort number);
 	bool isHubExist(nodePtr v1);
 	bool isNodeHasConnections(nodePtr v1);
+	bool hasConnection(nodePtr v1, nodePtr v2);
+	bool hasMultipleConnection(nodePtr v1);
 	//создание
 	const nodePtr newNode();
 	const nodePtr newNode(ushort type, ushort subtype = 0, size_t data = 0);
@@ -31,6 +32,7 @@ namespace nechto
 	void disconnect(nodePtr v1, nodePtr v2);
 	//удаление
 	void deleteNode(nodePtr v);
+	//анализ
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
@@ -40,11 +42,6 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//проверка наличия соединения
-	bool isConnectionForNumberExist(nodePtr v1, ushort number)
-	{
-		assert(number < 4);
-		return v1->connection[number].load().exist();
-	}
 	bool isHubExist(nodePtr v1)
 	{
 		return v1->hubConnection.load().exist();
@@ -52,12 +49,11 @@ namespace nechto
 	bool isNodeHasConnections(nodePtr v1)
 	{
 		for (int i = 0; i < 4; i++)
-			if (isConnectionForNumberExist(v1, i))
+			if (v1->hasConnection(i))
 				return true;
 		if (isHubExist(v1)) return true;
 		return false;
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
 	const nodePtr newNode()

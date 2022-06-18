@@ -40,6 +40,21 @@ namespace nechto
 			}
 			node* operator-> () const;
 			node* operator* () const;
+
+			bool operator<(const ptr& v2)const
+			{
+				const void* v1p = this;
+				const void* v2p = &v2;
+				return *reinterpret_cast<const uint32_t*>(v1p) < *reinterpret_cast<const uint32_t*>(v2p);
+			}
+			bool operator==(const ptr& v2)const
+			{
+				return (first == v2.first) && (second == v2.second);
+			}
+			bool operator!=(const ptr& v2)const
+			{
+				return !(first == v2.first) && (second == v2.second);
+			}
 		};
 		//внимание при смени типа, не забыть поменять в stream
 		std::atomic<size_t> data = 0;
