@@ -10,25 +10,43 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <functional>
 
+class commandLine;
 namespace nechto
 {
+	namespace nodeStorage
+	{
+		class Terminal;
+	}
+	
 	using ushort = unsigned short;
 	struct node //один узел nechto
  	{
-		struct ptr
+		class ptr
 		{
 			ushort first;
 			ushort second;
 
-			ptr(ushort f = 0, ushort s = 0){
+			ptr(ushort f, ushort s){
 				first = f;
 				second = s;
 			}
-			ptr(std::pair<ushort, ushort> address)
+			friend class nodeStorage::Terminal;
+			friend class commandLine;
+		public:
+			ushort getFirst() const
 			{
-				first = address.first;
-				second = address.second;
+				return first;
+			}
+			ushort getSecond() const
+			{
+				return second;
+			}
+			ptr()
+			{
+				first = 0;
+				second = 0;
 			}
 			bool exist() const
 			{
@@ -53,13 +71,13 @@ namespace nechto
 			}
 			bool operator!=(const ptr& v2)const
 			{
-				return !(first == v2.first) && (second == v2.second);
+				return (first != v2.first) || (second != v2.second);
 			}
 		};
 		//внимание при смени типа, не забыть поменять в stream
 		std::atomic<size_t> data = 0;
-		std::atomic<ushort> type;
-		std::atomic<ushort> subtype;
+		std::atomic<char> type;
+		std::atomic<char> subtype;
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 
@@ -114,7 +132,9 @@ namespace nechto
 	};
 
 	using nodePtr = node::ptr;
-	const nodePtr nullNodePtr(0, 0); //аналог nullptr
+	using nodeEvent = std::function<void(nodePtr)>;
+	using nodeConnectionEvent = std::function<void(nodePtr, nodePtr)>;
+	const nodePtr nullNodePtr = nodePtr(); //аналог nullptr
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -123,23 +143,23 @@ namespace nechto
 	namespace nodeStorage
 	{
 		const int maxNumOfAllocators = 16; //максимальное количество выделяемых аллокаторов
-		std::unique_ptr<staticAllocator<node>> content[maxNumOfAllocators]; //массив контейнеров
-		ushort occupancy[maxNumOfAllocators]; //массив занятости
-		std::atomic<ushort> sflag; //номер занимаемого контейнера
-		std::atomic<ushort> freeSpace; //количество созданных контейнеров
+		static std::unique_ptr<staticAllocator<node>> content[maxNumOfAllocators]; //массив контейнеров
+		static ushort occupancy[maxNumOfAllocators]; //массив занятости
+		static std::atomic<ushort> sflag; //номер занимаемого контейнера
+		static std::atomic<ushort> freeSpace; //количество созданных контейнеров
 
-		std::mutex changeAllocatorBlock;
+		static std::mutex changeAllocatorBlock;
 
 
 
-		void toFreeAllocator(ushort number)//освобождение контейнера
+		static void toFreeAllocator(ushort number)//освобождение контейнера
 		{
 			changeAllocatorBlock.lock();
 			occupancy[sflag.fetch_add(-1)] = number;
 			++freeSpace;
 			changeAllocatorBlock.unlock();
 		}
-		ushort getFreeAllocator()//взятие контейнера
+		static ushort getFreeAllocator()//взятие контейнера
 		{
 			changeAllocatorBlock.lock();
 			--freeSpace;
@@ -169,11 +189,11 @@ namespace nechto
 			return content[number].get();
 		}
 
-		ushort getFreeSpace()
+		static ushort getFreeSpace()
 		{
 			return freeSpace;
 		}
-		void reset()
+		static void reset()
 		{//полный сброс хранилища. Опасная операция!
 			changeAllocatorBlock.lock();
 			for (int i = 0; i < maxNumOfAllocators; i++)

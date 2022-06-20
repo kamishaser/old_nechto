@@ -6,7 +6,7 @@
 
 namespace nechto
 {
-	nodePtr createNode(ushort type, ushort subtype)
+	nodePtr createNode(char type, char subtype)
 	{
 		nodePtr temp = newNode();
 		temp->type = type;

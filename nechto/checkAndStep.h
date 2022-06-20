@@ -44,9 +44,7 @@ namespace nechto
 		case node::ConditionalBranching:
 			return ((v1->hasConnection(0)) && (v1->connection[0].load()->type == node::Variable));
 		case node::ExteralFunction:
-			if (v1->getData<externalFunction*>()->isCorrect != nullptr
-				&& v1->getData<externalFunction*>()->Func != nullptr
-				&& v1->getData<externalFunction*>()->isCorrect(v1))
+			if (v1->getData<externalFunction*>()->isCorrect(v1))
 				return true;
 		default:
 			return false;

@@ -5,7 +5,7 @@ namespace nechto
 {
 	const std::string to_string(nodePtr address)
 	{
-		return static_cast<std::string>("[") + std::to_string((int)address.first) + ' ' + std::to_string((int)address.second) + ']';
+		return static_cast<std::string>("[") + std::to_string((int)address.getFirst()) + ' ' + std::to_string((int)address.getSecond()) + ']';
 	}
 	const std::string nodeType(nodePtr address)
 	{

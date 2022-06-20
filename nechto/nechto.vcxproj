@@ -144,6 +144,8 @@
     <ClInclude Include="externalFunction.h" />
     <ClInclude Include="lowLevelGraphOperations.h" />
     <ClInclude Include="mathOperator.h" />
+    <ClInclude Include="nechto.h" />
+    <ClInclude Include="nEvent.h" />
     <ClInclude Include="nodeTypeProperties.h" />
     <ClInclude Include="stream.h" />
     <ClInclude Include="fileStream.h" />

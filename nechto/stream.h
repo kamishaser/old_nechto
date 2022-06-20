@@ -2,7 +2,8 @@
 #include "node.h"
 #include "nodeTypeProperties.h"
 
-#include "textOut.h"
+#include "externalFunction.h"
+#include "tag.h"
 #include <functional>
 #include <map>
 #include <set>
@@ -114,8 +115,8 @@ namespace nechto
 		}
 
 	public:
-		std::function<std::string(nodePtr)>			getAdditionalNodeData = nullptr; 
-		std::function<void(nodePtr, std::string)>	setAdditionalNodeData = nullptr;
+		nodeEvent saveEvent = nullptr; 
+		nodeEvent loadEvent = nullptr;
 		//дополнительные данные ноды
 
 		std::function<void(const char*, uint32_t size)> write = nullptr;
@@ -154,8 +155,8 @@ namespace nechto
 			if (hasStaticAdData(v1))
 			{
 				std::string adData;
-				if (getAdditionalNodeData != nullptr)
-					adData = getAdditionalNodeData(v1);
+				if(v1->type == node::Tag)
+					adData = tag::getData(v1);
 				const uint32_t adDataSize = static_cast<uint32_t>(adData.size());
 				writeElement(&adDataSize);
 				for (uint32_t i = 0; i < adDataSize; i++)
@@ -164,7 +165,8 @@ namespace nechto
 					writeElement(&temp);
 				}
 			}
-
+			if (saveEvent != nullptr)
+				saveEvent(v1);
 			//2)сохранение нумерованных соединений
 			for (int i = 0; i < 4; i++)
 			{
@@ -214,7 +216,7 @@ namespace nechto
 			while (true)
 			{
 				
-				ushort typeBuffer, subtypeBuffer;
+				char typeBuffer, subtypeBuffer;
 				size_t dataBuffer;
 				nodePtr oldAddress;
 				oldAddress = readAddress();
@@ -250,9 +252,11 @@ namespace nechto
 							adData[i] = temp;
 						}
 					}
+					if (vload->type == node::Tag)
+						tag::setData(vload, adData);
 				}
-				if(setAdditionalNodeData != nullptr)
-					setAdditionalNodeData(vload, adData);
+				if (loadEvent != nullptr)
+					loadEvent(vload);
 				for (int i = 0; i < 4; i++)
 				{
 					nodePtr conAddress = readAddress();
@@ -267,7 +271,7 @@ namespace nechto
 							if (backNumber == hubBack)
 								NumHubConnect(vload, conAddress, i);
 							else
-								NumNumConnect(vload, conAddress, i, backNumber);
+								assert(false);
 					}
 
 				}

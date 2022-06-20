@@ -24,7 +24,6 @@ namespace nechto
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
 	void HubConnect(nodePtr v1, nodePtr v2);
 	//создание двухстороннего соединени
-	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
 	//разрыв соединения
@@ -60,16 +59,14 @@ namespace nechto
 	{
 		nodePtr v;
 		nodePtr temp = nodeStorage::terminal.allocate();
-		v.first  = temp.first;
-		v.second = temp.second;
+		v = temp;
 		return v;
 	}
-	const nodePtr newNode(ushort type, ushort subtype, size_t data)
+	const nodePtr newNode(char type, char subtype, size_t data)
 	{
 		nodePtr v;
 		nodePtr temp = nodeStorage::terminal.allocate();
-		v.first = temp.first;
-		v.second = temp.second;
+		v = temp;
 		v->type = type;
 		v->subtype = subtype;
 		v->data = data;
@@ -88,7 +85,6 @@ namespace nechto
 		nodePtr temp = nullNodePtr;//ввиду того, что compare_excha
 		if (!v1->hubConnection.compare_exchange_strong(temp, hub))
 			deleteNode(hub);
-		std::cout << v1->hubConnection.load().second << std::endl;
 		//если присоединить хаб не удалось, значит он уже есть
 	}
 	const nodePtr getHubParrent(const nodePtr hub)
@@ -136,14 +132,6 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание двухстороннего соединения
-	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2)
-	{
-		assert(v1 != nullNodePtr && v2 != nullNodePtr);
-		assert(v1->type != node::Hub);
-		assert(v2->type != node::Hub);
-		NumConnect(v1, v2, number1);
-		NumConnect(v2, v1, number2);
-	}
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
 		assert(v1 != nullNodePtr && v2 != nullNodePtr);

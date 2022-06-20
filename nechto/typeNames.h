@@ -11,7 +11,7 @@ namespace nechto
 {
 	namespace typeName
 	{
-		const ushort find(const std::vector<std::string>& NameSet, const std::string name)
+		const char find(const std::vector<std::string>& NameSet, const std::string name)
 		{
 			for (int i = 0; i < NameSet.size(); i++)
 				if (NameSet[i] == name)
@@ -36,7 +36,6 @@ namespace nechto
 		{
 			"Error",
 			"Int64",
-			"Float",
 			"Double",
 		};
 		
@@ -69,7 +68,7 @@ namespace nechto
 			"Decrement"			// --
 		};
 
-		ushort findSubType(ushort type, std::string subtypeName)
+		char findSubType(char type, std::string subtypeName)
 		{
 			switch (type)
 			{

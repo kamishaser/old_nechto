@@ -10,11 +10,10 @@ namespace nechto
 		stream			nechto_string;
 		std::fstream	string_file;
 	public:
-		explicit fileStream(std::function<std::string(nodePtr)>	getAdditionalNodeData = nullptr,
-			std::function<void(nodePtr, std::string)>	setAdditionalNodeData = nullptr)
+		explicit fileStream(nodeEvent saveEvent = nullptr, nodeEvent loadEvent = nullptr)
 		{
-			nechto_string.getAdditionalNodeData = getAdditionalNodeData;
-			nechto_string.setAdditionalNodeData = setAdditionalNodeData;
+			nechto_string.saveEvent = saveEvent;
+			nechto_string.loadEvent = loadEvent;
 			nechto_string.read = [&](char* c, int32_t s) {string_file.read(c, s); };
 			nechto_string.write = [&](const char* c, int32_t s) {string_file.write(c, s); };
 		}

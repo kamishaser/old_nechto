@@ -66,6 +66,12 @@
     <ClInclude Include="nodeTypeProperties.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="nechto.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="nEvent.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

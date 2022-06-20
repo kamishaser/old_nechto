@@ -5,7 +5,7 @@
 
 using namespace nechto;
 
-void loadNode(nodePtr v1, std::string trash)
+void loadNode(nodePtr v1)
 {
 	std::cout << nodeProperties(v1) << std::endl;
 }
@@ -109,7 +109,7 @@ std::string commandLine::commandNew(std::string& line)
 	if (line.empty())
 		return to_string(v1);
 	word = cutWord(line);
-	ushort type = typeName::find(typeName::nodeT, word);
+	char type = typeName::find(typeName::nodeT, word);
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + word);
 	v1->type = type;
@@ -140,7 +140,7 @@ std::string commandLine::commandSetType(std::string& line)
 {
 	if (line.empty())
 		return "error";
-	ushort type = typeName::find(typeName::nodeT, line);
+	char type = typeName::find(typeName::nodeT, line);
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + line);
 	v1->type = type;
@@ -150,7 +150,7 @@ std::string commandLine::commandSetSubtype(std::string& line)
 {
 	if (line.empty())
 		return "error";
-	ushort type = typeName::findSubType(v1->type, line);
+	char type = typeName::findSubType(v1->type, line);
 	if (type == 0)
 		return (to_string(v1) + "unknownSubype: " + line);
 	v1->subtype = type;
