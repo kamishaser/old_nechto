@@ -157,6 +157,11 @@ namespace nechto
 				std::string adData;
 				if(v1->type == node::Tag)
 					adData = tag::getData(v1);
+				if(v1->type == node::ExteralFunction)
+					if (v1->getData<externalFunction*>() == nullptr)
+						adData = "error";
+					else
+						adData = v1->getData<externalFunction*>()->name;
 				const uint32_t adDataSize = static_cast<uint32_t>(adData.size());
 				writeElement(&adDataSize);
 				for (uint32_t i = 0; i < adDataSize; i++)
@@ -207,7 +212,7 @@ namespace nechto
 			writeElement(&nullNodePtr);
 			return;
 		}
-		void load()
+		std::set<nodePtr> load()
 		{
 			std::map<nodePtr, nodePtr> loadedNodes;//map загруженных нод
 			//ноды сохраняются с теми адресами, которые занимали на момент сохранения
@@ -254,6 +259,13 @@ namespace nechto
 					}
 					if (vload->type == node::Tag)
 						tag::setData(vload, adData);
+					if (vload->type == node::ExteralFunction)
+					{
+						if (!isExternalFunctionExist(adData))
+							vload->setData(getExternalFunction("error"));
+						else
+							vload->setData(getExternalFunction(adData));
+					}
 				}
 				if (loadEvent != nullptr)
 					loadEvent(vload);
@@ -278,7 +290,6 @@ namespace nechto
 				while (true)
 				{
 					nodePtr conAddress = readAddress();
-					std::cout << to_string(conAddress) << std::endl;
 					if (!conAddress.exist())
 						break;
 					assert(loadedNodes.contains(conAddress));
@@ -290,6 +301,10 @@ namespace nechto
 						HubHubConnect(conAddress, vload);
 				}
 			}
+			std::set<nodePtr> lNodes;
+			for (auto i = loadedNodes.begin(); i != loadedNodes.end(); ++i)
+				lNodes.emplace(i->second);
+			return lNodes;	
 		}
 	};
 }

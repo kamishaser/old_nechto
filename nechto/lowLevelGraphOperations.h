@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <cassert>
+#include <set>
 
 namespace nechto
 {
@@ -31,7 +32,8 @@ namespace nechto
 	void disconnect(nodePtr v1, nodePtr v2);
 	//удаление
 	void deleteNode(nodePtr v);
-	//анализ
+	//список соединений
+	std::set<nodePtr>&& allNodeConnactions(nodePtr v1);
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
@@ -201,5 +203,23 @@ namespace nechto
 			nodeStorage::terminal.deallocate(vTemp);
 			vTemp = vHub;
 		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//список соединений
+	std::set<nodePtr>&& allNodeConnactions(nodePtr v1)
+	{
+		std::set<nodePtr> nodeSet;
+		while (true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (v1->hasConnection(i))
+					nodeSet.emplace(v1->connection[i]);
+			}
+			if (!v1->hasHub())
+				break;
+			v1 = v1->hubConnection;
+		}
+		return std::move(nodeSet);
 	}
 }

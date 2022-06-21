@@ -43,6 +43,13 @@ namespace nechto
 			default:
 				return "error";
 			}
+		case node::Tag:
+			return tag::getData(v1);
+		case node::ExteralFunction:
+			if (v1->getData<externalFunction*>() == nullptr)
+				return "nullptr Error";
+			else 
+				return v1->getData<externalFunction*>()->name;
 		}
 		return "error";
 	}
@@ -51,6 +58,6 @@ namespace nechto
 	{
 		if (v1 == nullNodePtr)
 			return "nullNodePtr";
-		return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
+		return std::string(to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1));
 	}
 }

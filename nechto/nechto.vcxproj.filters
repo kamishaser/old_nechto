@@ -72,6 +72,9 @@
     <ClInclude Include="nEvent.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="script.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

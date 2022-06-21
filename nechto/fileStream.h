@@ -40,16 +40,17 @@ namespace nechto
 			nechto_string.saveEnd();
 			string_file.close();
 		}
-		bool load(std::filesystem::path path)
+		std::set<nodePtr> load(std::filesystem::path path)
 		{
+			std::set<nodePtr> loadedNodes;
 			if (isOpen())
-				return false;
+				return std::move(loadedNodes);
 			string_file.open(path, std::ios::in | std::ios::binary);
 			if (!isOpen())
-				return false;
-			nechto_string.load();
+				return std::move(loadedNodes);
+			loadedNodes = nechto_string.load();
 			string_file.close();
-			return true;
+			return loadedNodes;
 		}
 	};
 }

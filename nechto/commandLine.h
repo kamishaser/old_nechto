@@ -29,7 +29,6 @@ class commandLine
 	std::string commandConnections	(std::string& line);
 	std::string commandDisconnect	(std::string& line);
 
-	const std::filesystem::path filePath;
 	fileStream filehan;
 	std::string commandSave			(std::string& line);
 	std::string commandIsSaved		(std::string& line);
@@ -39,7 +38,7 @@ public:
 	nodePtr stoptr(std::string& line);
 
 	commandLine()
-		:filehan(nullptr, loadNode), filePath("conSave.nechto")
+		:filehan(nullptr, loadNode)
 	{
 		v1 = newNode();
 	}
@@ -144,7 +143,7 @@ std::string commandLine::commandSetType(std::string& line)
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + line);
 	v1->type = type;
-	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
+	return nodeProperties(v1);
 }
 std::string commandLine::commandSetSubtype(std::string& line)
 {
@@ -154,7 +153,7 @@ std::string commandLine::commandSetSubtype(std::string& line)
 	if (type == 0)
 		return (to_string(v1) + "unknownSubype: " + line);
 	v1->subtype = type;
-	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1);
+	return nodeProperties(v1);
 }
 std::string commandLine::commandSetData(std::string& line)
 {
@@ -187,6 +186,15 @@ std::string commandLine::commandSetData(std::string& line)
 		default:
 			return "error";
 		}
+	case node::Tag:
+		tag::setData(v1, line);
+		return nodeProperties(v1);
+	case node::ExteralFunction:
+		if (!isExternalFunctionExist(line))
+			return "the function named " + line + " isn't exist";
+		v1->setData(getExternalFunction(line));
+		return nodeProperties(v1);
+
 	default:
 		break;
 	}
@@ -206,12 +214,16 @@ std::string commandLine::commandNumHub(std::string& line)
 	if (!v2.exist())
 		return "error";
 	ushort nc1;
-	try { nc1 = std::stoi(cutWord(line)); }
+	try 
+	{ 
+		nc1 = std::stoi(cutWord(line)); 
+		NumHubConnect(v1, v2, nc1);
+	}
 	catch (std::exception e)
 	{
 		return e.what();
 	}
-	NumHubConnect(v1, v2, nc1);
+	
 	return to_string(v1);
 }
 std::string commandLine::commandHubNum(std::string& line)
@@ -220,12 +232,16 @@ std::string commandLine::commandHubNum(std::string& line)
 	if (!v2.exist())
 		return "error";
 	ushort nc1;
-	try { nc1 = std::stoi(cutWord(line)); }
+	try 
+	{ 
+		nc1 = std::stoi(cutWord(line)); 
+		NumHubConnect(v2, v1, nc1);
+	}
 	catch (std::exception e)
 	{
 		return e.what();
 	}
-	NumHubConnect(v2, v1, nc1);
+	
 	return to_string(v1);
 }
 std::string commandLine::commandGo(std::string& line)
@@ -281,8 +297,9 @@ std::string commandLine::commandIsCorrect(std::string& line)
 
 std::string commandLine::commandSave(std::string& line)
 {
+	std::filesystem::path path(line);
 	if (!filehan.isOpen())
-		filehan.sOpen(filePath);
+		filehan.sOpen(path);
 	if (!filehan.isOpen())
 		return "error";
 	if (!filehan.isSaved(v1))
@@ -299,7 +316,8 @@ std::string commandLine::commandEndSave(std::string& line)
 }
 std::string commandLine::commandLoad(std::string& line)
 {
-	if (filehan.load(filePath))
+	std::filesystem::path path(line);;
+	if (!filehan.load(path).empty())
 		return "success";
 	else
 		return "error";

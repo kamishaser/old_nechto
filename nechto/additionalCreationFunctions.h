@@ -30,7 +30,7 @@ namespace nechto
 		NumHubConnect(temp, to, 0);
 		return temp;
 	}
-	nodePtr createMathOperator(ushort subtype, nodePtr result,
+	nodePtr createMathOperator(char subtype, nodePtr result,
 		nodePtr first = nullNodePtr, nodePtr second = nullNodePtr)
 	{
 		nodePtr temp = newNode();
@@ -53,6 +53,15 @@ namespace nechto
 		NumHubConnect(temp, condition, 0);
 		if (truthWay.exist())NumHubConnect(temp, truthWay, 1);
 		if (wrongWay.exist())NumHubConnect(temp, wrongWay, 2);
+		return temp;
+	}
+	nodePtr createExternalFunction(std::string funName)
+	{
+		if (!isExternalFunctionExist(funName))
+			return nullNodePtr;
+		nodePtr temp = newNode();
+		temp->type = node::ExteralFunction;
+		temp->setData(getExternalFunction(funName));
 		return temp;
 	}
 

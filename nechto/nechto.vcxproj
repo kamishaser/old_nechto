@@ -147,6 +147,7 @@
     <ClInclude Include="nechto.h" />
     <ClInclude Include="nEvent.h" />
     <ClInclude Include="nodeTypeProperties.h" />
+    <ClInclude Include="script.h" />
     <ClInclude Include="stream.h" />
     <ClInclude Include="fileStream.h" />
     <ClInclude Include="node.h" />
