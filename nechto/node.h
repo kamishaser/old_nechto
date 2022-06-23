@@ -56,8 +56,11 @@ namespace nechto
 			{
 				return exist();
 			}
-			node* operator-> () const;
-			node* operator* () const;
+			node* operator-> ();
+			node* operator* ();
+
+			const node* operator-> () const;
+			const node* operator* () const;
 
 			bool operator<(const ptr& v2)const
 			{
@@ -74,10 +77,9 @@ namespace nechto
 				return (first != v2.first) || (second != v2.second);
 			}
 		};
-		//внимание при смени типа, не забыть поменять в stream
-		std::atomic<size_t> data = 0;
-		std::atomic<char> type;
-		std::atomic<char> subtype;
+		std::atomic<size_t> data = 0;//данные ноды
+		std::atomic<char> type;//тип ноды
+		std::atomic<char> subtype;//подти ноды
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 
@@ -271,12 +273,23 @@ namespace nechto
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	node* node::ptr::operator-> () const
+	node* node::ptr::operator-> ()
 	{
 		assert(*this != nullNodePtr);
 		return nodeStorage::getAllocator(first)->get(second);
 	}
-	node* node::ptr::operator* () const
+	node* node::ptr::operator* ()
+	{
+		assert(*this != nullNodePtr);
+		return nodeStorage::getAllocator(first)->get(second);
+	}
+
+	const node* node::ptr::operator-> () const
+	{
+		assert(*this != nullNodePtr);
+		return nodeStorage::getAllocator(first)->get(second);
+	}
+	const node* node::ptr::operator* () const
 	{
 		assert(*this != nullNodePtr);
 		return nodeStorage::getAllocator(first)->get(second);

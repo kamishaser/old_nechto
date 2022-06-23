@@ -36,8 +36,6 @@ namespace nechto
 			{
 			case baseValueType::Int64:
 				return std::to_string(*static_cast<int64_t*>(temptr));
-			case baseValueType::Float:
-				return std::to_string(*static_cast<float*>(temptr));
 			case baseValueType::Double:
 				return std::to_string(*static_cast<double*>(temptr));
 			default:

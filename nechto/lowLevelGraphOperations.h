@@ -5,6 +5,11 @@
 #include <cassert>
 #include <set>
 
+#include "baseValueTypes.h"
+#include "mathOperator.h"
+#include "tag.h"
+#include "externalFunction.h"
+
 namespace nechto
 {
 	//сравнение типов
@@ -188,6 +193,7 @@ namespace nechto
 	{
 		assert(!isNodeHasConnections(v1));
 		nodePtr vTemp = v1;
+
 		while (true)
 		{//цикл удаления узла со всеми хабами
 			for (int i = 0; i < 4; i++)//разрыв соединения

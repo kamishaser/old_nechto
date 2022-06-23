@@ -60,20 +60,31 @@ int main()
 		variableAtNullConnection,
 		[](nodePtr v1)
 		{
-			
-			double temp;
 			if (v1->connectionSubtype(0) == baseValueType::Int64)
 			{
-				int64_t temp;
+				std::string temp;
 				std::cin >> temp;
-				v1->connection[0].load()->setData<int64_t>(temp);
+				try
+				{ v1->connection[0].load()->setData<int64_t>(std::stoll(temp)); }
+				catch(...)
+				{
+					v1->connection[0].load()->setData<int64_t>(0);
+				}
+				
 				return;
 			}
 			if (v1->connectionSubtype(0) == baseValueType::Double)
 			{
-				double temp;
+				std::string temp;
 				std::cin >> temp;
-				v1->connection[0].load()->setData<double>(temp);
+				try
+				{
+					v1->connection[0].load()->setData<double>(std::stod(temp));
+				}
+				catch (...)
+				{
+					v1->connection[0].load()->setData<double>(0);
+				}
 				return;
 			}
 			return;
@@ -87,8 +98,7 @@ int main()
 			std::cout << nodeProperties(v1->connection[0].load()) << std::endl;
 		}
 	));
-	
-	/*commandLine c;
+	commandLine c;
 	while (true)
 	{
 		try
@@ -102,11 +112,11 @@ int main()
 		{
 			std::cout << e.what() << std::endl;
 		}
-	}*/
-	createCalculator()();
+	}
+	/*createCalculator()();
 	fileStream scrSave;
 	std::set<nodePtr> temp = scrSave.load("script.nechto");
 	assert(!temp.empty());
 	script scr(*temp.begin());
-	scr();
+	scr();*/
 }

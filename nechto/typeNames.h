@@ -36,7 +36,6 @@ namespace nechto
 		{
 			"Error",
 			"Int64",
-			"Float",
 			"Double",
 		};
 		

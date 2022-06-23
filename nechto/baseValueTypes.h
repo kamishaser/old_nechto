@@ -13,7 +13,6 @@ namespace nechto
 		{
 			Error,
 			Int64,
-			Float,
 			Double,
 			
 		};
@@ -23,7 +22,7 @@ namespace nechto
 	{
 		assert(isTypeCastOperatorCorrect(typeCastOperator));
 		size_t buffer = 0;
-		ushort varType[2];
+		ushort varType[2]{0,0};
 		buffer = typeCastOperator->connection[1].load()->data.load();
 		varType[0] = typeCastOperator->connection[0].load()->subtype;
 		varType[1] = typeCastOperator->connection[1].load()->subtype;
@@ -55,8 +54,6 @@ namespace nechto
 		{
 		case baseValueType::Int64:
 			return static_cast<bool>(*static_cast<int64_t*>(temprt));
-		case baseValueType::Float:
-			return static_cast<bool>(*static_cast<float*>(temprt));
 		case baseValueType::Double:
 			return static_cast<bool>(*static_cast<double*>(temprt));
 		default:
@@ -75,24 +72,8 @@ namespace nechto
 			case baseValueType::Int64:
 				*static_cast<int64_t*>(to) = static_cast<int64_t>(*static_cast<int64_t*>(from));
 				return;
-			case baseValueType::Float:
-				*static_cast<int64_t*>(to) = static_cast<int64_t>(*static_cast<float*>(from));
-				return;
 			case baseValueType::Double:
 				*static_cast<int64_t*>(to) = static_cast<int64_t>(*static_cast<double*>(from));
-				return;
-			}
-		case baseValueType::Float:
-			switch (fromType)
-			{
-			case baseValueType::Int64:
-				*static_cast<float*>(to) = static_cast<float>(*static_cast<int64_t*>(from));
-				return;
-			case baseValueType::Float:
-				*static_cast<float*>(to) = static_cast<float>(*static_cast<float*>(from));
-				return;
-			case baseValueType::Double:
-				*static_cast<float*>(to) = static_cast<float>(*static_cast<double*>(from));
 				return;
 			}
 		case baseValueType::Double:
@@ -100,9 +81,6 @@ namespace nechto
 			{
 			case baseValueType::Int64:
 				*static_cast<double*>(to) = static_cast<double>(*static_cast<int64_t*>(from));
-				return;
-			case baseValueType::Float:
-				*static_cast<double*>(to) = static_cast<double>(*static_cast<float*>(from));
 				return;
 			case baseValueType::Double:
 				*static_cast<double*>(to) = static_cast<double>(*static_cast<double*>(from));

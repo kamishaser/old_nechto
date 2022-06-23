@@ -112,13 +112,17 @@ std::string commandLine::commandNew(std::string& line)
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + word);
 	v1->type = type;
-	if (line.empty())
-		return to_string(v1);
-	word = cutWord(line);
-	type = typeName::findSubType(type, word);
-	if (type == 0)
-		return (to_string(v1) + "unknownSubype: " + word);
-	v1->subtype = type;
+	if (hasSubType(v1))
+	{
+		
+		if (line.empty())
+			return to_string(v1);
+		word = cutWord(line);
+		type = typeName::findSubType(type, word);
+		if (type == 0)
+			return (to_string(v1) + "unknownSubype: " + word);
+		v1->subtype = type;
+	}
 	return to_string(v1);
 }
 
@@ -160,9 +164,8 @@ std::string commandLine::commandSetData(std::string& line)
 	if (line.empty())
 		return "error";
 	nodePtr ptemp;
-	int64_t itemp;
-	float   ftemp;
-	double  dtemp;
+	int64_t itemp = 0;
+	double  dtemp = 0;
 	switch (v1->type.load())
 	{
 	case node::Variable:
@@ -172,11 +175,6 @@ std::string commandLine::commandSetData(std::string& line)
 			try { itemp = std::stoll(line); }
 			catch (...) { return "error"; }
 			v1->setData<int64_t>(itemp);
-			return commandThis(line);
-		case baseValueType::Float:
-			try { ftemp = std::stof(line); }
-			catch (...) { return "error"; }
-			v1->setData<float>(ftemp);
 			return commandThis(line);
 		case baseValueType::Double:
 			try { dtemp = std::stod(line); }

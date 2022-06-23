@@ -6,11 +6,17 @@ namespace nechto
 {
 	namespace tag
 	{
+		//таг - вспомогательная, не являющаяся частью исполняемого алгоритма информация
 		enum Type
 		{
 			Error,
-			Name,
 			Comment, //стандартный текстовый комментарий
+			Name,
+
+			ExternalConnection, //внешнее подключение. Данная нода может использоваться извне.
+			//ноду имеющую внешнее подключение нельзя удалять.
+			//комонента связности, не имеющаа внешнего подключение считается утеренной и 
+			//может быть удалена сборщиком мусора, (когда он будет разработан)
 		};
 		bool isCorrect(nodePtr tag)
 		{
@@ -28,60 +34,40 @@ namespace nechto
 			return true;
 		}
 
-		class nodeAddDataMapPart
-		{//часть словаря nodeData с нодами зранящимися в определённом аллокаторе
-			std::mutex mapBlock;
-			std::map<ushort, std::string> adData;
 
-		public:
-			void set(ushort address, std::string temp) noexcept
-			{
-				
-				mapBlock.lock();
-				if (adData.contains(address))
-					adData.at(address) = std::move(temp);
-				else
-					adData.emplace(address, std::move(temp));
-				
-				mapBlock.unlock();
-			}
-			std::string get(ushort address) noexcept
-			{
-				std::string temp;
-				mapBlock.lock();
-				if (adData.contains(address))
-					temp = adData.at(address);
-				else
-					temp = std::string();
-				std::cout << temp << ' ' << adData.size() << std::endl;
-				mapBlock.unlock();
-				return temp;
-			}
-			void erase(ushort address) noexcept
-			{
-				mapBlock.lock();
-				auto i = adData.find(address);
-				if (i != adData.end())
-					adData.erase(address);
-				mapBlock.unlock();
-			}
-		};
-		static nodeAddDataMapPart nodeAddDataMap[nodeStorage::maxNumOfAllocators];
-
-		void setData(nodePtr address, std::string& data) noexcept
+		void setData(nodePtr tag, std::string& data) noexcept
 		{
-			nodeAddDataMap[address.getFirst()].set(address.getSecond(), data);
+			std::cout << tag->getData<std::string*>() << std::endl;
+			if (tag->getData<std::string*>() == nullptr)
+				tag->setData(new std::string(data));
+			else
+				*tag->getData<std::string*>() = data;
 		}
-		std::string getData(nodePtr address) noexcept
+		std::string getData(nodePtr tag) noexcept
 		{
-			return nodeAddDataMap[address.getFirst()].get(address.getSecond());
+			if (tag->getData<std::string*>() == nullptr)
+				return std::string();
+			else
+				return *tag->getData<std::string*>();
 		}
-		void eraseAdData(nodePtr address) noexcept
+		void deleteData(nodePtr tag) noexcept
 		{
-			nodeAddDataMap[address.getFirst()].erase(address.getSecond());
+			if (tag->getData<std::string*>() != nullptr)
+				delete tag->getData<std::string*>();
+			tag->setData<std::string*>(nullptr);
 		}
 	}
 	//std::function<void(nodePtr, size_t)>addTag;
 	//std::function<nodePtr(size_t)> GetAddressByID;
 	//std::function<>
+	/*class externalConnection
+	{
+		nodePtr exConTag;
+	public:
+		externalConnection(nodePtr conNode)
+		{
+			if (conNode->type == node::Tag && conNode->subtype == tag::ExternalConnection)
+				exConTag = conNode;
+		}
+	};*/
 }

@@ -222,7 +222,7 @@ namespace nechto
 			{
 				
 				char typeBuffer, subtypeBuffer;
-				size_t dataBuffer;
+				size_t dataBuffer = 0;
 				nodePtr oldAddress;
 				oldAddress = readAddress();
 				if (!oldAddress.exist())
@@ -244,7 +244,7 @@ namespace nechto
 				std::string adData;
 				if (hasStaticAdData(vload))
 				{
-					uint32_t adDataSize;
+					uint32_t adDataSize = 0;
 					read(reinterpret_cast<char*>(&adDataSize), sizeof(adDataSize));
 
 					if (adDataSize != 0)
@@ -261,10 +261,9 @@ namespace nechto
 						tag::setData(vload, adData);
 					if (vload->type == node::ExteralFunction)
 					{
-						if (!isExternalFunctionExist(adData))
-							vload->setData(getExternalFunction("error"));
-						else
-							vload->setData(getExternalFunction(adData));
+						if (!isExternalFunctionExist(adData))//если функции нет, создаётся затычка, которую потом можно заместить
+							addExternalFunction(externalFunction(adData, [](nodePtr v1) {return false; }, nullptr));
+						vload->setData(getExternalFunction(adData));
 					}
 				}
 				if (loadEvent != nullptr)

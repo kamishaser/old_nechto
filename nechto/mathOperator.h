@@ -220,9 +220,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = unaryMinus<int64_t>(&firstValue);
 					break;
-				case baseValueType::Float:
-					temp = unaryMinus<float>(&firstValue);
-					break;
 				case baseValueType::Double:
 					temp = unaryMinus<double>(&firstValue);
 					break;
@@ -241,9 +238,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = addition<int64_t>(&firstValue, &secondValue);
 					break;
-				case baseValueType::Float:
-					temp = addition<float>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Double:
 					temp = addition<double>(&firstValue, &secondValue);
 					break;
@@ -259,9 +253,6 @@ namespace nechto
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
 					temp = substraction<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Float:
-					temp = substraction<float>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Double:
 					temp = substraction<double>(&firstValue, &secondValue);
@@ -279,9 +270,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = multiplication<int64_t>(&firstValue, &secondValue);
 					break;
-				case baseValueType::Float:
-					temp = multiplication<float>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Double:
 					temp = multiplication<double>(&firstValue, &secondValue);
 						break;
@@ -297,9 +285,6 @@ namespace nechto
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
 					temp = division<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Float:
-					temp = division<float>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Double:
 					temp = division<double>(&firstValue, &secondValue);
@@ -320,9 +305,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = equal<int64_t>(&firstValue, &secondValue);
 					break;
-				case baseValueType::Float:
-					temp = equal<float>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Double:
 					temp = equal<double>(&firstValue, &secondValue);
 					break;
@@ -341,9 +323,6 @@ namespace nechto
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
 					temp = notEqual<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Float:
-					temp = notEqual<float>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Double:
 					temp = notEqual<double>(&firstValue, &secondValue);
@@ -364,9 +343,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = less<int64_t>(&firstValue, &secondValue);
 					break;
-				case baseValueType::Float:
-					temp = less<float>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Double:
 					temp = less<double>(&firstValue, &secondValue);
 						break;
@@ -385,9 +361,6 @@ namespace nechto
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
 					temp = greater<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Float:
-					temp = greater<float>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Double:
 					temp = greater<double>(&firstValue, &secondValue);
@@ -408,9 +381,6 @@ namespace nechto
 				case baseValueType::Int64:
 					temp = lessOrEqual<int64_t>(&firstValue, &secondValue);
 					break;
-				case baseValueType::Float:
-					temp = lessOrEqual<float>(&firstValue, &secondValue);
-					break;
 				case baseValueType::Double:
 					temp = lessOrEqual<double>(&firstValue, &secondValue);
 						break;
@@ -429,9 +399,6 @@ namespace nechto
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
 					temp = greaterOrEqual<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Float:
-					temp = greaterOrEqual<float>(&firstValue, &secondValue);
 					break;
 				case baseValueType::Double:
 					temp = greaterOrEqual<double>(&firstValue, &secondValue);
@@ -648,7 +615,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 
@@ -664,7 +631,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 
@@ -680,7 +647,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 			case  Greater:		//////////////////////////////////////////////
@@ -695,7 +662,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 			case  LessOrEqual://////////////////////////////////////////////
@@ -710,7 +677,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 
@@ -726,7 +693,7 @@ namespace nechto
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
 					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -738,9 +705,9 @@ namespace nechto
 				if (operatorNode->connectionType(0) != node::Variable
 					|| operatorNode->connectionType(1) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(1) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(1) == baseValueType::Double)
 					return false;
 				break;
 
@@ -753,7 +720,7 @@ namespace nechto
 					|| operatorNode->connectionType(1) != node::Variable
 					|| operatorNode->connectionType(2) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
@@ -769,7 +736,7 @@ namespace nechto
 					|| operatorNode->connectionType(1) != node::Variable
 					|| operatorNode->connectionType(2) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
@@ -785,7 +752,7 @@ namespace nechto
 					|| operatorNode->connectionType(1) != node::Variable
 					|| operatorNode->connectionType(2) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				if (operatorNode->connectionSubtype(1)
 					!= operatorNode->connectionSubtype(2))
@@ -798,7 +765,7 @@ namespace nechto
 					return false;
 				if (operatorNode->connectionType(0) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 			case  Decrement://////////////////////////////////////////////
@@ -806,7 +773,7 @@ namespace nechto
 					return false;
 				if (operatorNode->connectionType(0) != node::Variable)
 					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) >= baseValueType::Float)
+				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
 					return false;//только целочисленное возвращаемое значение
 				break;
 			default:

@@ -40,7 +40,7 @@ namespace nechto
 			nechto_string.saveEnd();
 			string_file.close();
 		}
-		std::set<nodePtr> load(std::filesystem::path path)
+		std::set<nodePtr>&& load(std::filesystem::path path)
 		{
 			std::set<nodePtr> loadedNodes;
 			if (isOpen())
@@ -50,7 +50,7 @@ namespace nechto
 				return std::move(loadedNodes);
 			loadedNodes = nechto_string.load();
 			string_file.close();
-			return loadedNodes;
+			return std::move(loadedNodes);
 		}
 	};
 }

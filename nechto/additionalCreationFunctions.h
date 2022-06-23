@@ -86,45 +86,45 @@ namespace nechto
 		if (std::is_same<TCon, bool>())
 		{
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData<int64_t>(startValue);
+			temp->setData(static_cast<int64_t>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, long>())
 		{
 			assert(sizeof(TCon) == 4);
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData<int64_t>(startValue);
+			temp->setData(static_cast<int64_t>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, int>())
 		{
 			assert(sizeof(TCon) == 4);
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData<int64_t>(startValue);
+			temp->setData(static_cast<int64_t>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, int64_t>())
 		{
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData<int64_t>(startValue);
+			temp->setData(static_cast<int64_t>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, size_t>())
 		{
 			temp->subtype.store(baseValueType::Int64);
-			temp->setData<int64_t>(startValue);
+			temp->setData(static_cast<int64_t>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, float>())
 		{
-			temp->subtype.store(baseValueType::Float);
-			temp->setData(startValue);
+			temp->subtype.store(baseValueType::Double);
+			temp->setData(static_cast<double>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, double>())
 		{
 			temp->subtype.store(baseValueType::Double);
-			temp->setData(startValue);
+			temp->setData(static_cast<double>(startValue));
 			return temp;
 		}
 		throw;
