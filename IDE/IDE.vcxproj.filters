@@ -9,12 +9,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\analysis">
-      <UniqueIdentifier>{a8e21c20-5089-4f24-bc65-5b633a0a70a4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\NewFilter1">
-      <UniqueIdentifier>{daa267f8-046b-4734-ae19-b04388724083}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">

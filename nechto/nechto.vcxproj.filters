@@ -75,6 +75,9 @@
     <ClInclude Include="commandLine.h">
       <Filter>Исходные файлы\text</Filter>
     </ClInclude>
+    <ClInclude Include="externalConnection.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

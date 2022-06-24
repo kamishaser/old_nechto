@@ -1,6 +1,7 @@
 #pragma once
 #include "textOut.h"
 #include "fileStream.h"
+#include "externalConnection.h"
 #include <filesystem>
 
 using namespace nechto;
@@ -11,7 +12,7 @@ void loadNode(nodePtr v1)
 }
 class commandLine
 {
-	nodePtr v1;
+	externalConnection v1;
 	std::string cutWord				(std::string& line);
 	std::string commandNew			(std::string& line);
 	std::string commandDelete		(std::string& line);
@@ -38,7 +39,7 @@ public:
 	nodePtr stoptr(std::string& line);
 
 	commandLine()
-		:filehan(nullptr, loadNode)
+		:filehan(nullptr, loadNode), v1("")
 	{
 		v1 = newNode();
 	}
@@ -247,6 +248,9 @@ std::string commandLine::commandGo(std::string& line)
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
 		return "error";
+	if (v2->type == node::Tag)
+		if (v2->subtype == tag::ExternalConnection)
+			return "error: You can't go to External Connection";
 	v1 = v2;
 	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1);
 }

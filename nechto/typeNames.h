@@ -38,6 +38,14 @@ namespace nechto
 			"Int64",
 			"Double",
 		};
+
+		const std::vector<std::string> tagT
+		{
+			"Error",
+			"Comment",
+			"Name",
+			"ExternalConnaction"
+		};
 		
 		const std::vector<std::string> mathOperatorT
 		{
@@ -76,6 +84,8 @@ namespace nechto
 				return find(variableT, subtypeName);
 			case node::MathOperator:
 				return find(mathOperatorT, subtypeName);
+			case node::Tag:
+				return find(tagT, subtypeName);
 			default:
 				return 0;
 			}

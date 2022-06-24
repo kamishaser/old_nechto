@@ -36,7 +36,7 @@ namespace nechto
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
 	//удаление
-	void deleteNode(nodePtr v);
+	void deleteNode(nodePtr& v);
 	//список соединений
 	std::set<nodePtr>&& allNodeConnactions(nodePtr v1);
 	
@@ -44,16 +44,19 @@ namespace nechto
 	//сравнение типов
 	bool typeCompare(nodePtr v1, ushort type)
 	{
+		assert(v1 != nullNodePtr);
 		return v1->type.load() == type;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//проверка наличия соединения
 	bool isHubExist(nodePtr v1)
 	{
+		assert(v1 != nullNodePtr);
 		return v1->hubConnection.load().exist();
 	}
 	bool isNodeHasConnections(nodePtr v1)
 	{
+		assert(v1 != nullNodePtr);
 		for (int i = 0; i < 4; i++)
 			if (v1->hasConnection(i))
 				return true;
@@ -84,6 +87,7 @@ namespace nechto
 
 	void addHub(nodePtr v1)
 	{//добавление хаба к элементу
+		assert(v1 != nullNodePtr);
 		nodePtr hub = newNode();
 		hub->type.store(node::Hub);
 		hub->type.store(0);
@@ -189,9 +193,9 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// удаление
-	void deleteNode(nodePtr v1)
+	void deleteNode(nodePtr& v1)
 	{
-		assert(!isNodeHasConnections(v1));
+		assert(v1 != nullNodePtr);
 		nodePtr vTemp = v1;
 
 		while (true)
@@ -209,11 +213,13 @@ namespace nechto
 			nodeStorage::terminal.deallocate(vTemp);
 			vTemp = vHub;
 		}
+		v1 = nullNodePtr;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//список соединений
 	std::set<nodePtr>&& allNodeConnactions(nodePtr v1)
 	{
+		assert(v1 != nullNodePtr);
 		std::set<nodePtr> nodeSet;
 		while (true)
 		{
