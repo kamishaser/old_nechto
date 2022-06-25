@@ -7,50 +7,54 @@ namespace nechto
 {
 	class fileStream
 	{
-		stream			nechto_string;
-		std::fstream	string_file;
+		stream			nechtoStream;
+		std::fstream	fStream;
+
 	public:
-		explicit fileStream(nodeEvent saveEvent = nullptr, nodeEvent loadEvent = nullptr)
+		explicit fileStream()
+			:nechtoStream([&](const char* c, int32_t s) {fStream.write(c, s); },
+					[&](char* c, int32_t s) {fStream.read(c, s); }){}
+
+		bool saveStart(std::filesystem::path path)
 		{
-			nechto_string.saveEvent = saveEvent;
-			nechto_string.loadEvent = loadEvent;
-			nechto_string.read = [&](char* c, int32_t s) {string_file.read(c, s); };
-			nechto_string.write = [&](const char* c, int32_t s) {string_file.write(c, s); };
+			assert(!isOpen());
+			fStream.open(path, std::ios::out | std::ios::binary);
+			if (!fStream.is_open())
+				return false;
+			nechtoStream.saveStart();
+			return true;
 		}
-		bool sOpen(std::filesystem::path path)
+		bool loadStart(std::filesystem::path path)
 		{
-			string_file.open(path, std::ios::out | std::ios::binary);
-			return string_file.is_open();
+			assert(!isOpen());
+			fStream.open(path, std::ios::in  | std::ios::binary);
+			if (!fStream.is_open())
+				return false;
+			nechtoStream.loadStart();
+			return true;
 		}
 		bool isOpen()
 		{
-			return string_file.is_open();
+			return fStream.is_open();
 		}
 		bool isSaved(const nodePtr v1)
 		{
-			return nechto_string.isSaved(v1);
+			return nechtoStream.isSaved(v1);
 		}
 		void save(const nodePtr v1)
 		{
 			assert(isOpen());
-			nechto_string.save(v1);
+			nechtoStream.save(v1);
 		}
-		void close()
+		void end()
 		{
-			nechto_string.saveEnd();
-			string_file.close();
+			nechtoStream.end();
+			fStream.close();
 		}
-		std::set<nodePtr>&& load(std::filesystem::path path)
+		nodePtr load()
 		{
-			std::set<nodePtr> loadedNodes;
-			if (isOpen())
-				return std::move(loadedNodes);
-			string_file.open(path, std::ios::in | std::ios::binary);
-			if (!isOpen())
-				return std::move(loadedNodes);
-			loadedNodes = nechto_string.load();
-			string_file.close();
-			return std::move(loadedNodes);
+			assert(isOpen());
+			return nechtoStream.load();
 		}
 	};
 }

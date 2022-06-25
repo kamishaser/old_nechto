@@ -19,6 +19,8 @@ namespace nechto
 			return typeName::variableT[address->subtype];
 		case node::MathOperator:
 			return typeName::mathOperatorT[address->subtype];
+		case node::Tag:
+			return typeName::tagT[address->subtype];
 		default:
 			return "error";
 		}

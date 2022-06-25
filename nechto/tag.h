@@ -36,7 +36,7 @@ namespace nechto
 		}
 
 
-		void setData(nodePtr tag, std::string& data) noexcept
+		void setData(nodePtr tag, const std::string& data) noexcept
 		{
 			assert(tag != nullNodePtr);
 			assert(tag->type == node::Tag);

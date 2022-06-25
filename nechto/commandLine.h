@@ -33,16 +33,13 @@ class commandLine
 	fileStream filehan;
 	std::string commandSave			(std::string& line);
 	std::string commandIsSaved		(std::string& line);
-	std::string commandEndSave		(std::string& line);
+	std::string commandEnd		(std::string& line);
 	std::string commandLoad			(std::string& line);
 public:
 	nodePtr stoptr(std::string& line);
 
 	commandLine()
-		:filehan(nullptr, loadNode), v1("")
-	{
-		v1 = newNode();
-	}
+		:v1(std::string("commandLine")){}
 	std::string operator()(std::string line)
 	{
 		std::string command;
@@ -64,7 +61,7 @@ public:
 
 		if (command == "save")			return commandSave(line);
 		if (command == "isSaved")		return commandIsSaved(line);
-		if (command == "endSave")		return commandEndSave(line);
+		if (command == "end")			return commandEnd(line);
 		if (command == "load")			return commandLoad(line);
 
 		
@@ -119,7 +116,7 @@ std::string commandLine::commandNew(std::string& line)
 		if (line.empty())
 			return to_string(v1);
 		word = cutWord(line);
-		type = typeName::findSubType(type, word);
+		type = typeName::findSubtype(type, word);
 		if (type == 0)
 			return (to_string(v1) + "unknownSubype: " + word);
 		v1->subtype = type;
@@ -154,7 +151,7 @@ std::string commandLine::commandSetSubtype(std::string& line)
 {
 	if (line.empty())
 		return "error";
-	char type = typeName::findSubType(v1->type, line);
+	char type = typeName::findSubtype(v1->type, line);
 	if (type == 0)
 		return (to_string(v1) + "unknownSubype: " + line);
 	v1->subtype = type;
@@ -248,9 +245,6 @@ std::string commandLine::commandGo(std::string& line)
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
 		return "error";
-	if (v2->type == node::Tag)
-		if (v2->subtype == tag::ExternalConnection)
-			return "error: You can't go to External Connection";
 	v1 = v2;
 	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1);
 }
@@ -285,7 +279,11 @@ std::string commandLine::commandStep(std::string& line)
 {
 	if (!isCorrect(v1))
 		return "the node isn't correct";
-	step(v1);
+	nodePtr nPos = step(v1);
+	if (nPos.exist())
+		v1 = nPos;
+	else
+		return "end";
 	return commandThis(line);
 }
 //std::string commandLine::commandSet(std::string& line)
@@ -301,7 +299,7 @@ std::string commandLine::commandSave(std::string& line)
 {
 	std::filesystem::path path(line);
 	if (!filehan.isOpen())
-		filehan.sOpen(path);
+		filehan.saveStart(path);
 	if (!filehan.isOpen())
 		return "error";
 	if (!filehan.isSaved(v1))
@@ -309,20 +307,21 @@ std::string commandLine::commandSave(std::string& line)
 	else return "error";
 	return "success";
 }
-std::string commandLine::commandEndSave(std::string& line)
+std::string commandLine::commandEnd(std::string& line)
 {
 	if (!filehan.isOpen())
 		return "error";
-	filehan.close();
+	filehan.end();
 	return "success";
 }
 std::string commandLine::commandLoad(std::string& line)
 {
-	std::filesystem::path path(line);;
-	if (!filehan.load(path).empty())
-		return "success";
-	else
-		return "error";
+	std::filesystem::path path(line);
+	if (!filehan.isOpen())
+		filehan.loadStart(path);
+	if (!filehan.isOpen())
+		return "file " + path.string() + " isn't detected";
+	return nodeProperties(filehan.load());
 }
 std::string commandLine::commandIsSaved(std::string& line)
 {

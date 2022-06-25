@@ -53,7 +53,7 @@ namespace nechto
 		}
 	}
 	
-	bool step(nodePtr& flag)
+	nodePtr step(nodePtr flag)
 	{
 		assert(isCorrect(flag));
 		assert(isAction(flag));
@@ -64,29 +64,25 @@ namespace nechto
 			mathOperator::mathOperation(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
-				return false;
-			flag = nextPosition;
-			return true;
+				return nullNodePtr;
+			return nextPosition;
 		case node::TypeCastOperator:
 			typeCast(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
-				return false;
-			flag = nextPosition;
-			return true;
+				return nullNodePtr;
+			return nextPosition;
 		case node::ConditionalBranching:
 			nextPosition = (boolCast(flag->connection[0])) ? flag->connection[1] : flag->connection[2];
 			if (!nextPosition.exist())
-				return false;
-			flag = nextPosition;
-			return true;
+				return nullNodePtr;
+			return nextPosition;
 		case node::ExteralFunction:
 			(flag->getData<externalFunction*>())->Func(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
-				return false;
-			flag = nextPosition;
-			return true;
+				return nullNodePtr;
+			return nextPosition;
 		default: throw;
 		}
 	}

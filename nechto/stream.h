@@ -78,7 +78,10 @@ namespace nechto
 		const char hubBack = -1;
 
 		std::set<nodePtr> savedNodes;//список сохранённых нод
-
+		std::map<nodePtr, nodePtr> loadedNodes;//map загруженных нод
+		//ноды сохраняются с теми адресами, которые занимали на момент сохранения
+		//соответственно и связи прописаны по ним
+		//однако при загрузке им выдают новые адреса, по которым и надо коннектиться
 		
 		//std::ofstream out;//поток файлового сохранения
 		
@@ -114,29 +117,55 @@ namespace nechto
 			return backNumber;
 		}
 
+		bool saveMode  = false; //saveMode - true | loadMode - false
+		bool inProcess = false;
 	public:
-		nodeEvent saveEvent = nullptr; 
-		nodeEvent loadEvent = nullptr;
-		//дополнительные данные ноды
+		using saveFunType = std::function<void(const char*, uint32_t size)>;
+		using loadFunType =  std::function<void(char*, uint32_t size)>;
+	private:
+		saveFunType write = nullptr;
+		loadFunType  read = nullptr;
+	public:	
+		stream(saveFunType sf, loadFunType lf)
+			:write(sf), read(lf) {}
 
-		std::function<void(const char*, uint32_t size)> write = nullptr;
-		std::function<void(char*,		uint32_t size)> read  = nullptr;
-
-		void clear()
-		{//полная отчистка списка сохранённых нод
-			savedNodes.clear();
-		}
 		bool isSaved(nodePtr v1)
 		{//проверка сохранена ли нода
 			return savedNodes.contains(v1);
 		}
-		void saveEnd()
+		void saveStart()
 		{
-			writeElement(&nullNodePtr);
-			savedNodes.clear();
+			assert(!inProcess);
+			inProcess = true;
+			saveMode = true;
 		}
+		void loadStart()
+		{
+			assert(!inProcess);
+			inProcess = true;
+			saveMode = false;
+		}
+		void end()
+		{
+			assert(inProcess);
+			inProcess = false;
+			if (saveMode)
+			{
+				writeElement(&nullNodePtr);
+				savedNodes.clear();
+			}
+			else
+			{
+				inProcess = false;
+				loadedNodes.clear();
+			}
+		}
+
 		void save(const nodePtr v1)
 		{//сохранение ноды
+			assert(inProcess);
+			assert(saveMode);
+
 			assert(v1->type != node::Hub);
 			if (isSaved(v1))
 				return;
@@ -170,8 +199,6 @@ namespace nechto
 					writeElement(&temp);
 				}
 			}
-			if (saveEvent != nullptr)
-				saveEvent(v1);
 			//2)сохранение нумерованных соединений
 			for (int i = 0; i < 4; i++)
 			{
@@ -212,98 +239,86 @@ namespace nechto
 			writeElement(&nullNodePtr);
 			return;
 		}
-		std::set<nodePtr> load()
-		{
-			std::map<nodePtr, nodePtr> loadedNodes;//map загруженных нод
-			//ноды сохраняются с теми адресами, которые занимали на момент сохранения
-			//соответственно и связи прописаны по ним
-			//однако при загрузке им выдают новые адреса, по которым и надо коннектиться
-			while (true)
+		nodePtr load()
+		{	
+			assert(inProcess);
+			assert(!saveMode);
+			char typeBuffer, subtypeBuffer;
+			size_t dataBuffer = 0;
+			nodePtr oldAddress = readAddress();
+			if (!oldAddress.exist())
+				return nullNodePtr;
+			nodePtr vload = newNode();
+			loadedNodes.emplace(oldAddress, vload);
+			read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
+			vload->type = typeBuffer;
+			if (hasSubType(vload))
 			{
-				
-				char typeBuffer, subtypeBuffer;
-				size_t dataBuffer = 0;
-				nodePtr oldAddress;
-				oldAddress = readAddress();
-				if (!oldAddress.exist())
-					break;
-				nodePtr vload = newNode();
-				loadedNodes.emplace(oldAddress, vload);
-				read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
-				vload->type = typeBuffer;
-				if (hasSubType(vload))
-				{
-					read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
-					vload->subtype = subtypeBuffer;
-				}
-				if (hasStaticData(vload))
-				{
-					read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
-					vload->data = dataBuffer;
-				}
-				std::string adData;
-				if (hasStaticAdData(vload))
-				{
-					uint32_t adDataSize = 0;
-					read(reinterpret_cast<char*>(&adDataSize), sizeof(adDataSize));
+				read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
+				vload->subtype = subtypeBuffer;
+			}
+			if (hasStaticData(vload))
+			{
+				read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
+				vload->data = dataBuffer;
+			}
+			std::string adData;
+			if (hasStaticAdData(vload))
+			{
+				uint32_t adDataSize = 0;
+				read(reinterpret_cast<char*>(&adDataSize), sizeof(adDataSize));
 
-					if (adDataSize != 0)
+				if (adDataSize != 0)
+				{
+					adData.resize(adDataSize);
+					for (uint32_t i = 0; i < adDataSize; i++)
 					{
-						adData.resize(adDataSize);
-						for (uint32_t i = 0; i < adDataSize; i++)
-						{
-							char temp;
-							read(&temp, 1);
-							adData[i] = temp;
-						}
-					}
-					if (vload->type == node::Tag)
-						tag::setData(vload, adData);
-					if (vload->type == node::ExteralFunction)
-					{
-						if (!isExternalFunctionExist(adData))//если функции нет, создаётся затычка, которую потом можно заместить
-							addExternalFunction(externalFunction(adData, [](nodePtr v1) {return false; }, nullptr));
-						vload->setData(getExternalFunction(adData));
+						char temp;
+						read(&temp, 1);
+						adData[i] = temp;
 					}
 				}
-				if (loadEvent != nullptr)
-					loadEvent(vload);
-				for (int i = 0; i < 4; i++)
+				if (vload->type == node::Tag)
+					tag::setData(vload, adData);
+				if (vload->type == node::ExteralFunction)
 				{
-					nodePtr conAddress = readAddress();
-					char backNumber = readBackNumber();
-					
-					if (conAddress.exist())
-					{
-						assert(loadedNodes.contains(conAddress));
-						conAddress = loadedNodes.at(conAddress);
-						
-						if (conAddress.exist())
-							if (backNumber == hubBack)
-								NumHubConnect(vload, conAddress, i);
-							else
-								assert(false);
-					}
-
-				}
-				while (true)
-				{
-					nodePtr conAddress = readAddress();
-					if (!conAddress.exist())
-						break;
-					assert(loadedNodes.contains(conAddress));
-					conAddress = loadedNodes.at(conAddress);
-					char backNumber = readBackNumber();
-					if (backNumber != hubBack)
-						NumHubConnect(conAddress, vload, backNumber);
-					else
-						HubHubConnect(conAddress, vload);
+					if (!isExternalFunctionExist(adData))//если функции нет, создаётся затычка, которую потом можно заместить
+						addExternalFunction(externalFunction(adData, [](nodePtr v1) {return false; }, nullptr));
+					vload->setData(getExternalFunction(adData));
 				}
 			}
-			std::set<nodePtr> lNodes;
-			for (auto i = loadedNodes.begin(); i != loadedNodes.end(); ++i)
-				lNodes.emplace(i->second);
-			return lNodes;	
+			for (int i = 0; i < 4; i++)
+			{
+				nodePtr conAddress = readAddress();
+				char backNumber = readBackNumber();
+
+				if (conAddress.exist())
+				{
+					assert(loadedNodes.contains(conAddress));
+					conAddress = loadedNodes.at(conAddress);
+
+					if (conAddress.exist())
+						if (backNumber == hubBack)
+							NumHubConnect(vload, conAddress, i);
+						else
+							assert(false);
+				}
+
+			}
+			while (true)
+			{
+				nodePtr conAddress = readAddress();
+				if (!conAddress.exist())
+					break;
+				assert(loadedNodes.contains(conAddress));
+				conAddress = loadedNodes.at(conAddress);
+				char backNumber = readBackNumber();
+				if (backNumber != hubBack)
+					NumHubConnect(conAddress, vload, backNumber);
+				else
+					HubHubConnect(conAddress, vload);
+			}
+			return vload;
 		}
 	};
 }

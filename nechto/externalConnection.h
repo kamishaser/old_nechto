@@ -7,51 +7,74 @@ namespace nechto
 	class externalConnection
 	{
 		nodePtr exConTag;
-		std::string tName; //временное имя. Передаётся тегу при создании
 	public:
-		externalConnection(nodePtr conNode, std::string& name)
+		externalConnection(const std::string& name, const nodePtr conNode = nullNodePtr)
+			:exConTag(newNode(node::Tag, tag::ExternalConnection))
 		{
-			assert(conNode != nullNodePtr);
-			exConTag = newNode(node::Tag, tag::ExternalConnection);
 			tag::setData(exConTag, name);
+			if(conNode.exist())
+				NumHubConnect(exConTag, conNode, 0);
+		}
+		externalConnection& operator=(const nodePtr conNode)
+		{
+			disconnect(exConTag, exConTag->connection[0]);
 			NumHubConnect(exConTag, conNode, 0);
+			return *this;
 		}
-		explicit externalConnection(std::string& name)
-			:tName(name), exConTag(nullNodePtr);
-		void setConnaction(nodePtr connaction)
+		bool exist() { return exConTag->hasConnection(0); }
+		auto operator <=> (const externalConnection& exCon)
 		{
-			assert(connaction != nullNodePtr);
-			if (exConTag != nullNodePtr)
-			{
-				exConTag = newNode(node::Tag, tag::ExternalConnection);
-				tag::setData(exConTag, tName);
-				tName.clear();
-				NumHubConnect(exConTag, conNode, 0);
-			}
-			else
-			{
-				disconnect(exConTag, exConTag->connection[0]);
-				NumHubConnect(exConTag, conNode, 0);
-			}
+			return tag::getData(exConTag) <=> tag::getData(exCon.exConTag);
 		}
-		bool exist() { return exConTag != nullNodePtr; }
-		
-		operator nodePtr()
+		operator const nodePtr()
 		{
-			return (exConTag != nullNodePtr)
-				? exConTag->connection[0] : nullNodePtr;
+			return exConTag->connection[0];
 		}
 		node* operator->()
 		{
 			return *exConTag->connection[0].load();
 		}
-		int64_t getI()//возввращает целочисленное значение переменной
+		///////////////////////////////////////////////////
+		//дополнительные функции для работы с переменными
+
+		operator int64_t()//возввращает значение переменной
 		{
-			assert(exist());
 			nodePtr v1 = exConTag->connection[0];
-			assert(v1 != nullNodePtr);
+			assert(v1.exist());
 			assert(exConTag->type == node::Variable);
-			if ()
+			if (v1->subtype == baseValueType::Int64)
+				return v1->getData<int64_t>();
+			return static_cast<int64_t>(v1->getData<double>());
+		}
+		operator double()//возввращает значение переменной
+		{
+			nodePtr v1 = exConTag->connection[0];
+			assert(v1.exist());
+			assert(exConTag->type == node::Variable);
+			if (v1->subtype == baseValueType::Double)
+				return v1->getData<double>();
+			return static_cast<double>(v1->getData<int64_t>());
+		}
+
+		externalConnection& operator=(const int64_t value)
+		{
+			nodePtr v1 = exConTag->connection[0];
+			assert(v1.exist());
+			assert(exConTag->type == node::Variable);
+			if (v1->subtype == baseValueType::Int64)
+				v1->setData<int64_t>(value);
+			else
+				v1->setData<double>(static_cast<double>(value));
+		}
+		externalConnection& operator=(const double value)
+		{
+			nodePtr v1 = exConTag->connection[0];
+			assert(v1.exist());
+			assert(exConTag->type == node::Variable);
+			if (v1->subtype == baseValueType::Int64)
+				v1->setData<int64_t>(static_cast<int64_t>(value));
+			else
+				v1->setData<double>(value);
 		}
 	};
 }

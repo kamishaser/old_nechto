@@ -76,7 +76,7 @@ namespace nechto
 			"Decrement"			// --
 		};
 
-		char findSubType(char type, std::string subtypeName)
+		char findSubtype(char type, std::string subtypeName)
 		{
 			switch (type)
 			{

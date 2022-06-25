@@ -21,7 +21,7 @@ namespace nechto
 	bool hasMultipleConnection(nodePtr v1);
 	//создание
 	const nodePtr newNode();
-	const nodePtr newNode(ushort type, ushort subtype = 0, size_t data = 0);
+	const nodePtr newNode(char type, char subtype = 0, size_t data = 0);
 	
 	//операции с хабами
 	void addHub(nodePtr v1);
@@ -36,7 +36,7 @@ namespace nechto
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
 	//удаление
-	void deleteNode(nodePtr& v);
+	void deleteNode(nodePtr v);
 	//список соединений
 	std::set<nodePtr>&& allNodeConnactions(nodePtr v1);
 	
@@ -193,7 +193,7 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// удаление
-	void deleteNode(nodePtr& v1)
+	void deleteNode(nodePtr v1)
 	{
 		assert(v1 != nullNodePtr);
 		nodePtr vTemp = v1;

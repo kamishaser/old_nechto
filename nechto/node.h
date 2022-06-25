@@ -275,23 +275,23 @@ namespace nechto
 
 	node* node::ptr::operator-> ()
 	{
-		assert(*this != nullNodePtr);
+		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 	node* node::ptr::operator* ()
 	{
-		assert(*this != nullNodePtr);
+		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 
 	const node* node::ptr::operator-> () const
 	{
-		assert(*this != nullNodePtr);
+		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 	const node* node::ptr::operator* () const
 	{
-		assert(*this != nullNodePtr);
+		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);
 	}
 }

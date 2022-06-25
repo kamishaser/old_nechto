@@ -2,6 +2,10 @@
 #include "commandLine.h"
 #include "script.h"
 
+#include "SFML/Graphics.hpp"
+#include "SFML/Window.hpp"
+
+
 using namespace nechto;
 bool variableAtNullConnection(nodePtr v1)
 {
@@ -14,6 +18,8 @@ bool variableAtNullConnection(nodePtr v1)
 
 script createCalculator()
 {
+	sf::RenderWindow sff;
+
 	nodePtr sl1 = createVariable(0.0);
 	nodePtr sl2 = createVariable(0.0);
 	nodePtr result = createVariable(0.0);
@@ -31,10 +37,8 @@ script createCalculator()
 	NumHubConnect(summator, printer, 3);
 	NumHubConnect(printer, reader1, 3);
 
-	
-
 	fileStream scrSave;
-	scrSave.sOpen("script.nechto");
+	scrSave.saveStart("script.nechto");
 	scrSave.save(reader1);
 	scrSave.save(reader2);
 	scrSave.save(sl1);
@@ -42,7 +46,7 @@ script createCalculator()
 	scrSave.save(result);
 	scrSave.save(summator);
 	scrSave.save(printer);
-	scrSave.close();
+	scrSave.end();
 
 	assert(isCorrect(summator));
 
@@ -53,9 +57,27 @@ script createCalculator()
 int main()
 {
 	
-	
+	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+	sf::CircleShape shape(100.f);
+	shape.setFillColor(sf::Color::Green);
 
-	addExternalFunction(externalFunction(
+	while (window.isOpen())
+	{
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+
+		window.clear();
+		window.draw(shape);
+		window.display();
+	}
+
+	return 0;
+
+	/*addExternalFunction(externalFunction(
 		"consoleIn",
 		variableAtNullConnection,
 		[](nodePtr v1)
@@ -112,7 +134,7 @@ int main()
 		{
 			std::cout << e.what() << std::endl;
 		}
-	}
+	}*/
 	/*createCalculator()();
 	fileStream scrSave;
 	std::set<nodePtr> temp = scrSave.load("script.nechto");
