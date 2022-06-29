@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <functional>
+#include <compare>
 
 class commandLine;
 namespace nechto
@@ -63,7 +64,7 @@ namespace nechto
 			const node* operator-> () const;
 			const node* operator* () const;
 
-			bool operator<(const ptr& v2)const
+			/*bool operator<(const ptr& v2)const
 			{
 				const void* v1p = this;
 				const void* v2p = &v2;
@@ -76,7 +77,8 @@ namespace nechto
 			bool operator!=(const ptr& v2)const
 			{
 				return (first != v2.first) || (second != v2.second);
-			}
+			}*/
+			auto operator<=>(const ptr&) const = default;
 		};
 	private:
 		std::atomic<size_t> data = 0;//данные ноды

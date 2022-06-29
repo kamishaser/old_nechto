@@ -91,6 +91,14 @@ namespace nechto
 			tag->setData<std::string*>(nullptr);
 			tagAdDataBlock[tag.getFirst()].unlock();
 		}
+		auto operator <=> (const nodePtr& tag1, const nodePtr& tag2)
+		{
+			assert(tag1.exist());
+			assert(tag1->getType() == node::Tag);
+			assert(tag2.exist());
+			assert(tag2->getType() == node::Tag);
+			return tag::getData(tag1) <=> tag::getData(tag2);
+		}
 	}
 	//std::function<void(nodePtr, size_t)>addTag;
 	//std::function<nodePtr(size_t)> GetAddressByID;

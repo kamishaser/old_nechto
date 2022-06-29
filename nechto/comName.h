@@ -44,7 +44,7 @@ namespace nechto
 		{
 			return static_cast <int64_t> (nameComponents.size());
 		}
-		std::string str() const
+		const std::string str() const
 		{
 			std::string name;
 			name.reserve(nameSize());
@@ -57,11 +57,11 @@ namespace nechto
 			}
 			return name;
 		}
-		operator std::string() const 
+		operator const std::string() const 
 		{
 			return str();
 		}
-		std::string getComponent(int64_t number = 0) const
+		const std::string& getComponent(int64_t number = 0) const
 		{
 			return nameComponents[number];
 		}
@@ -70,7 +70,7 @@ namespace nechto
 		{
 			if (nameComponents.size() <= directory.nameComponents.size())
 				return false;
-			for (int64_t i = 0; i < directory.nameComponents.size(); ++i)
+			for (int64_t i = 0; i < directory.comNum(); ++i)
 			{
 				if (nameComponents[i] != directory.nameComponents[i])
 					return false;
@@ -83,5 +83,28 @@ namespace nechto
 				nameComponents.push_back(*i);
 			return *this;
 		}
+		static bool isGlobalAndLocal(const comName& n1, const comName& n2)
+		{
+			const comName* global;
+			const comName* local;
+			if (n1.comNum() > n2.comNum())
+			{
+				global = &n1;
+				local = &n2;
+			}
+			else
+			{
+				global = &n2;
+				local = &n1;
+			}
+			const int64_t offset = global->comNum() - local->comNum();
+			for (int64_t i = 0; i < local->comNum(); ++i)
+			{
+				if (local->getComponent(i) != global->getComponent(i + offset))
+					return false;
+			}
+			return true;
+		}
 	};
+	
 }

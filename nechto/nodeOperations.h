@@ -14,7 +14,9 @@
 namespace nechto
 {
 	//сравнение типов
-	bool typeCompare(nodePtr v1, ushort type);
+	bool typeCompare(nodePtr v1, char type);
+	bool subtypeCompare(nodePtr v1, char subtype);
+	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
 	//проверка наличия соединения
 	bool isHubExist(nodePtr v1);
 	bool isNodeHasConnections(nodePtr v1);
@@ -36,6 +38,7 @@ namespace nechto
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
+	void numDisconnect(nodePtr v1, int64_t conNum);
 	//смена типа
 	void reset(nodePtr v1);
 	void setTypeAndSubtype(nodePtr v1, char type, char subtype = 0);
@@ -45,10 +48,27 @@ namespace nechto
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
-	bool typeCompare(nodePtr v1, ushort type)
+	bool typeCompare(nodePtr v1, char type)
 	{
-		assert(v1.exist());
-		return v1->getType() == type;
+		if (!v1.exist())
+			return false;
+		return (v1->getType() == type);
+	}
+	bool subtypeCompare(nodePtr v1, char subtype)
+	{
+		if (!v1.exist())
+			return false;
+		return (v1->getSubtype() == subtype);
+	}
+	bool typeSubtypeCompare(nodePtr v1, char type, char subtype)
+	{
+		if (!v1.exist())
+			return false;
+		if (v1->getType() != type)
+			return false;
+		if (v1->getSubtype() != subtype)
+			return false;
+		return true;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//проверка наличия соединения
@@ -60,11 +80,18 @@ namespace nechto
 	bool isNodeHasConnections(nodePtr v1)
 	{
 		assert(v1.exist());
-		for (int i = 0; i < 4; i++)
-			if (v1->hasConnection(i))
-				return true;
-		if (isHubExist(v1)) return true;
-		return false;
+		nodePtr hubIterator = v1;
+		while (true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (hubIterator->connection[i].load().exist())
+					return true;
+			}
+			if (!hubIterator->hasHub())
+				return false;
+			hubIterator = hubIterator->hubConnection;
+		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
@@ -165,8 +192,9 @@ namespace nechto
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//разрыв соединения
 
+	//односторонне отстоединяет v2 от v1 (v1 не будет знать о v2)
 	void oneSideDisconnect(nodePtr v1, nodePtr v2)
-	{//односторонне отстоединяет v2 от v1 (v1 не будет знать о v2)
+	{
 		assert(v1.exist() && v2.exist());
 		nodePtr temp = v2;
 		while (true)
@@ -193,8 +221,23 @@ namespace nechto
 		oneSideDisconnect(v1, v2);
 		oneSideDisconnect(v2, v1);
 	}
+	void numDisconnect(nodePtr v1, int64_t conNum)
+	{
+		assert(v1.exist());
+		int64_t hubNumber = conNum >> 2;
+
+		nodePtr hubIterator = v1;
+		for (int64_t i = 0; i < (conNum >> 2); ++i)
+		{
+			if (!v1->hasHub())
+				return;
+			hubIterator = hubIterator->hubConnection;
+		}
+		oneSideDisconnect(hubIterator->connection[conNum & 3ll].exchange(nullNodePtr), v1);
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//смена типа
+	//сброс дополнительных данных
 	void reset(nodePtr v1)
 	{
 		switch (v1->getType())
@@ -209,6 +252,7 @@ namespace nechto
 			break;
 		}
 	}
+	//установка типа и подтипа
 	void setTypeAndSubtype(nodePtr v1, char type, char subtype)
 	{
 		reset(v1);
@@ -261,6 +305,7 @@ namespace nechto
 			vTemp = vHub;
 		}
 	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//список соединений
 }
