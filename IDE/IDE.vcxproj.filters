@@ -9,10 +9,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\projection">
+      <UniqueIdentifier>{057edadb-9bb6-4f69-a25d-3f821de840a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="visualNode.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="visualConnection.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeScreen.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -30,6 +30,7 @@ namespace nechto
 			"ExternalFunction",		//функци€, не €вл€юща€с€ частью nechto
 			"Tag",					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
 									//(о метке знает только один объект))
+			"Pointer"
 		};
 		
 		const std::vector<std::string> variableT

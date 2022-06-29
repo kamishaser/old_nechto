@@ -1,5 +1,5 @@
 #include "node.h"
-#include "lowLevelGraphOperations.h"
+#include "nodeOperations.h"
 #include "additionalCreationFunctions.h"
 #include "baseValueTypes.h"
 #include "typeNames.h"

@@ -56,6 +56,7 @@ namespace nechto
 			{
 				return exist();
 			}
+			
 			node* operator-> ();
 			node* operator* ();
 
@@ -77,12 +78,15 @@ namespace nechto
 				return (first != v2.first) || (second != v2.second);
 			}
 		};
+	private:
 		std::atomic<size_t> data = 0;//данные ноды
 		std::atomic<char> type;//тип ноды
-		std::atomic<char> subtype;//подти ноды
+		std::atomic<char> subtype;//подтип ноды
+	public:
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
-
+	
+		friend void setTypeAndSubtype(ptr, char, char);
 
 		template <class TCon>
 		const TCon getData() const //получение данных в формате <TCon>
@@ -99,26 +103,33 @@ namespace nechto
 			data.store(temp);
 		}
 
-		bool hasConnection(int number) //проверка наличи€ соединени€ по номеру	
+		bool hasConnection(int number) const //проверка наличи€ соединени€ по номеру	
 		{
 			assert(number < 4);
 			return (connection[number].load());
 		}
-		bool hasHub() //проверка наличи€ соединени€ по номеру	
+		bool hasHub() const //проверка наличи€ соединени€ по номеру	
 		{
 			return (hubConnection.load());
 		}
-		int connectionType(int number) //получение типа ноды подключЄнной по номеру
+		int connectionType(int number) const //получение типа ноды подключЄнной по номеру
 		{
 			if (!hasConnection(number)) return 0;
-			return connection[number].load()->type;
+			return connection[number].load()->getType();
 		}
-		int connectionSubtype(int number)//получение подтипа ноды подключЄнной по номеру
+		int connectionSubtype(int number) const//получение подтипа ноды подключЄнной по номеру
 		{
 			if (!hasConnection(number)) return 0;
-			return connection[number].load()->subtype;
+			return connection[number].load()->getSubtype();
 		}
-
+		char getType() const
+		{
+			return type;
+		}
+		char getSubtype() const 
+		{
+			return subtype;
+		}
 		enum Type //список типов нод
 		{
 			Error,
@@ -129,6 +140,7 @@ namespace nechto
 			ConditionalBranching,	//if
 			ExteralFunction,		//функци€, не €вл€юща€с€ частью nechto
 			Tag,					//метка
+			Pointer					//указатель на объект / массив
 		};
 		
 	};

@@ -199,22 +199,21 @@ namespace nechto
 			assert(isCorrect(operatorNode));
 
 
-			ushort resultType = operatorNode->connection[0].load()->subtype;
+			ushort resultType = operatorNode->connection[0].load()->getSubtype();
 			ushort comVarType;
 			size_t temp;
 			size_t firstValue;
 			size_t secondValue;
 
-			switch (operatorNode->subtype)
+			switch (operatorNode->getSubtype())
 			{
 			case  Assigment:
-				operatorNode->connection[0].load()->data.
-					store(operatorNode->connection[1].load()->data.load());
-
+				operatorNode->connection[0].load()->
+					setData<size_t>(operatorNode->connection[1].load()->getData<size_t>());
 				break;
 
 			case  UnaryMinus:
-				firstValue = operatorNode->connection[1].load()->data.load();
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -226,13 +225,13 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case  Addition:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -244,11 +243,11 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Subtraction:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -260,11 +259,11 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Multiplication:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -276,11 +275,11 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Division:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -292,14 +291,14 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case  Equal:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -313,12 +312,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  NotEqual:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -332,12 +331,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Less:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -351,12 +350,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Greater:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -370,12 +369,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  LessOrEqual:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -389,12 +388,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  GreaterOrEqual:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -408,13 +407,13 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case  LogicNegation:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -425,12 +424,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  LogicAnd:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -441,12 +440,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  LogicOr:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -457,12 +456,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  LogicExclusive:
-				firstValue = operatorNode->connection[1].load()->data.load();
-				secondValue = operatorNode->connection[2].load()->data.load();
-				comVarType = operatorNode->connection[1].load()->subtype;
+				firstValue = operatorNode->connection[1].load()->getData<size_t>();
+				secondValue = operatorNode->connection[2].load()->getData<size_t>();
+				comVarType = operatorNode->connection[1].load()->getSubtype();
 				switch (comVarType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -473,12 +472,12 @@ namespace nechto
 				}
 				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
 					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case  Increment:
-				firstValue = operatorNode->connection[0].load()->data.load();
+				firstValue = operatorNode->connection[0].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -487,10 +486,10 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			case  Decrement:
-				firstValue = operatorNode->connection[0].load()->data.load();
+				firstValue = operatorNode->connection[0].load()->getData<size_t>();
 				switch (resultType)
 				{//выбор используемой функции в зависимости от типа данных
 				case baseValueType::Int64:
@@ -499,7 +498,7 @@ namespace nechto
 				default:
 					throw;
 				}
-				operatorNode->connection[0].load()->data.store(temp);//запись результата
+				operatorNode->connection[0].load()->setData(temp);//запись результата
 				break;
 			default:
 				throw;
@@ -508,10 +507,10 @@ namespace nechto
 
 		bool isCorrect(nodePtr operatorNode)
 		{
-			assert(operatorNode->type == node::MathOperator);
+			assert(operatorNode->getType() == node::MathOperator);
 			if (!operatorNode->hasConnection(0))
 				return false;
-			switch (operatorNode->subtype)
+			switch (operatorNode->getSubtype())
 			{
 			case  Assigment://////////////////////////////////////////////
 				if (!operatorNode->hasConnection(0)//наличие соединения

@@ -23,34 +23,34 @@ namespace nechto
 		assert(isTypeCastOperatorCorrect(typeCastOperator));
 		size_t buffer = 0;
 		ushort varType[2]{0,0};
-		buffer = typeCastOperator->connection[1].load()->data.load();
-		varType[0] = typeCastOperator->connection[0].load()->subtype;
-		varType[1] = typeCastOperator->connection[1].load()->subtype;
+		buffer = typeCastOperator->connection[1].load()->getData<size_t>();
+		varType[0] = typeCastOperator->connection[0].load()->getSubtype();
+		varType[1] = typeCastOperator->connection[1].load()->getSubtype();
 		if (varType[0] != varType[1])
 		{
 			typeCast(&buffer, &buffer, varType[1], varType[0]);
 		}
-		typeCastOperator->connection[0].load()->data.store(buffer);
+		typeCastOperator->connection[0].load()->setData(buffer);
 	}
 
 	bool isTypeCastOperatorCorrect(nodePtr typeCastOperator)
 	{
-		assert(typeCastOperator->type.load() == node::TypeCastOperator);
+		assert(typeCastOperator->getType() == node::TypeCastOperator);
 		if (!typeCastOperator->hasConnection(0)
 			|| !typeCastOperator->hasConnection(1))
 			return false;
-		if (typeCastOperator->connection[0].load()->type != node::Variable
-			|| typeCastOperator->connection[1].load()->type != node::Variable)
+		if (typeCastOperator->connection[0].load()->getType() != node::Variable
+			|| typeCastOperator->connection[1].load()->getType() != node::Variable)
 			return false;
 		return true;
 	}
 
 	bool boolCast(nodePtr Variable)
 	{
-		assert(Variable->type = node::Variable);
-		size_t buffer = Variable->data;
+		assert(Variable->getType() == node::Variable);
+		size_t buffer = Variable->getData<size_t>();
 		void* temprt = &buffer;
-		switch (Variable->subtype)
+		switch (Variable->getSubtype())
 		{
 		case baseValueType::Int64:
 			return static_cast<bool>(*static_cast<int64_t*>(temprt));

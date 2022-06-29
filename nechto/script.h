@@ -87,7 +87,7 @@ namespace nechto
 			} };
 		do
 		{
-			if (current->type == node::ConditionalBranching)
+			if (current->getType() == node::ConditionalBranching)
 			{
 				if (isConnactionMarked(current, 2))
 				{
@@ -116,7 +116,8 @@ namespace nechto
 				if (current->hasConnection(i))
 					nodeSet.emplace(current->connection[i]);
 			}
-		} while ((current = next) != nullNodePtr);
+			
+		} while ((current = next).exist());
 		return std::move(nodeSet);
 	}
 }

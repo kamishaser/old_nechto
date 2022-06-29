@@ -1,6 +1,6 @@
 #pragma once
 #include "tag.h"
-#include "lowLevelGraphOperations.h"
+#include "nodeOperations.h"
 
 namespace nechto
 {
@@ -21,16 +21,20 @@ namespace nechto
 			NumHubConnect(exConTag, conNode, 0);
 			return *this;
 		}
-		bool exist() { return exConTag->hasConnection(0); }
+		bool exist() const{ return exConTag->hasConnection(0); }
 		auto operator <=> (const externalConnection& exCon)
 		{
 			return tag::getData(exConTag) <=> tag::getData(exCon.exConTag);
 		}
-		operator const nodePtr()
+		operator const nodePtr() const
 		{
 			return exConTag->connection[0];
 		}
-		node* operator->()
+		~externalConnection()
+		{
+			deleteNode(exConTag);
+		}
+		node* operator->() const
 		{
 			return *exConTag->connection[0].load();
 		}
@@ -41,8 +45,8 @@ namespace nechto
 		{
 			nodePtr v1 = exConTag->connection[0];
 			assert(v1.exist());
-			assert(exConTag->type == node::Variable);
-			if (v1->subtype == baseValueType::Int64)
+			assert(exConTag->getType() == node::Variable);
+			if (v1->getSubtype() == baseValueType::Int64)
 				return v1->getData<int64_t>();
 			return static_cast<int64_t>(v1->getData<double>());
 		}
@@ -50,8 +54,8 @@ namespace nechto
 		{
 			nodePtr v1 = exConTag->connection[0];
 			assert(v1.exist());
-			assert(exConTag->type == node::Variable);
-			if (v1->subtype == baseValueType::Double)
+			assert(exConTag->getType() == node::Variable);
+			if (v1->getSubtype() == baseValueType::Double)
 				return v1->getData<double>();
 			return static_cast<double>(v1->getData<int64_t>());
 		}
@@ -60,8 +64,8 @@ namespace nechto
 		{
 			nodePtr v1 = exConTag->connection[0];
 			assert(v1.exist());
-			assert(exConTag->type == node::Variable);
-			if (v1->subtype == baseValueType::Int64)
+			assert(exConTag->getType() == node::Variable);
+			if (v1->getSubtype() == baseValueType::Int64)
 				v1->setData<int64_t>(value);
 			else
 				v1->setData<double>(static_cast<double>(value));
@@ -70,8 +74,8 @@ namespace nechto
 		{
 			nodePtr v1 = exConTag->connection[0];
 			assert(v1.exist());
-			assert(exConTag->type == node::Variable);
-			if (v1->subtype == baseValueType::Int64)
+			assert(exConTag->getType() == node::Variable);
+			if (v1->getSubtype() == baseValueType::Int64)
 				v1->setData<int64_t>(static_cast<int64_t>(value));
 			else
 				v1->setData<double>(value);

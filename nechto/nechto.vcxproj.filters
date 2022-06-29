@@ -21,7 +21,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lowLevelGraphOperations.h">
+    <ClInclude Include="nodeOperations.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="staticAllocator.h">
@@ -66,9 +66,6 @@
     <ClInclude Include="nechto.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="nEvent.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="script.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
@@ -76,6 +73,12 @@
       <Filter>Исходные файлы\text</Filter>
     </ClInclude>
     <ClInclude Include="externalConnection.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="pointer.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="comName.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

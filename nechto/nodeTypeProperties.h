@@ -5,7 +5,7 @@ namespace nechto
 {
 	bool hasSubType(nodePtr v1)
 	{
-		switch (v1->type.load())
+		switch (v1->getType())
 		{
 		case node::Hub:
 			return false;
@@ -28,7 +28,7 @@ namespace nechto
 	}
 	bool hasStaticData(nodePtr v1)
 	{
-		switch (v1->type.load())
+		switch (v1->getType())
 		{
 		case node::Hub:
 			return false;
@@ -51,7 +51,7 @@ namespace nechto
 	}
 	bool hasStaticAdData(nodePtr v1)
 	{
-		switch (v1->type.load())
+		switch (v1->getType())
 		{
 		case node::Hub:
 			return false;
@@ -74,7 +74,7 @@ namespace nechto
 	}
 }
 /*
-	switch (v1->type.load())
+	switch (v1->getType())
 		{
 		case node::Hub:
 			return;

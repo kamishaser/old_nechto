@@ -2,11 +2,13 @@
 #include "node.h"
 #include <map>
 
+
 namespace nechto
 {
 	namespace tag
 	{
-		//таг - вспомогательна€, не €вл€юща€с€ частью исполн€емого алгоритма информаци€
+		//вспомогательна€ информаци€
+		
 		enum Type
 		{
 			Error,
@@ -17,52 +19,77 @@ namespace nechto
 			//ноду имеющую внешнее подключение нельз€ удал€ть.
 			//комонента св€зности, не имеющаа внешнего подключение считаетс€ утеренной и 
 			//может быть удалена сборщиком мусора, (когда он будет разработан)
+			SystemAttribute
 		};
+		bool isConnectedToNumber(nodePtr v1)
+		{
+			nodePtr vtemp = v1;
+			while (true)
+			{
+				for (int i1 = 0; i1 < 4; ++i1)
+				{
+					nodePtr vback = vtemp->connection[i1];
+					while (true)
+					{
+						for (char i = 0; i < 4; i++)
+							if (vback->connection[i].load() == v1)
+								return true;
+						if (!vback->hasHub())
+							break;
+						vback = vback->hubConnection;
+					}
+				}
+				if (!vtemp->hasHub())
+					break;
+				vtemp = vtemp->hubConnection;
+			}
+			return false;
+		}
 		bool isCorrect(nodePtr tag)
 		{
-			assert(tag != nullNodePtr);
-			assert(tag->type == node::Tag);
+			assert(tag.exist());
+			assert(tag->getType() == node::Tag);
 			
-			switch (tag->subtype.load())
-			{
-			case Comment:
-				if (!tag->hasConnection(0))//наличие соединени€)
-					return false;
-				break;
-			default:
+			if (!tag->hasConnection(0))//наличие соединени€)
 				return false;
-			}
+			
 			return true;
 		}
 
-
+		static std::mutex tagAdDataBlock[nechto::nodeStorage::maxNumOfAllocators];
 		void setData(nodePtr tag, const std::string& data) noexcept
 		{
-			assert(tag != nullNodePtr);
-			assert(tag->type == node::Tag);
+			assert(tag.exist());
+			assert(tag->getType() == node::Tag);
+			tagAdDataBlock[tag.getFirst()].lock();
 			std::cout << tag->getData<std::string*>() << std::endl;
 			if (tag->getData<std::string*>() == nullptr)
 				tag->setData(new std::string(data));
 			else
 				*tag->getData<std::string*>() = data;
+			tagAdDataBlock[tag.getFirst()].unlock();
 		}
 
 		std::string getData(nodePtr tag) noexcept
 		{
-			assert(tag != nullNodePtr);
-			assert(tag->type == node::Tag);
-			if (tag->getData<std::string*>() == nullptr)
-				return std::string();
-			else
-				return *tag->getData<std::string*>();
+			assert(tag.exist());
+			assert(tag->getType() == node::Tag);
+			std::string temp;
+			tagAdDataBlock[tag.getFirst()].lock();
+			if (tag->getData<std::string*>() != nullptr)
+				temp = *tag->getData<std::string*>();
+			tagAdDataBlock[tag.getFirst()].unlock();
+			return temp;
 		}
 		void deleteData(nodePtr tag) noexcept
 		{
-			assert(tag != nullNodePtr);
-			assert(tag->type == node::Tag);
+			assert(tag.exist());
+			assert(tag->getType() == node::Tag);
+			tagAdDataBlock[tag.getFirst()].lock();
 			if (tag->getData<std::string*>() != nullptr)
 				delete tag->getData<std::string*>();
 			tag->setData<std::string*>(nullptr);
+			tagAdDataBlock[tag.getFirst()].unlock();
 		}
 	}
 	//std::function<void(nodePtr, size_t)>addTag;

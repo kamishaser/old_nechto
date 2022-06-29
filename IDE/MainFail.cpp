@@ -5,7 +5,6 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 
-
 using namespace nechto;
 bool variableAtNullConnection(nodePtr v1)
 {

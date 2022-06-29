@@ -145,6 +145,11 @@
   <ItemGroup>
     <ClCompile Include="MainFail.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="nodeScreen.h" />
+    <ClInclude Include="visualConnection.h" />
+    <ClInclude Include="visualNode.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

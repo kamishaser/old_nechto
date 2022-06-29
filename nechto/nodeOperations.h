@@ -8,6 +8,7 @@
 #include "baseValueTypes.h"
 #include "mathOperator.h"
 #include "tag.h"
+#include "pointer.h"
 #include "externalFunction.h"
 
 namespace nechto
@@ -35,28 +36,30 @@ namespace nechto
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
+	//смена типа
+	void reset(nodePtr v1);
+	void setTypeAndSubtype(nodePtr v1, char type, char subtype = 0);
+	
 	//удаление
 	void deleteNode(nodePtr v);
-	//список соединений
-	std::set<nodePtr>&& allNodeConnactions(nodePtr v1);
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
 	bool typeCompare(nodePtr v1, ushort type)
 	{
-		assert(v1 != nullNodePtr);
-		return v1->type.load() == type;
+		assert(v1.exist());
+		return v1->getType() == type;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//проверка наличия соединения
 	bool isHubExist(nodePtr v1)
 	{
-		assert(v1 != nullNodePtr);
+		assert(v1.exist());
 		return v1->hubConnection.load().exist();
 	}
 	bool isNodeHasConnections(nodePtr v1)
 	{
-		assert(v1 != nullNodePtr);
+		assert(v1.exist());
 		for (int i = 0; i < 4; i++)
 			if (v1->hasConnection(i))
 				return true;
@@ -77,31 +80,31 @@ namespace nechto
 		nodePtr v;
 		nodePtr temp = nodeStorage::terminal.allocate();
 		v = temp;
-		v->type = type;
-		v->subtype = subtype;
-		v->data = data;
+		setTypeAndSubtype(v, type, subtype);
+		v->setData(data);
 		return v;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//операции с хабами
 
-	void addHub(nodePtr v1)
+	void addHub(nodePtr vertex, nodePtr lastHub)
 	{//добавление хаба к элементу
-		assert(v1 != nullNodePtr);
+		assert(vertex.exist());
+		assert(lastHub.exist());
+
 		nodePtr hub = newNode();
-		hub->type.store(node::Hub);
-		hub->type.store(0);
-		hub->setData<nodePtr>(v1);
+		setTypeAndSubtype(hub, node::Hub, 0);
+		hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
 		//адресс расширяемого элемента
 		nodePtr temp = nullNodePtr;//ввиду того, что compare_excha
-		if (!v1->hubConnection.compare_exchange_strong(temp, hub))
+		if (!lastHub->hubConnection.compare_exchange_strong(temp, hub))
 			deleteNode(hub);
 		//если присоединить хаб не удалось, значит он уже есть
 	}
 	const nodePtr getHubParrent(const nodePtr hub)
 	{
-		assert(hub->type.load() == node::Hub);
-		return hub->getData<nodePtr>();
+		assert(hub->getType() == node::Hub);
+		return hub->getData<std::pair<nodePtr, nodePtr>>().first;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание одностороннего соединения
@@ -117,45 +120,44 @@ namespace nechto
 
 	void HubConnect(nodePtr v1, nodePtr v2)
 	{//добавление связи в первое попавшееся свободное место в хабе
-		assert(v1 != nullNodePtr && v2 != nullNodePtr);
+		assert(v1.exist() && v2.exist());
 		if (!v1->hubConnection.load().exist())
-			addHub(v1);
-		v1=v1->hubConnection;
-
+			addHub(v1, nullNodePtr);
+		nodePtr hubIterator = v1->hubConnection;
 		nodePtr temp;
 		while (true)
 		{
 			temp = nullNodePtr;
-			if (v1->connection[0].compare_exchange_strong(temp, v2))
+			if (hubIterator->connection[0].compare_exchange_strong(temp, v2))
 				return;
 			temp = nullNodePtr;
-			if (v1->connection[1].compare_exchange_strong(temp, v2))
+			if (hubIterator->connection[1].compare_exchange_strong(temp, v2))
 				return;
 			temp = nullNodePtr;
-			if (v1->connection[2].compare_exchange_strong(temp, v2))
+			if (hubIterator->connection[2].compare_exchange_strong(temp, v2))
 				return;
 			temp = nullNodePtr;
-			if (v1->connection[3].compare_exchange_strong(temp, v2))
+			if (hubIterator->connection[3].compare_exchange_strong(temp, v2))
 				return;
-			addHub(v1);
-			v1 = v1->hubConnection;
+			addHub(v1, hubIterator);
+			hubIterator = hubIterator->hubConnection;
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание двухстороннего соединения
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
-		assert(v1 != nullNodePtr && v2 != nullNodePtr);
-		assert(v1->type != node::Hub);
-		assert(v2->type != node::Hub);
+		assert(v1.exist() && v2.exist());
+		assert(v1->getType() != node::Hub);
+		assert(v2->getType() != node::Hub);
 		NumConnect(v1, v2, number1);
 		HubConnect(v2, v1);
 	}
 	void HubHubConnect(nodePtr v1, nodePtr v2)
 	{
-		assert(v1 != nullNodePtr && v2 != nullNodePtr);
-		assert(v1->type != node::Hub);
-		assert(v2->type != node::Hub);
+		assert(v1.exist() && v2.exist());
+		assert(v1->getType() != node::Hub);
+		assert(v2->getType() != node::Hub);
 		HubConnect(v1, v2);
 		HubConnect(v2, v1);
 	}
@@ -165,7 +167,7 @@ namespace nechto
 
 	void oneSideDisconnect(nodePtr v1, nodePtr v2)
 	{//односторонне отстоединяет v2 от v1 (v1 не будет знать о v2)
-		assert(v1 != nullNodePtr && v2 != nullNodePtr);
+		assert(v1.exist() && v2.exist());
 		nodePtr temp = v2;
 		while (true)
 		{
@@ -192,14 +194,59 @@ namespace nechto
 		oneSideDisconnect(v2, v1);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//смена типа
+	void reset(nodePtr v1)
+	{
+		switch (v1->getType())
+		{
+		case node::Tag:
+			tag::deleteData(v1);
+			break;
+		case node::Pointer:
+			pointer::deletePointer(v1);
+			break;
+		default:
+			break;
+		}
+	}
+	void setTypeAndSubtype(nodePtr v1, char type, char subtype)
+	{
+		reset(v1);
+		v1->type = type;
+		v1->subtype = subtype;
+
+		switch (v1->getType())
+		{
+		case node::Tag:
+		case node::ExteralFunction:
+			v1->setData(nullptr);
+			break;
+		case node::Variable:
+			switch (v1->getSubtype())
+			{
+			case baseValueType::Int64:
+				v1->setData<int64_t>(0);
+				break;
+			case baseValueType::Double:
+				v1->setData<double>(0);
+				break;
+			default:
+				break;
+			}
+		default:
+			break;
+		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// удаление
 	void deleteNode(nodePtr v1)
 	{
-		assert(v1 != nullNodePtr);
+		assert(v1.exist());
 		nodePtr vTemp = v1;
-
+		reset(v1);
 		while (true)
 		{//цикл удаления узла со всеми хабами
+			setTypeAndSubtype(vTemp, node::Error, 0);
 			for (int i = 0; i < 4; i++)//разрыв соединения
 				if (vTemp->connection[i].load().exist())
 				{
@@ -213,25 +260,7 @@ namespace nechto
 			nodeStorage::terminal.deallocate(vTemp);
 			vTemp = vHub;
 		}
-		v1 = nullNodePtr;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//список соединений
-	std::set<nodePtr>&& allNodeConnactions(nodePtr v1)
-	{
-		assert(v1 != nullNodePtr);
-		std::set<nodePtr> nodeSet;
-		while (true)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (v1->hasConnection(i))
-					nodeSet.emplace(v1->connection[i]);
-			}
-			if (!v1->hasHub())
-				break;
-			v1 = v1->hubConnection;
-		}
-		return std::move(nodeSet);
-	}
 }

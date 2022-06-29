@@ -109,18 +109,18 @@ std::string commandLine::commandNew(std::string& line)
 	char type = typeName::find(typeName::nodeT, word);
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + word);
-	v1->type = type;
 	if (hasSubType(v1))
 	{
-		
+		char subtype;
 		if (line.empty())
 			return to_string(v1);
 		word = cutWord(line);
-		type = typeName::findSubtype(type, word);
+		subtype = typeName::findSubtype(type, word);
 		if (type == 0)
 			return (to_string(v1) + "unknownSubype: " + word);
-		v1->subtype = type;
+		setTypeAndSubtype(v1, type, subtype);
 	}
+	setTypeAndSubtype(v1, type);
 	return to_string(v1);
 }
 
@@ -144,17 +144,17 @@ std::string commandLine::commandSetType(std::string& line)
 	char type = typeName::find(typeName::nodeT, line);
 	if (type == 0)
 		return (to_string(v1) + "unknownType: " + line);
-	v1->type = type;
+	setTypeAndSubtype(v1, type);
 	return nodeProperties(v1);
 }
 std::string commandLine::commandSetSubtype(std::string& line)
 {
 	if (line.empty())
 		return "error";
-	char type = typeName::findSubtype(v1->type, line);
-	if (type == 0)
+	char subtype = typeName::findSubtype(v1->getType(), line);
+	if (subtype == 0)
 		return (to_string(v1) + "unknownSubype: " + line);
-	v1->subtype = type;
+	setTypeAndSubtype(v1, v1->getType(), subtype);
 	return nodeProperties(v1);
 }
 std::string commandLine::commandSetData(std::string& line)
@@ -164,10 +164,10 @@ std::string commandLine::commandSetData(std::string& line)
 	nodePtr ptemp;
 	int64_t itemp = 0;
 	double  dtemp = 0;
-	switch (v1->type.load())
+	switch (v1->getType())
 	{
 	case node::Variable:
-		switch (v1->subtype)
+		switch (v1->getSubtype())
 		{
 		case baseValueType::Int64:
 			try { itemp = std::stoll(line); }

@@ -166,15 +166,15 @@ namespace nechto
 			assert(inProcess);
 			assert(saveMode);
 
-			assert(v1->type != node::Hub);
+			assert(v1->getType() != node::Hub);
 			if (isSaved(v1))
 				return;
 			savedNodes.insert(v1);//добавление в список сохранённых
 			
 			//1)сохранение данных ноды
-			auto type    = v1->type.load();
-			auto subtype = v1->subtype.load();
-			auto data    = v1->data.load();
+			auto type    = v1->getType();
+			auto subtype = v1->getSubtype();
+			auto data    = v1->getData<size_t>();
 			writeElement(&v1);		//адрес
 			writeElement(&type);
 			if(hasSubType(v1))
@@ -184,9 +184,9 @@ namespace nechto
 			if (hasStaticAdData(v1))
 			{
 				std::string adData;
-				if(v1->type == node::Tag)
+				if(v1->getType() == node::Tag)
 					adData = tag::getData(v1);
-				if(v1->type == node::ExteralFunction)
+				if(v1->getType() == node::ExteralFunction)
 					if (v1->getData<externalFunction*>() == nullptr)
 						adData = "error";
 					else
@@ -251,16 +251,19 @@ namespace nechto
 			nodePtr vload = newNode();
 			loadedNodes.emplace(oldAddress, vload);
 			read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
-			vload->type = typeBuffer;
 			if (hasSubType(vload))
 			{
 				read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
-				vload->subtype = subtypeBuffer;
+				setTypeAndSubtype(vload, typeBuffer, subtypeBuffer);
+			}
+			else
+			{
+				setTypeAndSubtype(vload, typeBuffer);
 			}
 			if (hasStaticData(vload))
 			{
 				read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
-				vload->data = dataBuffer;
+				vload->setData(dataBuffer);
 			}
 			std::string adData;
 			if (hasStaticAdData(vload))
@@ -278,9 +281,9 @@ namespace nechto
 						adData[i] = temp;
 					}
 				}
-				if (vload->type == node::Tag)
+				if (vload->getType() == node::Tag)
 					tag::setData(vload, adData);
-				if (vload->type == node::ExteralFunction)
+				if (vload->getType() == node::ExteralFunction)
 				{
 					if (!isExternalFunctionExist(adData))//если функции нет, создаётся затычка, которую потом можно заместить
 						addExternalFunction(externalFunction(adData, [](nodePtr v1) {return false; }, nullptr));

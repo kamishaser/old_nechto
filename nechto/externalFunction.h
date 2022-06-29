@@ -1,6 +1,7 @@
 #pragma once
 #include "node.h"
 #include "baseValueTypes.h"
+#include "comName.h"
 
 #include <functional>
 #include <set>
@@ -13,7 +14,7 @@ namespace nechto
 	private:
 		
 	public:
-		const std::string name;
+		const comName name;
 		mutable std::function<bool(nodePtr)> isCorrect;
 		mutable nodeEvent Func = nullptr;
 
@@ -21,20 +22,12 @@ namespace nechto
 			:name(fname),isCorrect(check), Func(Function)
 		{}
 		
-		operator bool(){ return Func != nullptr; }   const
+		operator bool() const { return Func != nullptr; }
 
-		bool operator==(const externalFunction& fun2)const
-		{return name == fun2.name;}
-		bool operator!=(const externalFunction& fun2)const
-		{return name != fun2.name;}
-		bool operator< (const externalFunction& fun2)const
-		{return name < fun2.name;}
-		bool operator> (const externalFunction& fun2)const
-		{return name > fun2.name;}
-		bool operator<=(const externalFunction& fun2)const
-		{return name <= fun2.name;}
-		bool operator>=(const externalFunction& fun2)const
-		{return name >= fun2.name;}
+		auto operator <=> (const externalFunction& exCon)const
+		{
+			return name <=> exCon.name;
+		}
 	};
 
 	static std::set<externalFunction> funSet{externalFunction("error")};

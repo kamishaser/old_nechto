@@ -1,7 +1,7 @@
 #pragma once
 #include "staticAllocator.h"
 #include "node.h"
-#include "lowLevelGraphOperations.h"
+#include "nodeOperations.h"
 #include "baseValueTypes.h"
 #include "mathOperator.h"
 #include "externalFunction.h"

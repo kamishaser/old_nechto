@@ -9,18 +9,18 @@ namespace nechto
 	}
 	const std::string nodeType(nodePtr address)
 	{
-		return typeName::nodeT[address->type];
+		return typeName::nodeT[address->getType()];
 	}
 	const std::string nodeSubtype(nodePtr address)
 	{
-		switch (address->type)
+		switch (address->getType())
 		{
 		case node::Variable:
-			return typeName::variableT[address->subtype];
+			return typeName::variableT[address->getSubtype()];
 		case node::MathOperator:
-			return typeName::mathOperatorT[address->subtype];
+			return typeName::mathOperatorT[address->getSubtype()];
 		case node::Tag:
-			return typeName::tagT[address->subtype];
+			return typeName::tagT[address->getSubtype()];
 		default:
 			return "error";
 		}
@@ -29,12 +29,12 @@ namespace nechto
 	{
 		if (v1 == nullNodePtr)
 			return "error";
-		size_t data = v1->data.load();
+		size_t data = v1->getData<size_t>();
 		void* temptr = &data;
-		switch (v1->type)
+		switch (v1->getType())
 		{
 		case node::Variable:
-			switch (v1->subtype)
+			switch (v1->getSubtype())
 			{
 			case baseValueType::Int64:
 				return std::to_string(*static_cast<int64_t*>(temptr));
