@@ -1,16 +1,17 @@
 #pragma once
 #include "tag.h"
 #include "nodeOperations.h"
+#include "uniqueNodePtr.h"
 
 namespace nechto
 {
 	class externalConnection
 	{
 	protected:
-		nodePtr exConTag;
+		uniqueNodePtr exConTag;
 	public:
 		externalConnection(const std::string& name, const nodePtr conNode = nullNodePtr)
-			:exConTag(newNode(node::Tag, tag::ExternalConnection))
+			:exConTag(uniqueNodePtr::makeUnique(node::Tag, tag::ExternalConnection))
 		{
 			tag::setData(exConTag, name);
 			if(conNode.exist())
@@ -31,13 +32,13 @@ namespace nechto
 		{
 			return exConTag->connection[0];
 		}
-		~externalConnection()
-		{
-			deleteNode(exConTag);
-		}
 		node* operator->() const
 		{
 			return *exConTag->connection[0].load();
+		}
+		const nodePtr getTag() const
+		{
+			return exConTag;
 		}
 		///////////////////////////////////////////////////
 		//дополнительные функции для работы с переменными

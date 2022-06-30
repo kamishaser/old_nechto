@@ -81,7 +81,7 @@ namespace nechto
 				return nullNodePtr;
 			return nextPosition;
 		case node::ExteralFunction:
-			(flag->getData<externalFunction*>())->Func(flag);
+			(flag->getData<externalFunction*>())->perform(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())
 				return nullNodePtr;

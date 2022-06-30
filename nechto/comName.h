@@ -28,10 +28,6 @@ namespace nechto
 				}
 			}
 		}
-		bool empty()
-		{
-			return nameComponents.empty();
-		}
 		int64_t nameSize() const
 		{
 			int64_t size = 0;
@@ -82,6 +78,12 @@ namespace nechto
 			for (auto i = topName.nameComponents.begin(); i != topName.nameComponents.end(); i++)
 				nameComponents.push_back(*i);
 			return *this;
+		}
+		const comName operator+(const comName& topName)
+		{
+			comName result(*this);
+			result += topName;
+			return result;
 		}
 		static bool isGlobalAndLocal(const comName& n1, const comName& n2)
 		{

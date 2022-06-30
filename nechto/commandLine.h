@@ -186,9 +186,9 @@ std::string commandLine::commandSetData(std::string& line)
 		tag::setData(v1, line);
 		return nodeProperties(v1);
 	case node::ExteralFunction:
-		if (!isExternalFunctionExist(line))
+		if (!externalFunction::exist(line))
 			return "the function named " + line + " isn't exist";
-		v1->setData(getExternalFunction(line));
+		v1->setData(externalFunction::get(line));
 		return nodeProperties(v1);
 
 	default:

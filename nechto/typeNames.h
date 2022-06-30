@@ -45,7 +45,8 @@ namespace nechto
 			"Error",
 			"Comment",
 			"Name",
-			"ExternalConnaction"
+			"ExternalConnection"
+			"Attribute"
 		};
 		
 		const std::vector<std::string> mathOperatorT

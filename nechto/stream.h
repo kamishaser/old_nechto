@@ -285,9 +285,12 @@ namespace nechto
 					tag::setData(vload, adData);
 				if (vload->getType() == node::ExteralFunction)
 				{
-					if (!isExternalFunctionExist(adData))//если функции нет, создаётся затычка, которую потом можно заместить
-						addExternalFunction(externalFunction(adData, [](nodePtr v1) {return false; }, nullptr));
-					vload->setData(getExternalFunction(adData));
+					//если функции нет, создаётся затычка, которую потом можно заместить
+					if (!externalFunction::exist(adData))
+						externalFunction::add(
+							externalFunction(adData, externalFunction::Error.isCorrectPtr, 
+								externalFunction::Error.FuncPtr));
+					vload->setData(externalFunction::get(adData));
 				}
 			}
 			for (int i = 0; i < 4; i++)

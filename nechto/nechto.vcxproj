@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="additionalCreationFunctions.h" />
+    <ClInclude Include="attribute.h" />
     <ClInclude Include="checkAndStep.h" />
     <ClInclude Include="commandLine.h" />
     <ClInclude Include="externalConnection.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="tag.h" />
     <ClInclude Include="textOut.h" />
     <ClInclude Include="typeNames.h" />
+    <ClInclude Include="uniqueNodePtr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />

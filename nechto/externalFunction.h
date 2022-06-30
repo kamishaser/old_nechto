@@ -12,58 +12,82 @@ namespace nechto
 	class externalFunction
 	{
 	private:
-		
+		static std::mutex setBlock;
+		static std::set<externalFunction> funSet;
+
 	public:
-		const comName name;
-		mutable std::function<bool(nodePtr)> isCorrect;
-		mutable nodeEvent Func = nullptr;
+		comName name;
+		mutable std::atomic<bool(*)(nodePtr)> isCorrectPtr;
+		mutable std::atomic<void(*)(nodePtr)> FuncPtr;
 
-		externalFunction(std::string fname, std::function<bool(nodePtr)> check = [](nodePtr c) {return false; }, nodeEvent Function = nullptr)
-			:name(fname),isCorrect(check), Func(Function)
+		externalFunction(comName fname, bool(*check)(nodePtr), void(*Function)(nodePtr))
+			:name(fname),isCorrectPtr(check), FuncPtr(Function)
 		{}
-		
-		operator bool() const { return Func != nullptr; }
+		externalFunction(const externalFunction& f)
+			:name(f.name), isCorrectPtr(f.isCorrectPtr.load()), FuncPtr(f.FuncPtr.load()) {}
+		const externalFunction& operator=(const externalFunction& f)
+		{
+			name = f.name;
+			isCorrectPtr = f.isCorrectPtr.load();
+			FuncPtr = f.FuncPtr.load();
+		}
 
+		bool isCorrect(nodePtr v1)
+		{
+			return isCorrectPtr.load()(v1);
+		}
+		void perform(nodePtr v1)
+		{
+			FuncPtr.load()(v1);
+		}
 		auto operator <=> (const externalFunction& exCon)const
 		{
 			return name <=> exCon.name;
 		}
-	};
 
-	static std::set<externalFunction> funSet{externalFunction("error")};
-	static std::mutex setBlock;
+		static const externalFunction Error;
 
-	externalFunction addExternalFunction(const externalFunction newFun) noexcept
-	{
-		setBlock.lock();
-		if (funSet.contains(newFun))
-		{//провер€етс€ только по имени
-			auto ExtFun = funSet.find(newFun);//стрЄмна€ конструкци€(проверка только по имени)
-			externalFunction old(newFun.name, ExtFun->isCorrect, ExtFun->Func);
-			ExtFun->isCorrect = newFun.isCorrect;
-			ExtFun->Func = newFun.Func;
+
+		static const externalFunction add(const externalFunction newFun) noexcept
+		{
+			setBlock.lock();
+			if (funSet.contains(newFun))
+			{//провер€етс€ только по имени
+				auto ExtFun = funSet.find(newFun);//стрЄмна€ конструкци€(проверка только по имени)
+				const externalFunction oldFun(newFun.name, ExtFun->isCorrectPtr.load(), ExtFun->FuncPtr.load());
+				ExtFun->isCorrectPtr = newFun.isCorrectPtr.load();
+				ExtFun->FuncPtr = newFun.FuncPtr.load();
+				setBlock.unlock();
+				return oldFun;
+			}
+			funSet.emplace(newFun);
 			setBlock.unlock();
-			return old;
+			return Error;
 		}
-		funSet.emplace(newFun);
-		setBlock.unlock();
-		return externalFunction("empty", nullptr, nullptr);
-	}
-	bool isExternalFunctionExist(const std::string& name) noexcept
-	{
-		const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
-		setBlock.lock();
-		bool result = funSet.contains(temp);//провер€етс€ только по имени
-		setBlock.unlock();
-		return result;
-	}
-	const externalFunction* getExternalFunction(const std::string& name) noexcept
-	{
-		const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
-		setBlock.lock();
-		const externalFunction* function = (funSet.contains(temp)) ? &(*funSet.find(temp)) : nullptr;
-		//провер€етс€ только по имени
-		setBlock.unlock();
-		return function;
-	}
+		static bool exist(const std::string& name) noexcept
+		{
+			const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
+			setBlock.lock();
+			bool result = funSet.contains(temp);//провер€етс€ только по имени
+			setBlock.unlock();
+			return result;
+		}
+		static const externalFunction* get(const std::string& name) noexcept
+		{
+			const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
+			setBlock.lock();
+			const externalFunction* function = (funSet.contains(temp)) ? &(*funSet.find(temp)) : nullptr;
+			//провер€етс€ только по имени
+			setBlock.unlock();
+			return function;
+		}
+	};
+	const externalFunction externalFunction::Error =
+		externalFunction(std::string("error"), [](nodePtr c) {return false; }, [](nodePtr) {});
+	std::mutex externalFunction::setBlock;
+	std::set<externalFunction> externalFunction::funSet;
+	
+	
+
+	
 }

@@ -22,9 +22,6 @@
     <ClInclude Include="visualNode.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="visualConnection.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
     <ClInclude Include="nodeScreen.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>

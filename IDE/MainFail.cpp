@@ -6,7 +6,9 @@
 #include "SFML/Window.hpp"
 
 #include "visualNode.h"
+#include "attribute.h"
 using namespace nechto;
+using namespace nechto::ide;
 bool variableAtNullConnection(nodePtr v1)
 {
 	if (!v1->hasConnection(0))//наличие соединения
@@ -56,27 +58,13 @@ script createCalculator()
 
 int main()
 {
-	
-	sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
-
-	while (window.isOpen())
-	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
-
-		window.clear();
-		window.draw(shape);
-		window.display();
-	}
-
-	return 0;
-
+	nodePtr sl1 = createVariable(0.0);
+	attribute::set(sl1, std::string("laja.lag"));
+	std::cout << to_string(attribute::get(sl1, std::string("laja"))) << std::endl;
+	std::cout << to_string(attribute::get(sl1, std::string("lag"))) << std::endl;
+	std::cout << to_string(attribute::get(sl1, std::string("unknown.laja.lag"))) << std::endl;
+	attribute::set(sl1, std::string("fulllaja.lag"));
+	std::cout << to_string(attribute::get(sl1, std::string("lag"))) << std::endl;
 	/*addExternalFunction(externalFunction(
 		"consoleIn",
 		variableAtNullConnection,
