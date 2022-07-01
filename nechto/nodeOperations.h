@@ -118,7 +118,6 @@ namespace nechto
 	{//добавление хаба к элементу
 		assert(vertex.exist());
 		assert(lastHub.exist());
-
 		nodePtr hub = newNode();
 		setTypeAndSubtype(hub, node::Hub, 0);
 		hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
@@ -148,8 +147,9 @@ namespace nechto
 	void HubConnect(nodePtr v1, nodePtr v2)
 	{//добавление связи в первое попавшееся свободное место в хабе
 		assert(v1.exist() && v2.exist());
+
 		if (!v1->hubConnection.load().exist())
-			addHub(v1, nullNodePtr);
+			addHub(v1, v1);
 		nodePtr hubIterator = v1->hubConnection;
 		nodePtr temp;
 		while (true)

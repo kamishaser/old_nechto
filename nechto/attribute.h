@@ -19,12 +19,33 @@ namespace nechto
 					nodePtr connection = hubIterator->connection[i];
 					if (typeSubtypeCompare(connection, node::Tag, tag::Attribute))
 					{
-						if (comName::isGlobalAndLocal(comName(tag::getData(connection)), name))
+						if (comName(tag::getData(connection)) == name)
 							return connection;
 					}
 				}
 				if (!hubIterator->hasHub())
 					return nullNodePtr;
+				hubIterator = hubIterator->hubConnection;
+			}
+		}
+		std::set<nodePtr>&& getAll(nodePtr v1)
+		{
+			std::set<nodePtr> atrset;
+			nodePtr hubIterator = v1->hubConnection;
+			if (!hubIterator.exist())
+				return std::move(atrset);
+			while (true)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					nodePtr connection = hubIterator->connection[i];
+					if (typeSubtypeCompare(connection, node::Tag, tag::Attribute))
+					{
+						atrset.emplace(connection);
+					}
+				}
+				if (!hubIterator->hasHub())
+					return std::move(atrset);
 				hubIterator = hubIterator->hubConnection;
 			}
 		}

@@ -39,7 +39,7 @@ public:
 	nodePtr stoptr(std::string& line);
 
 	commandLine()
-		:v1(std::string("commandLine")){}
+		:v1(nullNodePtr, std::string("commandLine")){}
 	std::string operator()(std::string line)
 	{
 		std::string command;
