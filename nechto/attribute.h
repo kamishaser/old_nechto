@@ -28,12 +28,12 @@ namespace nechto
 				hubIterator = hubIterator->hubConnection;
 			}
 		}
-		std::set<nodePtr>&& getAll(nodePtr v1)
+		std::set<nodePtr> getAll(nodePtr v1)
 		{
 			std::set<nodePtr> atrset;
 			nodePtr hubIterator = v1->hubConnection;
 			if (!hubIterator.exist())
-				return std::move(atrset);
+				return atrset;
 			while (true)
 			{
 				for (int i = 0; i < 4; i++)
@@ -45,7 +45,7 @@ namespace nechto
 					}
 				}
 				if (!hubIterator->hasHub())
-					return std::move(atrset);
+					return atrset;
 				hubIterator = hubIterator->hubConnection;
 			}
 		}
@@ -94,6 +94,8 @@ namespace nechto
 
 		void delAll(nodePtr v1)
 		{
+			if (!v1->hasHub())
+				return;
 			nodePtr hubIterator = v1->hubConnection;
 			while (true)
 			{

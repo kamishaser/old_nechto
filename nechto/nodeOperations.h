@@ -22,6 +22,9 @@ namespace nechto
 	bool isNodeHasConnections(nodePtr v1);
 	bool hasConnection(nodePtr v1, nodePtr v2);
 	bool hasMultipleConnection(nodePtr v1);
+
+	int64_t getConnectionNumber(nodePtr v1, nodePtr v2);
+	std::vector<nodePtr> allNodeConnections(nodePtr v1);
 	//создание
 	const nodePtr newNode();
 	const nodePtr newNode(char type, char subtype = 0, size_t data = 0);
@@ -90,6 +93,42 @@ namespace nechto
 			}
 			if (!hubIterator->hasHub())
 				return false;
+			hubIterator = hubIterator->hubConnection;
+		}
+	}
+	//номер подключения v2 к v1 нод. -1, если соединение не найдено
+	int64_t getConnectionNumber(nodePtr v1, nodePtr v2)
+	{
+		assert(v1.exist());
+		int64_t number = 0;
+		nodePtr hubIterator = v1;
+		while (true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (hubIterator->connection[i].load() == v2)
+					return number;
+				++number;
+			}
+			if (!hubIterator->hasHub())
+				return -1;
+			hubIterator = hubIterator->hubConnection;
+		}
+	}
+
+	std::vector<nodePtr> allNodeConnections(nodePtr v1)
+	{
+		assert(v1.exist());
+		nodePtr hubIterator = v1;
+		std::vector<nodePtr> connections;
+		while (true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				connections.push_back(hubIterator->connection[i].load());
+			}
+			if (!hubIterator->hasHub())
+				return connections;
 			hubIterator = hubIterator->hubConnection;
 		}
 	}

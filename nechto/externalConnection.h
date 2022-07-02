@@ -12,7 +12,7 @@ namespace nechto
 		uniqueNodePtr exConTag;
 	public:
 		externalConnection(const nodePtr conNode, const comName& name)
-			:exConTag(uniqueNodePtr::makeUnique(node::Tag, tag::ExternalConnection))
+			:exConTag(node::Tag, tag::ExternalConnection)
 		{
 			tag::setData(exConTag, name.str());
 			if(conNode.exist())

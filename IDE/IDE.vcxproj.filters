@@ -22,7 +22,13 @@
     <ClInclude Include="visualNode.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="nodeScreen.h">
+    <ClInclude Include="nodeBoard.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeDisplay.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="mHandlers.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
   </ItemGroup>

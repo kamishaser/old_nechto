@@ -146,7 +146,9 @@
     <ClCompile Include="MainFail.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nodeScreen.h" />
+    <ClInclude Include="mHandlers.h" />
+    <ClInclude Include="nodeBoard.h" />
+    <ClInclude Include="nodeDisplay.h" />
     <ClInclude Include="visualNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

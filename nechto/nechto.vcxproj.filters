@@ -19,12 +19,6 @@
     <Filter Include="Исходные файлы\text">
       <UniqueIdentifier>{f2d5d061-d8a1-4759-94dd-02d52e96f2a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\node\tag">
-      <UniqueIdentifier>{90c80de9-cecd-427f-8ba3-cc9b41008625}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\stream">
-      <UniqueIdentifier>{55cd6673-55ba-47ad-bfb6-a6bd04a9f9f5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nodeOperations.h">
@@ -57,6 +51,15 @@
     <ClInclude Include="externalFunction.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
+    <ClInclude Include="tag.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="stream.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="fileStream.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
     <ClInclude Include="nodeTypeProperties.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
@@ -69,29 +72,23 @@
     <ClInclude Include="commandLine.h">
       <Filter>Исходные файлы\text</Filter>
     </ClInclude>
+    <ClInclude Include="externalConnection.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
     <ClInclude Include="pointer.h">
       <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="comName.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="uniqueNodePtr.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="tag.h">
-      <Filter>Исходные файлы\node\tag</Filter>
-    </ClInclude>
     <ClInclude Include="attribute.h">
-      <Filter>Исходные файлы\node\tag</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="externalConnection.h">
-      <Filter>Исходные файлы\node\tag</Filter>
-    </ClInclude>
-    <ClInclude Include="stream.h">
-      <Filter>Исходные файлы\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="fileStream.h">
-      <Filter>Исходные файлы\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="comName.h">
-      <Filter>Исходные файлы\text</Filter>
+    <ClInclude Include="connectionIterator.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

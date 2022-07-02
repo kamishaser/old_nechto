@@ -45,7 +45,7 @@ namespace nechto
 			"Error",
 			"Comment",
 			"Name",
-			"ExternalConnection"
+			"ExternalConnection",
 			"Attribute"
 		};
 		

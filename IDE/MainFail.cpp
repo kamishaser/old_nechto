@@ -2,26 +2,50 @@
 #include "commandLine.h"
 #include "script.h"
 
-#include "SFML/Graphics.hpp"
-#include "SFML/Window.hpp"
 
+#include "nodeDisplay.h"
 #include "visualNode.h"
+#include "nodeBoard.h"
 #include "attribute.h"
+#include "mHandlers.h"
 using namespace nechto;
 using namespace nechto::ide;
-bool variableAtNullConnection(nodePtr v1)
+
+void cracalk(nodeBoard& nBoard);
+int main()
 {
-	if (!v1->hasConnection(0))//наличие соединения
-		return false;
-	if (v1->connectionType(0) != node::Variable)
-		return false;//проверка типа (только переменные)
-	return true;
+	nodeBoard nBoard(glm::vec2(1000, 1000));
+	
+	cracalk(nBoard);
+	nBoard.addHandler(std::make_shared<handler::repulsionHandler>(1));
+	nBoard.addHandler(std::make_shared<handler::attractionHandler>(0.05));
+	sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+
+	nodeDisplay nDisplay(nBoard, window);
+	
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		std::this_thread::sleep_for(20ms);
+		while (window.pollEvent(event))
+		{
+			
+			
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+		window.clear();
+		nDisplay.update();
+		nBoard.update();
+		
+		window.display();
+	}
 }
 
-script createCalculator()
-{
-	sf::RenderWindow sff;
 
+void cracalk(nodeBoard& nBoard)
+{
 	nodePtr sl1 = createVariable(0.0);
 	nodePtr sl2 = createVariable(0.0);
 	nodePtr result = createVariable(0.0);
@@ -39,94 +63,18 @@ script createCalculator()
 	NumHubConnect(summator, printer, 3);
 	NumHubConnect(printer, reader1, 3);
 
-	fileStream scrSave;
-	scrSave.saveStart("script.nechto");
-	scrSave.save(reader1);
-	scrSave.save(reader2);
-	scrSave.save(sl1);
-	scrSave.save(sl2);
-	scrSave.save(result);
-	scrSave.save(summator);
-	scrSave.save(printer);
-	scrSave.end();
-
-	assert(isCorrect(summator));
-
-	return script(reader1);
-}
-
-
-int main()
-{
-	nodePtr sl1 = createVariable(0.0);
-	attribute::set(sl1, std::string("laja.lag"));
-	std::cout << to_string(attribute::get(sl1, std::string("laja"))) << std::endl;
-	std::cout << to_string(attribute::get(sl1, std::string("lag"))) << std::endl;
-	std::cout << to_string(attribute::get(sl1, std::string("unknown.laja.lag"))) << std::endl;
-	attribute::set(sl1, std::string("fulllaja.lag"));
-	std::cout << to_string(attribute::get(sl1, std::string("lag"))) << std::endl;
-	/*addExternalFunction(externalFunction(
-		"consoleIn",
-		variableAtNullConnection,
-		[](nodePtr v1)
-		{
-			if (v1->connectionSubtype(0) == baseValueType::Int64)
-			{
-				std::string temp;
-				std::cin >> temp;
-				try
-				{ v1->connection[0].load()->setData<int64_t>(std::stoll(temp)); }
-				catch(...)
-				{
-					v1->connection[0].load()->setData<int64_t>(0);
-				}
-				
-				return;
-			}
-			if (v1->connectionSubtype(0) == baseValueType::Double)
-			{
-				std::string temp;
-				std::cin >> temp;
-				try
-				{
-					v1->connection[0].load()->setData<double>(std::stod(temp));
-				}
-				catch (...)
-				{
-					v1->connection[0].load()->setData<double>(0);
-				}
-				return;
-			}
-			return;
-		}
-	));
-	addExternalFunction(externalFunction(
-		"consoleOut",
-		variableAtNullConnection,
-		[](nodePtr v1)
-		{
-			std::cout << nodeProperties(v1->connection[0].load()) << std::endl;
-		}
-	));
-	commandLine c;
-	while (true)
-	{
-		try
-		{
-			std::string temp;
-			std::getline(std::cin, temp);
-			std::cin.clear();
-			std::cout << c(temp) << std::endl;
-		}
-		catch (std::exception e)
-		{
-			std::cout << e.what() << std::endl;
-		}
-	}*/
-	/*createCalculator()();
-	fileStream scrSave;
-	std::set<nodePtr> temp = scrSave.load("script.nechto");
-	assert(!temp.empty());
-	script scr(*temp.begin());
-	scr();*/
+	nBoard.add(sl1);
+	std::cout << std::endl;
+	nBoard.add(sl2);
+	std::cout << std::endl;
+	nBoard.add(result);
+	std::cout << std::endl;
+	nBoard.add(summator);
+	std::cout << std::endl;
+	nBoard.add(printer);
+	std::cout << std::endl;
+	nBoard.add(reader1);
+	std::cout << std::endl;
+	nBoard.add(reader2);
+	std::cout << std::endl;
 }

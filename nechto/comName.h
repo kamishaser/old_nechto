@@ -109,4 +109,8 @@ namespace nechto
 		}
 	};
 	
+	comName operator "" _cmn(const char* str, size_t size)
+	{
+		return comName(std::string(str, size));
+	}
 }

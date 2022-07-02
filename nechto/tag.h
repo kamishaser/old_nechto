@@ -62,7 +62,6 @@ namespace nechto
 			assert(tag.exist());
 			assert(tag->getType() == node::Tag);
 			tagAdDataBlock[tag.getFirst()].lock();
-			std::cout << tag->getData<std::string*>() << std::endl;
 			if (tag->getData<std::string*>() == nullptr)
 				tag->setData(new std::string(data));
 			else

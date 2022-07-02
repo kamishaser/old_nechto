@@ -55,10 +55,13 @@ namespace nechto
 	}
 	nodePtr createExternalFunction(std::string funName)
 	{
-		if (!externalFunction::exist(funName))
-			return nullNodePtr;
 		nodePtr temp = newNode();
 		setTypeAndSubtype(temp, node::ExteralFunction);
+		
+		if (!externalFunction::exist(funName))
+			externalFunction::add(
+				externalFunction(funName, externalFunction::Error.isCorrectPtr,
+					externalFunction::Error.FuncPtr));
 		temp->setData(externalFunction::get(funName));
 		return temp;
 	}
