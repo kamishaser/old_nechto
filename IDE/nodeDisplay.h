@@ -60,8 +60,39 @@ namespace nechto::ide
 			for (auto i : nBoard.vNode)
 			{
 				sf::CircleShape shape(i->size);
-				shape.setFillColor(sf::Color::Green);
 				shape.setPosition(SfGlmvec2(i->position - glm::vec2(i->size, i->size)));
+
+				switch (i->operator nechto::node::ptr()->getType())
+				{
+				case node::Error:
+					shape.setFillColor(sf::Color::Red);
+					break;
+				case node::Hub:
+					shape.setFillColor(sf::Color(50, 50, 50));
+					break;
+				case node::Variable:
+					shape.setFillColor(sf::Color(200, 200, 200));
+					break;
+				case node::TypeCastOperator:
+					shape.setFillColor(sf::Color(0, 200, 200));
+					break;;
+				case node::MathOperator:
+					shape.setFillColor(sf::Color::Blue);
+					break;
+				case node::Tag:
+					shape.setFillColor(sf::Color::Green);
+					break;
+				case node::ConditionalBranching:
+					shape.setFillColor(sf::Color::Yellow);
+					break;
+				case node::ExteralFunction:
+					shape.setFillColor(sf::Color::Magenta);
+					break;
+				case node::Pointer:
+					shape.setFillColor(sf::Color::Magenta);
+					break;
+				}
+
 				window.draw(shape);
 			}
 		}

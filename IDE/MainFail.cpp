@@ -18,7 +18,8 @@ int main()
 	
 	cracalk(nBoard);
 	nBoard.addHandler(std::make_shared<handler::repulsionHandler>(1));
-	nBoard.addHandler(std::make_shared<handler::attractionHandler>(0.05));
+	nBoard.addHandler(std::make_shared<handler::attractionHandler>(1));
+	nBoard.addHandler(std::make_shared<handler::centripetalHandler>(1));
 	sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
 
 	nodeDisplay nDisplay(nBoard, window);

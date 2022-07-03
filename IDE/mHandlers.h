@@ -43,16 +43,16 @@ namespace nechto::ide::handler
 		{
 			float distance = glm::length(vnPare.first->position - vnPare.second->position);
 			glm::vec2 normal = glm::normalize(vnPare.first->position - vnPare.second->position);
-			float averageSize = (vnPare.first->size + vnPare.second->size) / 2;
+			float averageSize = ((vnPare.first->size + vnPare.second->size) / 2);
 			return glm::vec2
 			(
-				-distance / averageSize * normal.x * force * (timeInterval / 1ms),
-				-distance / averageSize * normal.y * force * (timeInterval / 1ms)
+				-glm::sqrt(distance) / (averageSize) * normal.x * force * (timeInterval / 1ms),
+				-glm::sqrt(distance) / (averageSize) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
 		float force;
-
+		
 		attractionHandler(float fc)
 			:force(fc) {}
 
@@ -66,4 +66,33 @@ namespace nechto::ide::handler
 						i1->position += attraction(sharedVisualNodePare(i1, i2.second.lock()), timeInterval);
 		}
 	};
+	class centripetalHandler : public nodeBoard::handler
+	{
+		glm::vec2 centripet(sharedVisualNode vn, microseconds timeInterval)
+		{
+			glm::vec2 boardCenter(nBoard->boardSize.x / 2, nBoard->boardSize.y / 2);
+			float distance = glm::length(vn->position - boardCenter);
+			glm::vec2 normal = glm::normalize(vn->position - nBoard->boardSize + boardCenter);
+			return glm::vec2
+			(
+				-glm::sqrt(distance)/ vn->size  * normal.x * force * (timeInterval / 1ms),
+				-glm::sqrt(distance) / vn->size * normal.y * force * (timeInterval / 1ms)
+			);
+		}
+	public:
+		float force;
+
+		centripetalHandler(float fc)
+			:force(fc) {}
+
+		virtual ~centripetalHandler() override {}
+
+		virtual void update(milliseconds timeInterval) override
+		{
+			for (auto i1 : nBoard->vNode)
+				i1->position += centripet(i1, timeInterval);
+		}
+	};
+
+	
 }
