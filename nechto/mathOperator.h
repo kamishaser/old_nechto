@@ -196,7 +196,7 @@ namespace nechto
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		void mathOperation(nodePtr operatorNode)
 		{
-			assert(isCorrect(operatorNode));
+			assert(operatorNode.isCorrect());
 
 
 			ushort resultType = operatorNode->connection[0].load()->getSubtype();

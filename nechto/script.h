@@ -34,7 +34,7 @@ namespace nechto
 
 			for (auto i = nodeSet.begin(); i != nodeSet.end(); ++i)
 			{
-				if (!nechto::isCorrect(*i))
+				if (!i->isCorrect())
 					errorSet.emplace(*i);
 			}
 			return std::move(errorSet);
@@ -45,7 +45,7 @@ namespace nechto
 			for (auto i = nodeSet.begin(); i != nodeSet.end(); ++i)
 			{
 				std::cout  << to_string(*i) << std::endl;
-				if (!nechto::isCorrect(*i))
+				if (!i->isCorrect())
 					return false;
 			}
 			return true;

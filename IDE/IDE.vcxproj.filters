@@ -12,6 +12,9 @@
     <Filter Include="Исходные файлы\projection">
       <UniqueIdentifier>{057edadb-9bb6-4f69-a25d-3f821de840a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\display">
+      <UniqueIdentifier>{8f3c7e9a-25c3-4671-8f1f-79ea32632b3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
@@ -19,17 +22,29 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="visualNode.h">
+    <ClInclude Include="locatedNode.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
     <ClInclude Include="nodeBoard.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="nodeDisplay.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
     <ClInclude Include="mHandlers.h">
       <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeDisplay.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="line.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="periodLimiter.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNode.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="SFML GML compatibility.h">
+      <Filter>Исходные файлы\display</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

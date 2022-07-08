@@ -3,13 +3,13 @@
 
 namespace nechto::ide::handler
 {
-	using sharedVisualNodePare = std::pair<sharedVisualNode, sharedVisualNode>;
+	using sharedLocatedNodePare = std::pair<sharedLocatedNode, sharedLocatedNode>;
 	using nodeInteractionForce = std::function<glm::vec2
-	(sharedVisualNodePare, milliseconds)>;
+	(sharedLocatedNodePare, milliseconds)>;
 
 	class repulsionHandler : public nodeBoard::handler
 	{
-		glm::vec2 repulsion(sharedVisualNodePare vnPare, microseconds timeInterval)
+		glm::vec2 repulsion(sharedLocatedNodePare vnPare, microseconds timeInterval)
 		{
 			float distance = glm::length(vnPare.first->position - vnPare.second->position);
 			glm::vec2 normal = glm::normalize(vnPare.first->position - vnPare.second->position);
@@ -33,21 +33,21 @@ namespace nechto::ide::handler
 			for (auto i1 : nBoard->vNode)
 				for (auto i2 : nBoard->vNode)
 					if(i1->operator nechto::node::ptr() != i2->operator nechto::node::ptr())
-						i1->position += repulsion(sharedVisualNodePare(i1, i2), timeInterval);
+						i1->position += repulsion(sharedLocatedNodePare(i1, i2), timeInterval);
 		}
 	};
 
 	class attractionHandler : public nodeBoard::handler
 	{
-		glm::vec2 attraction(sharedVisualNodePare vnPare, microseconds timeInterval)
+		glm::vec2 attraction(sharedLocatedNodePare vnPare, microseconds timeInterval)
 		{
 			float distance = glm::length(vnPare.first->position - vnPare.second->position);
 			glm::vec2 normal = glm::normalize(vnPare.first->position - vnPare.second->position);
 			float averageSize = ((vnPare.first->size + vnPare.second->size) / 2);
 			return glm::vec2
 			(
-				-glm::sqrt(distance) / (averageSize) * normal.x * force * (timeInterval / 1ms),
-				-glm::sqrt(distance) / (averageSize) * normal.y * force * (timeInterval / 1ms)
+				-glm::sqrt(distance) / (glm::sqrt(averageSize)) * normal.x * force * (timeInterval / 1ms),
+				-glm::sqrt(distance) / (glm::sqrt(averageSize)) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
@@ -63,20 +63,20 @@ namespace nechto::ide::handler
 			for (auto i1 : nBoard->vNode)
 				for (auto i2 : i1->connections)
 					if (i1->operator nodePtr() != i2.second.lock()->operator nodePtr())
-						i1->position += attraction(sharedVisualNodePare(i1, i2.second.lock()), timeInterval);
+						i1->position += attraction(sharedLocatedNodePare(i1, i2.second.lock()), timeInterval);
 		}
 	};
 	class centripetalHandler : public nodeBoard::handler
 	{
-		glm::vec2 centripet(sharedVisualNode vn, microseconds timeInterval)
+		glm::vec2 centripet(sharedLocatedNode vn, microseconds timeInterval)
 		{
 			glm::vec2 boardCenter(nBoard->boardSize.x / 2, nBoard->boardSize.y / 2);
 			float distance = glm::length(vn->position - boardCenter);
 			glm::vec2 normal = glm::normalize(vn->position - nBoard->boardSize + boardCenter);
 			return glm::vec2
 			(
-				-glm::sqrt(distance)/ vn->size  * normal.x * force * (timeInterval / 1ms),
-				-glm::sqrt(distance) / vn->size * normal.y * force * (timeInterval / 1ms)
+				-glm::sqrt(distance)/ glm::sqrt(vn->size)  * normal.x * force * (timeInterval / 1ms),
+				-glm::sqrt(distance) / glm::sqrt(vn->size) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:

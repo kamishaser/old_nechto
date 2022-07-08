@@ -277,7 +277,7 @@ std::string commandLine::commandDisconnect(std::string& line)
 // 
 std::string commandLine::commandStep(std::string& line)
 {
-	if (!isCorrect(v1))
+	if (!v1.get().isCorrect())
 		return "the node isn't correct";
 	nodePtr nPos = step(v1);
 	if (nPos.exist())
@@ -289,7 +289,7 @@ std::string commandLine::commandStep(std::string& line)
 //std::string commandLine::commandSet(std::string& line)
 std::string commandLine::commandIsCorrect(std::string& line)
 {
-	if (isCorrect(v1))
+	if (v1.get().isCorrect())
 		return "the node is correct";
 	else
 		return "the node isn't correct";

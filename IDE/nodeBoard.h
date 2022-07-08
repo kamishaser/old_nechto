@@ -1,17 +1,14 @@
 #pragma once
-#include "visualNode.h"
+#include "locatedNode.h"
 #include "GLM/glm.hpp"
 #include "textOut.h"
-#include <chrono>
+#include "periodLimiter.h"
 
 namespace nechto::ide
 {
 	
 	using namespace std::chrono;
-	milliseconds currentTime()
-	{
-		return duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-	}
+	
 	glm::vec2 randomPos(glm::vec2 border)
 	{
 		return glm::vec2
@@ -43,14 +40,14 @@ namespace nechto::ide
 	private:
 		std::vector<std::shared_ptr<handler>> handlerSet;
 	public:
-		std::vector<sharedVisualNode> vNode;
-		
+		std::vector<sharedLocatedNode> vNode;
+		periodLimiter plim;
 		glm::vec2 boardSize;
 		milliseconds lastUp;
 
 		
 		nodeBoard(glm::vec2 size)
-			:boardSize(size), lastUp(currentTime()) {}
+			:boardSize(size), lastUp(currentTime()), plim(10ms, 12ms) {}
 
 		void addHandler(std::shared_ptr<handler> han)
 		{
@@ -60,40 +57,39 @@ namespace nechto::ide
 		}
 		void update()
 		{
-			milliseconds timeInterval = currentTime() - lastUp;
-			if (timeInterval > 500ms)
-				timeInterval = 500ms;
-			for (auto i = handlerSet.begin(); i != handlerSet.end(); ++i)
+			if (plim.moreThanMin())
 			{
-				if (*i)
-					(*i)->update(timeInterval);
-				else
-					handlerSet.erase(i);
+				for (auto i = handlerSet.begin(); i != handlerSet.end(); ++i)
+				{
+					if (*i)
+						(*i)->update(plim.currentPeriod());
+					else
+						handlerSet.erase(i);
+				}
+				plim.reset();
 			}
-			lastUp = currentTime();
-			std::cout << vNode[0]->position.x << ' ' << vNode[0]->position.y << std::endl;
 		}
 		bool contains(nodePtr v1)
 		{
 			if (!v1.exist())
 				return false;
 			return (std::find_if(vNode.begin(), vNode.end(),
-				[&](const sharedVisualNode v2)->bool {return nodePtr(*v2) == v1; })
+				[&](const sharedLocatedNode v2)->bool {return nodePtr(*v2) == v1; })
 				!= vNode.end());
 		}
-		sharedVisualNode operator[](nodePtr v1)
+		sharedLocatedNode operator[](nodePtr v1)
 		{
 			assert(contains(v1));
 			return *std::find_if(vNode.begin(), vNode.end(),
-				[&](const sharedVisualNode v2)->bool {return nodePtr(*v2) == v1; });
+				[&](const sharedLocatedNode v2)->bool {return nodePtr(*v2) == v1; });
 		}
-		sharedVisualNode add(nodePtr v1, glm::vec2 pos = glm::vec2(500, 500), float size = 50)
+		sharedLocatedNode add(nodePtr v1, glm::vec2 pos = glm::vec2(500, 500), float size = 30)
 		{
-			sharedVisualNode vn1;
+			sharedLocatedNode vn1;
 			
 			if (!contains(v1))
 			{
-				vn1 = std::make_shared<visualNode>(v1, pos + randomOffset(400), size);
+				vn1 = std::make_shared<locatedNode>(v1, pos + randomOffset(400), size);
 				vNode.push_back(vn1);
 				auto vn1Con = allNodeConnections(*vn1);
 				for (int64_t i = 0; i < static_cast<int64_t>(vn1Con.size()); ++i)

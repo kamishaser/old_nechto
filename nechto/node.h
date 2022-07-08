@@ -57,6 +57,7 @@ namespace nechto
 			{
 				return exist();
 			}
+			bool isCorrect() const;
 			
 			node* operator-> ();
 			node* operator* ();
@@ -84,11 +85,13 @@ namespace nechto
 		std::atomic<size_t> data = 0;//данные ноды
 		std::atomic<char> type;//тип ноды
 		std::atomic<char> subtype;//подтип ноды
+		std::atomic<bool> correctnessСhecked = false;
 	public:
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 	
 		friend void setTypeAndSubtype(ptr, char, char);
+		
 
 		template <class TCon>
 		const TCon getData() const //получение данных в формате <TCon>
@@ -113,6 +116,10 @@ namespace nechto
 		bool hasHub() const //проверка наличия соединения по номеру	
 		{
 			return (hubConnection.load());
+		}
+		void correctnessHasNotBeenChecked()
+		{
+			correctnessСhecked = false;
 		}
 		int connectionType(int number) const //получение типа ноды подключённой по номеру
 		{

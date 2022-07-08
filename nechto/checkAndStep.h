@@ -22,43 +22,54 @@ namespace nechto
 			return false;
 		}
 	}
-	bool isCorrect(nodePtr v1)
+	bool nodePtr::isCorrect() const
 	{
-		if (!v1.exist())
-			return false;
-		switch (v1->getType())
+		nodePtr temp = *this;
+		if (temp->correctnessÑhecked.load())
+			return true;
+		switch (temp->getType())
 		{
 		case node::Error:
-			return false;
+			temp->correctnessÑhecked = false;
+			break;
 		case node::Hub:
-			return getHubParrent(v1).exist();
+			temp->correctnessÑhecked = getHubParrent(*this).exist();
+			break;
 		case node::Variable:
-			return (!v1->hasConnection(0) && !v1->hasConnection(1)
-				 && !v1->hasConnection(2) && !v1->hasConnection(3)
-				 && v1->getSubtype() != baseValueType::Error);
+			temp->correctnessÑhecked = (!temp->hasConnection(0) && !temp->hasConnection(1)
+				 && !temp->hasConnection(2) && !temp->hasConnection(3)
+				 && temp->getSubtype() != baseValueType::Error);
+			break;
 		case node::TypeCastOperator:
-			return isTypeCastOperatorCorrect(v1);
+			temp->correctnessÑhecked = isTypeCastOperatorCorrect(*this);
+			break;
 		case node::MathOperator:
-			return mathOperator::isCorrect(v1);
+			temp->correctnessÑhecked = mathOperator::isCorrect(*this);
+			break;
 		case node::Tag:
-			return tag::isCorrect(v1);
+			temp->correctnessÑhecked = tag::isCorrect(*this);
+			break;
 		case node::ConditionalBranching:
-			return ((v1->hasConnection(0)) && (v1->connection[0].load()->getType() == node::Variable));
+			temp->correctnessÑhecked = ((temp->hasConnection(0)) && (temp->connection[0].load()->getType() == node::Variable));
+			break;
 		case node::ExteralFunction:
-			if (v1->getData<externalFunction*>() == nullptr)
-				return false;
-			if (v1->getData<externalFunction*>()->isCorrect(v1))
-				return true;
+			if (temp->getData<externalFunction*>() == nullptr)
+				temp->correctnessÑhecked = false;
+			if (temp->getData<externalFunction*>()->isCorrect((*this)))
+				temp->correctnessÑhecked = true;
+			break;
 		case node::Pointer:
-			return pointer::isCorrect(v1);
+			temp->correctnessÑhecked = pointer::isCorrect((*this));
+			break;
 		default:
-			return false;
+			temp->correctnessÑhecked = false;
 		}
+		return temp->correctnessÑhecked;
 	}
 	
 	nodePtr step(nodePtr flag)
 	{
-		assert(isCorrect(flag));
+		assert(flag.isCorrect());
 		assert(isAction(flag));
 		nodePtr nextPosition;
 		switch (flag->getType())

@@ -40,7 +40,7 @@ namespace nechto
 		{
 			return static_cast <int64_t> (nameComponents.size());
 		}
-		const std::string str() const
+		const std::string str(char separator = '.') const
 		{
 			std::string name;
 			name.reserve(nameSize());
@@ -49,7 +49,7 @@ namespace nechto
 				name += nameComponents[i];
 				if (i + 1 >= static_cast<int64_t>(nameComponents.size()))
 					break;
-				name.push_back('.');
+				name.push_back(separator);
 			}
 			return name;
 		}

@@ -33,6 +33,10 @@ namespace nechto
 		{
 			return exConTag->connection[0];
 		}
+		nodePtr get()const
+		{
+			return exConTag->connection[0].load();
+		}
 		node* operator->() const
 		{
 			return *exConTag->connection[0].load();
