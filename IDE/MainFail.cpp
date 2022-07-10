@@ -2,29 +2,31 @@
 #include "commandLine.h"
 #include "script.h"
 
-
+#include "sfmlDisplay.h"
 #include "nodeDisplay.h"
-#include "locatedNode.h"
+#include "visualNode.h"
+#include "graph.h"
 #include "nodeBoard.h"
 #include "attribute.h"
 #include "mHandlers.h"
+#include "autoExpandHandler.h"
 using namespace nechto;
 using namespace nechto::ide;
 
-void cracalk(nodeBoard& nBoard);
+void cracalk(graph& nGraph);
 int main()
 {
-	assert(visualNode::Font.loadFromFile("Fonts/arial.ttf"));
+	graph nGraph;
+	nodeBoard nBoard;
+	cracalk(nGraph);
+	nBoard.addHandler(std::make_shared<handler::repulsionHandler>(3.2));
+	nBoard.addHandler(std::make_shared<handler::attractionHandler>(3));
+	nBoard.addHandler(std::make_shared<handler::centripetalHandler>(0.06));
+	nBoard.addHandler(std::make_shared<handler::autoExpandHandler>());
 
-	nodeBoard nBoard(glm::vec2(1000, 1000));
-	
-	cracalk(nBoard);
-	nBoard.addHandler(std::make_shared<handler::repulsionHandler>(2));
-	nBoard.addHandler(std::make_shared<handler::attractionHandler>(1));
-	nBoard.addHandler(std::make_shared<handler::centripetalHandler>(1));
-	sf::RenderWindow window(sf::VideoMode(1000, 1000), "SFML works!");
+	sf::RenderWindow window(sf::VideoMode(1000, 1000), "nechtoIDE");
 
-	nodeDisplay nDisplay(nBoard, window);
+	sfmlDisplay nDisplay(window);
 	
 	periodLimiter plim(20ms, 100ms);
 	while (window.isOpen())
@@ -35,7 +37,10 @@ int main()
 		{
 			
 			window.clear();
-			nDisplay.update();
+			for (auto i : nGraph.connections)
+				nDisplay.draw(nGraph.findNode(i.first.first), nGraph.findNode(i.first.second), i.second);
+			for (auto i : nGraph.nodes)
+				nDisplay.draw(i.second);
 			window.display();
 			plim.reset();
 
@@ -50,7 +55,7 @@ int main()
 }
 
 
-void cracalk(nodeBoard& nBoard)
+void cracalk(graph& nGraph)
 {
 	nodePtr sl1 = createVariable(0.0);
 	nodePtr sl2 = createVariable(0.0);
@@ -72,28 +77,15 @@ void cracalk(nodeBoard& nBoard)
 	NumHubConnect(summator, printer, 3);
 	NumHubConnect(printer, reader1, 3);
 
-	nBoard.add(sl1);
-	std::cout << std::endl;
-	nBoard.add(sl2);
-	std::cout << std::endl;
-	nBoard.add(result);
-	std::cout << std::endl;
-	nBoard.add(summator);
-	std::cout << std::endl;
-	nBoard.add(printer);
-	std::cout << std::endl;
-	nBoard.add(reader1);
-	std::cout << std::endl;
-	nBoard.add(reader2);
-	std::cout << std::endl;
+	nGraph.addNode(sl1);
+	nGraph.addNode(reader1);
+	nGraph.connect(visualConnectionID(sl1, reader1));
 
 	nodePtr temp = sl1;
-	for (int i = 0; i < 10; ++i)
+	for (int i = 2; i < 9; ++i)
 	{
-		nodePtr n = newNode();
+		nodePtr n = newNode(i, 0);
 		HubHubConnect(temp, n);
 		temp = n;
-		nBoard.add(n);
-
 	}
 }

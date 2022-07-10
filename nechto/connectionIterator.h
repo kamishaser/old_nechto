@@ -13,7 +13,7 @@ namespace nechto
 		int64_t position = 0;
 
 		connectionIterator() {};
-		connectionIterator(nodePtr base, bool isArrayIterator)
+		connectionIterator(nodePtr base, bool isArrayIterator = false)
 		{
 			if (!isArrayIterator)
 			{
@@ -41,13 +41,13 @@ namespace nechto
 				if (nextNode.exist())
 				{
 					currentNode = nextNode;
-					return false;
+					return true;
 				}
 				else
 				{
 					currentNode = baseNode;
 					position = 0;
-					return true;
+					return false;
 				}
 			}
 		}

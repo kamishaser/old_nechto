@@ -146,13 +146,17 @@
     <ClCompile Include="MainFail.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="periodLimiter.h" />
-    <ClInclude Include="line.h" />
-    <ClInclude Include="mHandlers.h" />
+    <ClInclude Include="autoExpandHandler.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="visualConnection.h" />
     <ClInclude Include="nodeBoard.h" />
+    <ClInclude Include="periodLimiter.h" />
+    <ClInclude Include="mHandlers.h" />
+    <ClInclude Include="graph.h" />
     <ClInclude Include="nodeDisplay.h" />
-    <ClInclude Include="locatedNode.h" />
     <ClInclude Include="SFML GML compatibility.h" />
+    <ClInclude Include="sfmlDisplay.h" />
+    <ClInclude Include="shape.h" />
     <ClInclude Include="visualNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

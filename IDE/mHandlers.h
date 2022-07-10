@@ -1,23 +1,26 @@
 #pragma once
-#include "nodeBoard.h"
+#include "graph.h"
+#include "GLM/glm.hpp"
 
 namespace nechto::ide::handler
 {
-	using sharedLocatedNodePare = std::pair<sharedLocatedNode, sharedLocatedNode>;
-	using nodeInteractionForce = std::function<glm::vec2
-	(sharedLocatedNodePare, milliseconds)>;
 
-	class repulsionHandler : public nodeBoard::handler
+	class repulsionHandler : public graph::handler
 	{
-		glm::vec2 repulsion(sharedLocatedNodePare vnPare, microseconds timeInterval)
+		float scalar(float distance, float averageSize)
 		{
-			float distance = glm::length(vnPare.first->position - vnPare.second->position);
-			glm::vec2 normal = glm::normalize(vnPare.first->position - vnPare.second->position);
-			float averageSize = (vnPare.first->size + vnPare.second->size)/2;
+			return 1 / glm::abs(distance - averageSize / 2);
+		}
+		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
+		{
+			float distance = glm::length(v1.position - v2.position);
+			
+			glm::vec2 normal = glm::normalize(v1.position - v2.position);
+			glm::vec2 averageSize = (v1.size + v2.size) * 0.5f;
 			return glm::vec2
 			(
-				averageSize / distance * normal.x * force * (timeInterval / 1ms),
-				averageSize / distance * normal.y * force * (timeInterval / 1ms)
+				scalar(distance, averageSize.x) * normal.x * force * (timeInterval / 1ms),
+				scalar(distance, averageSize.x) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
@@ -30,24 +33,30 @@ namespace nechto::ide::handler
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nBoard->vNode)
-				for (auto i2 : nBoard->vNode)
-					if(i1->operator nechto::node::ptr() != i2->operator nechto::node::ptr())
-						i1->position += repulsion(sharedLocatedNodePare(i1, i2), timeInterval);
+			for (auto i1 : nGraph->nodes)
+				for (auto i2 : nGraph->nodes)
+					if(i1.first != i2.first)
+						i1.second.stepPosExchange += f(i1.second, i2.second, timeInterval);
 		}
 	};
 
-	class attractionHandler : public nodeBoard::handler
+	class attractionHandler : public graph::handler
 	{
-		glm::vec2 attraction(sharedLocatedNodePare vnPare, microseconds timeInterval)
+		float scalar(float distance, float averageSize)
 		{
-			float distance = glm::length(vnPare.first->position - vnPare.second->position);
-			glm::vec2 normal = glm::normalize(vnPare.first->position - vnPare.second->position);
-			float averageSize = ((vnPare.first->size + vnPare.second->size) / 2);
+			return (distance > averageSize) ?
+				2 * (distance - averageSize) / (averageSize * averageSize) : 0;
+		}
+		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
+		{
+			float distance = glm::length(v1.position - v2.position);
+
+			glm::vec2 normal = glm::normalize(v1.position - v2.position);
+			glm::vec2 averageSize = (v1.size + v2.size) * 0.5f;
 			return glm::vec2
 			(
-				-glm::sqrt(distance) / (glm::sqrt(averageSize)) * normal.x * force * (timeInterval / 1ms),
-				-glm::sqrt(distance) / (glm::sqrt(averageSize)) * normal.y * force * (timeInterval / 1ms)
+				scalar(distance, averageSize.x) * normal.x * force * (timeInterval / 1ms),
+				scalar(distance, averageSize.x) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
@@ -60,23 +69,20 @@ namespace nechto::ide::handler
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nBoard->vNode)
-				for (auto i2 : i1->connections)
-					if (i1->operator nodePtr() != i2.second.lock()->operator nodePtr())
-						i1->position += attraction(sharedLocatedNodePare(i1, i2.second.lock()), timeInterval);
+			for (auto i1 : nGraph->connections)
+				f(nGraph->findNode(i1.first.first), nGraph->findNode(i1.first.second), timeInterval);
 		}
 	};
-	class centripetalHandler : public nodeBoard::handler
+	class centripetalHandler : public graph::handler
 	{
-		glm::vec2 centripet(sharedLocatedNode vn, microseconds timeInterval)
+		glm::vec2 centripet(visualNode& v1, microseconds timeInterval)
 		{
-			glm::vec2 boardCenter(nBoard->boardSize.x / 2, nBoard->boardSize.y / 2);
-			float distance = glm::length(vn->position - boardCenter);
-			glm::vec2 normal = glm::normalize(vn->position - nBoard->boardSize + boardCenter);
+			float distance = glm::length(v1.position);
+			glm::vec2 normal = glm::normalize(v1.position);
 			return glm::vec2
 			(
-				-glm::sqrt(distance)/ glm::sqrt(vn->size)  * normal.x * force * (timeInterval / 1ms),
-				-glm::sqrt(distance) / glm::sqrt(vn->size) * normal.y * force * (timeInterval / 1ms)
+				-glm::sqrt(distance) * normal.x * force * (timeInterval / 1ms),
+				-glm::sqrt(distance) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
@@ -89,8 +95,8 @@ namespace nechto::ide::handler
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nBoard->vNode)
-				i1->position += centripet(i1, timeInterval);
+			for (auto i1 : nGraph->nodes)
+				i1.second.stepPosExchange += centripet(i1.second, timeInterval);
 		}
 	};
 

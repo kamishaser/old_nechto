@@ -55,7 +55,7 @@ namespace nechto
 		case node::ExteralFunction:
 			if (temp->getData<externalFunction*>() == nullptr)
 				temp->correctnessÑhecked = false;
-			if (temp->getData<externalFunction*>()->isCorrect((*this)))
+			else if (temp->getData<externalFunction*>()->isCorrect((*this)))
 				temp->correctnessÑhecked = true;
 			break;
 		case node::Pointer:

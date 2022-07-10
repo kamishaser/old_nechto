@@ -15,6 +15,9 @@
     <Filter Include="Исходные файлы\display">
       <UniqueIdentifier>{8f3c7e9a-25c3-4671-8f1f-79ea32632b3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\display\sfmlDisplay">
+      <UniqueIdentifier>{184dab61-083e-4756-9115-72304b64b492}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
@@ -22,10 +25,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="locatedNode.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeBoard.h">
+    <ClInclude Include="graph.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
     <ClInclude Include="mHandlers.h">
@@ -34,17 +34,32 @@
     <ClInclude Include="nodeDisplay.h">
       <Filter>Исходные файлы\display</Filter>
     </ClInclude>
-    <ClInclude Include="line.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
     <ClInclude Include="periodLimiter.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="visualNode.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
     <ClInclude Include="SFML GML compatibility.h">
       <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="shape.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNode.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="sfmlDisplay.h">
+      <Filter>Исходные файлы\display\sfmlDisplay</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeBoard.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="visualConnection.h">
+      <Filter>Исходные файлы\projection</Filter>
+    </ClInclude>
+    <ClInclude Include="autoExpandHandler.h">
+      <Filter>Исходные файлы\display\sfmlDisplay</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
