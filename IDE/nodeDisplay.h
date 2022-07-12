@@ -3,7 +3,6 @@
 #include "periodLimiter.h"
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
-#include "SFML GML compatibility.h"
 #include "visualNode.h"
 namespace nechto::ide
 {

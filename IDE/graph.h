@@ -29,7 +29,7 @@ namespace nechto::ide
 		class handler
 		{
 		public:
-			graph* nGraph;
+			std::shared_ptr<graph> nGraph;
 			bool switchedOn = true;
 			//возвращает true, если произвёл изменения и false если нет
 			
@@ -51,15 +51,18 @@ namespace nechto::ide
 		visualConnectionData& findConnection(visualConnectionID c1);
 		*/
 
-		visualNode& addNode(nodePtr v1)
+		virtual bool addNode(nodePtr v1)
 		{
+			assert(v1.exist());
 			visualNode temp;
-			temp.position = randomOffset(100);
-			return nodes.emplace(v1, temp).first->second;
-			
+			temp.position += randomOffset(400);
+			nodes.emplace(v1, temp);
+			return true;			
 		}
+		
 		void resetNode(nodePtr v1)
 		{
+			assert(v1.exist());
 			assert(nodes.contains(v1));
 			nodes.erase(v1);
 			for (auto i = connections.begin(); i != connections.end(); ++i)
@@ -72,18 +75,18 @@ namespace nechto::ide
 		}
 		visualNode& findNode(nodePtr v1)
 		{
+			assert(v1.exist());
 			assert(containsNode(v1));
 			return nodes.at(v1);
 		}
 		
-		visualConnectionData& connect(visualConnectionID c1)
+		virtual bool connect(visualConnectionID c1)
 		{
 			visualConnectionData temp;
 			assert(containsNode(c1.first) && containsNode(c1.second));
-			visualConnectionData& result = 
-				connections.emplace(c1, temp).first->second;
-			determineConnectionNumbers(c1);
-			return result;
+			connections.emplace(c1, temp);
+			//determineConnectionNumbers(c1);
+			return true;
 		}
 		void disconnect(visualConnectionID c1)
 		{
@@ -99,8 +102,9 @@ namespace nechto::ide
 			assert(connectionExist(c1));
 			return connections.at(c1);
 		}
+		virtual ~graph() {}
 
-		void determineConnectionNumbers(visualConnectionID c1)
+		/*void determineConnectionNumbers(visualConnectionID c1)
 		{
 			if (!connectionExist(c1))
 				connect(c1);
@@ -126,6 +130,22 @@ namespace nechto::ide
 			} while (++i);
 			if (vcn.empty())
 				disconnect(c1);
+		}*/
+
+		std::set<nodePtr> allNodeConnections(nodePtr v1)
+		{
+			std::set<nodePtr> con;
+			if (!containsNode(v1))
+				return con;
+			for (auto i = connections.begin(); i != connections.end(); ++i)
+			{
+				if (i->first.first == v1)
+					con.emplace(i->first.first);
+				else
+					if (i->first.second == v1)
+						con.emplace(i->first.second);
+			}
+			return con;
 		}
 	};
 }

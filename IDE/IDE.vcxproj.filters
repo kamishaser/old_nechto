@@ -12,10 +12,16 @@
     <Filter Include="Исходные файлы\projection">
       <UniqueIdentifier>{057edadb-9bb6-4f69-a25d-3f821de840a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\display">
+    <Filter Include="Исходные файлы\projection\visual">
+      <UniqueIdentifier>{2a9005a1-2161-48b2-9ceb-7a539c902a77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\projection\visual\fabric">
+      <UniqueIdentifier>{f4fe9a40-0d0b-4de6-972e-3701d9a6cd55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\projection\visual\fabric\display">
       <UniqueIdentifier>{8f3c7e9a-25c3-4671-8f1f-79ea32632b3f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\display\sfmlDisplay">
+    <Filter Include="Исходные файлы\projection\visual\fabric\display\sfmlDisplay">
       <UniqueIdentifier>{184dab61-083e-4756-9115-72304b64b492}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -32,34 +38,40 @@
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
     <ClInclude Include="nodeDisplay.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
-    <ClInclude Include="periodLimiter.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="SFML GML compatibility.h">
-      <Filter>Исходные файлы\display</Filter>
+      <Filter>Исходные файлы\projection\visual\fabric\display</Filter>
     </ClInclude>
     <ClInclude Include="client.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="shape.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="visualNode.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="sfmlDisplay.h">
-      <Filter>Исходные файлы\display\sfmlDisplay</Filter>
+    <ClInclude Include="ideWindow.h">
+      <Filter>Исходные файлы\projection\visual\fabric\display\sfmlDisplay</Filter>
     </ClInclude>
     <ClInclude Include="nodeBoard.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="visualConnection.h">
+    <ClInclude Include="autoExpandHandler.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
-    <ClInclude Include="autoExpandHandler.h">
-      <Filter>Исходные файлы\display\sfmlDisplay</Filter>
+    <ClInclude Include="visualConnection.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNode.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="periodLimiter.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="visual.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualAttribute.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualWay.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNodeFabric.h">
+      <Filter>Исходные файлы\projection\visual\fabric</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

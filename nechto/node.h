@@ -149,7 +149,8 @@ namespace nechto
 			ConditionalBranching,	//if
 			ExteralFunction,		//функци€, не €вл€юща€с€ частью nechto
 			Tag,					//метка
-			Pointer					//указатель на объект / массив
+			Pointer,					//указатель на объект
+			Array
 		};
 		
 	};

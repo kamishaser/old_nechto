@@ -90,6 +90,9 @@
     <ClInclude Include="connectionIterator.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="hub.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

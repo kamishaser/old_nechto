@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+#include "visual.h"
 
 namespace nechto::ide
 {

@@ -10,6 +10,7 @@
 #include "tag.h"
 #include "pointer.h"
 #include "externalFunction.h"
+#include "hub.h"
 
 namespace nechto
 {
@@ -29,9 +30,6 @@ namespace nechto
 	const nodePtr newNode();
 	const nodePtr newNode(char type, char subtype = 0, size_t data = 0);
 	
-	//операции с хабами
-	void addHub(nodePtr v1);
-	const nodePtr getHubParrent(const nodePtr hub);
 	//создание одностороннего соединения
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
 	void HubConnect(nodePtr v1, nodePtr v2);
@@ -49,6 +47,36 @@ namespace nechto
 	//удаление
 	void deleteNode(nodePtr v);
 	
+
+
+
+
+
+
+
+	void addHub(nodePtr vertex, nodePtr lastHub)
+	{//добавление хаба к элементу
+		assert(vertex.exist());
+		assert(lastHub.exist());
+		nodePtr hub = newNode();
+		setTypeAndSubtype(hub, node::Hub, 0);
+		hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
+		//адресс расширяемого элемента
+		nodePtr temp = nullNodePtr;//ввиду того, что compare_excha
+		if (!lastHub->hubConnection.compare_exchange_strong(temp, hub))
+			deleteNode(hub);
+		//если присоединить хаб не удалось, значит он уже есть
+	}
+	const nodePtr getHubParrent(const nodePtr hub)
+	{
+		assert(hub->getType() == node::Hub);
+		return hub->getData<std::pair<nodePtr, nodePtr>>().first;
+	}
+
+
+
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
 	bool typeCompare(nodePtr v1, char type)
@@ -153,24 +181,7 @@ namespace nechto
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//операции с хабами
 
-	void addHub(nodePtr vertex, nodePtr lastHub)
-	{//добавление хаба к элементу
-		assert(vertex.exist());
-		assert(lastHub.exist());
-		nodePtr hub = newNode();
-		setTypeAndSubtype(hub, node::Hub, 0);
-		hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
-		//адресс расширяемого элемента
-		nodePtr temp = nullNodePtr;//ввиду того, что compare_excha
-		if (!lastHub->hubConnection.compare_exchange_strong(temp, hub))
-			deleteNode(hub);
-		//если присоединить хаб не удалось, значит он уже есть
-	}
-	const nodePtr getHubParrent(const nodePtr hub)
-	{
-		assert(hub->getType() == node::Hub);
-		return hub->getData<std::pair<nodePtr, nodePtr>>().first;
-	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание одностороннего соединения
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber)
@@ -330,6 +341,7 @@ namespace nechto
 		while (true)
 		{//цикл удаления узла со всеми хабами
 			setTypeAndSubtype(vTemp, node::Error, 0);
+			vTemp->setData<void*>(nullptr);
 			for (int i = 0; i < 4; i++)//разрыв соединения
 				if (vTemp->connection[i].load().exist())
 				{

@@ -12,4 +12,6 @@ namespace nechto::ide
 	{
 		return glm::vec2(v.x, v.y);
 	}
+	using color = sf::Color;
+	using geometricShape = std::vector<glm::vec2>;
 }

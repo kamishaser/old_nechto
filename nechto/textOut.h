@@ -1,5 +1,6 @@
 #pragma once
 #include "typeNames.h"
+#include "connectionIterator.h"
 
 namespace nechto
 {
@@ -59,5 +60,16 @@ namespace nechto
 		if (v1 == nullNodePtr)
 			return "nullNodePtr";
 		return std::string(to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1));
+	}
+	std::string ConnectionsListText(const nodePtr v1)
+	{
+		std::string temp;
+		connectionIterator i(v1);
+		do {
+			temp += to_string(i.get()) + '\n';
+			if (i.position % 4 == 3)
+				temp += '\n';
+		} while (++i);
+		return temp;
 	}
 }

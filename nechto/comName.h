@@ -9,12 +9,12 @@ namespace nechto
 	{
 		std::vector <std::string> nameComponents;
 	public:
-		comName(const std::string& name)
+		comName(const std::string& name, char separator = '.')
 		{
 			int64_t lastPosition = 0;
 			for (int64_t i = 0; true; ++i)
 			{
-				if (name[i] == '.')
+				if (name[i] == separator)
 				{
 					nameComponents.push_back(name.substr(lastPosition,
 						i - lastPosition));
@@ -85,28 +85,27 @@ namespace nechto
 			result += topName;
 			return result;
 		}
-		static bool isGlobalAndLocal(const comName& n1, const comName& n2)
+		int matchesAtBegin(comName& cn)
 		{
-			const comName* global;
-			const comName* local;
-			if (n1.comNum() > n2.comNum())
-			{
-				global = &n1;
-				local = &n2;
-			}
-			else
-			{
-				global = &n2;
-				local = &n1;
-			}
-			const int64_t offset = global->comNum() - local->comNum();
-			for (int64_t i = 0; i < local->comNum(); ++i)
-			{
-				if (local->getComponent(i) != global->getComponent(i + offset))
-					return false;
-			}
-			return true;
+			int max = (nameComponents.size() < cn.nameComponents.size()) ?
+				nameComponents.size() : cn.nameComponents.size();
+			int i = 0;
+			for (; i < max; ++i)
+				if (nameComponents[i] != cn.nameComponents[i])
+					return i;
+			return max;
 		}
+		int matchesAtEnd(comName& cn)
+		{
+			int max = ((nameComponents.size() < cn.nameComponents.size()) ?
+				nameComponents.size() : cn.nameComponents.size());
+			int i = 0;
+			for(; i < max; ++i)
+				if (nameComponents[max-i-1] != cn.nameComponents[max-i-1])
+					return i;
+			return max;
+		}
+
 	};
 	
 	comName operator "" _cmn(const char* str, size_t size)

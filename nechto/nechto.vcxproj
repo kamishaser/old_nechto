@@ -146,6 +146,7 @@
     <ClInclude Include="externalFunction.h" />
     <ClInclude Include="comName.h" />
     <ClInclude Include="connectionIterator.h" />
+    <ClInclude Include="hub.h" />
     <ClInclude Include="nodeOperations.h" />
     <ClInclude Include="mathOperator.h" />
     <ClInclude Include="nechto.h" />

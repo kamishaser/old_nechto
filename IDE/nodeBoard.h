@@ -7,14 +7,11 @@ namespace nechto::ide
 	struct nodeBoard
 	{
 		std::vector<std::shared_ptr<graph::handler>> handlerSet;
-		graph mainGraph;
+		std::shared_ptr<graph> nGraph;
 		periodLimiter plim;
 
-		nodeBoard()
-			:plim(10ms, 12ms) {}
-
-		nodeBoard(const graph& nGraph)
-			:mainGraph(nGraph), plim(10ms, 12ms) {}
+		nodeBoard(std::shared_ptr<graph> nG)
+			:nGraph(nG), plim(10ms, 12ms) {}
 
 		void update()
 		{
@@ -28,10 +25,15 @@ namespace nechto::ide
 						i = handlerSet.erase(i);
 				plim.reset();
 			}
+			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
+			{
+				i1->second.position += i1->second.stepPosExchange;
+				i1->second.stepPosExchange = glm::vec2(0, 0);
+			}
 		}
 		void addHandler(std::shared_ptr<graph::handler> handler)
 		{
-			handler->nGraph = &mainGraph;
+			handler->nGraph = nGraph;
 			handlerSet.push_back(handler);
 		}
 

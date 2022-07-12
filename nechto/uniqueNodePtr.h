@@ -45,11 +45,11 @@ namespace nechto
 		{
 			return v.exist();
 		}
-		const nodePtr get() const
+		nodePtr get() const
 		{
 			return v;
 		}
-		operator const nodePtr() const
+		operator nodePtr() const
 		{
 			return get();
 		}

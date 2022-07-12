@@ -33,7 +33,7 @@ namespace nechto
 			if ((position & 3ll) != 0)
 			{
 				
-				return false;
+				return true;
 			}
 			else
 			{

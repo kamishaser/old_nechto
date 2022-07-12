@@ -9,18 +9,19 @@ namespace nechto::ide::handler
 	{
 		float scalar(float distance, float averageSize)
 		{
-			return 1 / glm::abs(distance - averageSize / 2);
+			float scal = 1 / glm::abs(distance - averageSize / 2);
+			return scal;
 		}
 		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
 		{
 			float distance = glm::length(v1.position - v2.position);
 			
 			glm::vec2 normal = glm::normalize(v1.position - v2.position);
-			glm::vec2 averageSize = (v1.size + v2.size) * 0.5f;
+			glm::vec2 averageSize = (v1.size + v2.size) / 2.0f;
 			return glm::vec2
 			(
 				scalar(distance, averageSize.x) * normal.x * force * (timeInterval / 1ms),
-				scalar(distance, averageSize.x) * normal.y * force * (timeInterval / 1ms)
+				scalar(distance, averageSize.y) * normal.y * force * (timeInterval / 1ms)
 			);
 		}
 	public:
@@ -33,10 +34,10 @@ namespace nechto::ide::handler
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nGraph->nodes)
-				for (auto i2 : nGraph->nodes)
-					if(i1.first != i2.first)
-						i1.second.stepPosExchange += f(i1.second, i2.second, timeInterval);
+			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
+				for (auto i2 = nGraph->nodes.begin(); i2 != nGraph->nodes.end(); ++i2)
+					if(i1->first != i2->first)
+						i1->second.stepPosExchange += f(i1->second, i2->second, timeInterval);
 		}
 	};
 
@@ -44,8 +45,9 @@ namespace nechto::ide::handler
 	{
 		float scalar(float distance, float averageSize)
 		{
-			return (distance > averageSize) ?
+			float scal = (distance > averageSize) ?
 				2 * (distance - averageSize) / (averageSize * averageSize) : 0;
+			return scal;
 		}
 		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
 		{
@@ -69,16 +71,17 @@ namespace nechto::ide::handler
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nGraph->connections)
-				f(nGraph->findNode(i1.first.first), nGraph->findNode(i1.first.second), timeInterval);
+			for (auto i1 = nGraph->connections.begin(); i1 != nGraph->connections.end(); ++i1)
+				f(nGraph->findNode(i1->first.first), nGraph->findNode(i1->first.second), timeInterval);
 		}
 	};
 	class centripetalHandler : public graph::handler
 	{
 		glm::vec2 centripet(visualNode& v1, microseconds timeInterval)
 		{
-			float distance = glm::length(v1.position);
-			glm::vec2 normal = glm::normalize(v1.position);
+			float distance = glm::length(v1.position-center);
+			
+			glm::vec2 normal = glm::normalize(v1.position-center);
 			return glm::vec2
 			(
 				-glm::sqrt(distance) * normal.x * force * (timeInterval / 1ms),
@@ -87,16 +90,20 @@ namespace nechto::ide::handler
 		}
 	public:
 		float force;
-
-		centripetalHandler(float fc)
-			:force(fc) {}
+		glm::vec2 center;
+		centripetalHandler(float fc, glm::vec2 c)
+			:force(fc), center(c) {}
 
 		virtual ~centripetalHandler() override {}
 
 		virtual void update(milliseconds timeInterval) override
 		{
-			for (auto i1 : nGraph->nodes)
-				i1.second.stepPosExchange += centripet(i1.second, timeInterval);
+			
+			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
+			{
+				i1->second.stepPosExchange += centripet(i1->second, timeInterval);
+				
+			}
 		}
 	};
 

@@ -60,10 +60,6 @@ namespace nechto
 					numDisconnect(attribute, i);
 					if (!isNodeHasConnections(atVar))
 						deleteNode(atVar);
-					else
-					{
-						NumHubConnect(attribute, atVar, i);
-					}
 				}
 			}
 			deleteNode(attribute);
