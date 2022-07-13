@@ -9,7 +9,7 @@ namespace nechto::ide::handler
 	{
 		float scalar(float distance, float averageSize)
 		{
-			float scal = 1 / glm::abs(distance - averageSize / 2);
+			float scal = (1.0f / glm::abs(distance - averageSize);
 			return scal;
 		}
 		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
@@ -46,14 +46,15 @@ namespace nechto::ide::handler
 		float scalar(float distance, float averageSize)
 		{
 			float scal = (distance > averageSize) ?
-				2 * (distance - averageSize) / (averageSize * averageSize) : 0;
+				(distance - averageSize) / (averageSize) : 0;
+			std::cout << scal << std::endl;
 			return scal;
 		}
 		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
 		{
 			float distance = glm::length(v1.position - v2.position);
 
-			glm::vec2 normal = glm::normalize(v1.position - v2.position);
+			glm::vec2 normal = -glm::normalize(v1.position - v2.position);
 			glm::vec2 averageSize = (v1.size + v2.size) * 0.5f;
 			return glm::vec2
 			(
@@ -72,6 +73,7 @@ namespace nechto::ide::handler
 		virtual void update(milliseconds timeInterval) override
 		{
 			for (auto i1 = nGraph->connections.begin(); i1 != nGraph->connections.end(); ++i1)
+				nGraph->findNode(i1->first.first).stepPosExchange +=
 				f(nGraph->findNode(i1->first.first), nGraph->findNode(i1->first.second), timeInterval);
 		}
 	};

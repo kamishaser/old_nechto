@@ -16,7 +16,8 @@ int main()
 	cracalk(nGraph);
 	client c(std::make_shared<sfmlIdeWindow>(), std::make_shared<nodeBoard>(nGraph));
 	
-	while (c.update());
+	while (c.update())
+		std::this_thread::sleep_for(2ms);
 }
 
 

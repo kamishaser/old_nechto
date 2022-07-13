@@ -18,9 +18,9 @@ namespace nechto::ide
 			:window(wd), nBoard(nb) 
 		{
 			nBoard->addHandler(std::make_shared<handler::repulsionHandler>(2.2));
-			nBoard->addHandler(std::make_shared<handler::attractionHandler>(2));
+			nBoard->addHandler(std::make_shared<handler::attractionHandler>(4));
 			nBoard->addHandler(
-				std::make_shared<handler::centripetalHandler>(0.01, glm::vec2(500, 500)));
+				std::make_shared<handler::centripetalHandler>(0.001, glm::vec2(500, 500)));
 			nBoard->addHandler(std::make_shared<handler::autoExpandHandler>());
 		}
 
