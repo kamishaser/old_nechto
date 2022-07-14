@@ -2,6 +2,7 @@
 #include "visualNode.h"
 #include "visualConnection.h"
 #include "connectionIterator.h"
+#include "periodLimiter.h"
 
 namespace nechto::ide
 {
@@ -31,9 +32,12 @@ namespace nechto::ide
 		public:
 			std::shared_ptr<graph> nGraph;
 			bool switchedOn = true;
+			periodLimiter plim;
 			//возвращает true, если произвёл изменения и false если нет
 			
-			virtual void update(milliseconds timiInterval) {};
+			handler(milliseconds minP, milliseconds maxP)
+				:plim(minP, maxP) {}
+			virtual void update() {};
 			virtual ~handler() {};
 		};
 	public:

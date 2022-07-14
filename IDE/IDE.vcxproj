@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="autoExpandHandler.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />
     <ClInclude Include="visualAttribute.h" />
     <ClInclude Include="visualConnection.h" />
@@ -155,8 +156,7 @@
     <ClInclude Include="periodLimiter.h" />
     <ClInclude Include="mHandlers.h" />
     <ClInclude Include="graph.h" />
-    <ClInclude Include="nodeDisplay.h" />
-    <ClInclude Include="ideWindow.h" />
+    <ClInclude Include="ideDisplay.h" />
     <ClInclude Include="visualNode.h" />
     <ClInclude Include="visualNodeFabric.h" />
     <ClInclude Include="visualWay.h" />

@@ -33,7 +33,7 @@ namespace nechto
 			temp->correctnessÑhecked = false;
 			break;
 		case node::Hub:
-			temp->correctnessÑhecked = getHubParrent(*this).exist();
+			temp->correctnessÑhecked = hub::getParrent(*this).exist();
 			break;
 		case node::Variable:
 			temp->correctnessÑhecked = (!temp->hasConnection(0) && !temp->hasConnection(1)

@@ -7,9 +7,9 @@ namespace nechto
 {
 	class comName
 	{
-		std::vector <std::string> nameComponents;
+		std::vector <std::wstring> nameComponents;
 	public:
-		comName(const std::string& name, char separator = '.')
+		comName(const std::wstring& name, char separator = '.')
 		{
 			int64_t lastPosition = 0;
 			for (int64_t i = 0; true; ++i)
@@ -40,9 +40,9 @@ namespace nechto
 		{
 			return static_cast <int64_t> (nameComponents.size());
 		}
-		const std::string str(char separator = '.') const
+		const std::wstring str(char separator = '.') const
 		{
-			std::string name;
+			std::wstring name;
 			name.reserve(nameSize());
 			for (int64_t i = 0; true; i++)
 			{
@@ -53,11 +53,11 @@ namespace nechto
 			}
 			return name;
 		}
-		operator const std::string() const 
+		operator const std::wstring() const 
 		{
 			return str();
 		}
-		const std::string& getComponent(int64_t number = 0) const
+		const std::wstring& getComponent(int64_t number = 0) const
 		{
 			return nameComponents[number];
 		}
@@ -87,8 +87,8 @@ namespace nechto
 		}
 		int matchesAtBegin(comName& cn)
 		{
-			int max = (nameComponents.size() < cn.nameComponents.size()) ?
-				nameComponents.size() : cn.nameComponents.size();
+			int max = static_cast<int>((nameComponents.size() < cn.nameComponents.size()) ?
+				nameComponents.size() : cn.nameComponents.size());
 			int i = 0;
 			for (; i < max; ++i)
 				if (nameComponents[i] != cn.nameComponents[i])
@@ -97,7 +97,7 @@ namespace nechto
 		}
 		int matchesAtEnd(comName& cn)
 		{
-			int max = ((nameComponents.size() < cn.nameComponents.size()) ?
+			int max = static_cast<int>((nameComponents.size() < cn.nameComponents.size()) ?
 				nameComponents.size() : cn.nameComponents.size());
 			int i = 0;
 			for(; i < max; ++i)
@@ -108,8 +108,8 @@ namespace nechto
 
 	};
 	
-	comName operator "" _cmn(const char* str, size_t size)
+	comName operator "" _cmn(const wchar_t* str, size_t size)
 	{
-		return comName(std::string(str, size));
+		return comName(std::wstring(str, size));
 	}
 }

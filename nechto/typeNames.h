@@ -11,7 +11,7 @@ namespace nechto
 {
 	namespace typeName
 	{
-		const char find(const std::vector<std::string>& NameSet, const std::string name)
+		const char find(const std::vector<std::wstring>& NameSet, const std::wstring name)
 		{
 			for (int i = 0; i < NameSet.size(); i++)
 				if (NameSet[i] == name)
@@ -19,66 +19,66 @@ namespace nechto
 			return 0;
 
 		}
-		const std::vector<std::string> nodeT
+		const std::vector<std::wstring> nodeT
 		{
-			"Error",				
-			"Hub",					//разветвитель
-			"Variable",				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
-			"TypeCastOperator",		//оператор преобразовани€ типа данных
-			"MathOperator",			//математический оператор
-			"ConditionalBranching",	//if
-			"ExternalFunction",		//функци€, не €вл€юща€с€ частью nechto
-			"Tag",					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
+			L"Error",				
+			L"Hub",					//разветвитель
+			L"Variable",				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
+			L"TypeCastOperator",		//оператор преобразовани€ типа данных
+			L"MathOperator",			//математический оператор
+			L"ConditionalBranching",	//if
+			L"ExternalFunction",		//функци€, не €вл€юща€с€ частью nechto
+			L"Tag",					//помечнный извне объект (односторонн€€ св€зь может быть только к метке 
 									//(о метке знает только один объект))
-			"Pointer"
+			L"Pointer"
 		};
 		
-		const std::vector<std::string> variableT
+		const std::vector<std::wstring> variableT
 		{
-			"Error",
-			"Int64",
-			"Double",
+			L"Error",
+			L"Int64",
+			L"Double",
 		};
 
-		const std::vector<std::string> tagT
+		const std::vector<std::wstring> tagT
 		{
-			"Error",
-			"Comment",
-			"Name",
-			"ExternalConnection",
-			"Attribute"
+			L"Error",
+			L"Comment",
+			L"Name",
+			L"ExternalConnection",
+			L"Attribute"
 		};
 		
-		const std::vector<std::string> mathOperatorT
+		const std::vector<std::wstring> mathOperatorT
 		{
-			"Error",
-			"Assigment",		// =		
-			"UnaryMinus",		// -
+			L"Error",
+			L"Assigment",		// =		
+			L"UnaryMinus",		// -
 
-			"Addition",			// +
-			"Subtraction",		// -
+			L"Addition",			// +
+			L"Subtraction",		// -
 
-			"Multiplication",	// *
-			"Division",			// /
+			L"Multiplication",	// *
+			L"Division",			// /
 
-			"Equal",			// ==
-			"NotEqual",			// !=
+			L"Equal",			// ==
+			L"NotEqual",			// !=
 
-			"Less",				// <
-			"Greater",			// >
-			"LessOrEqual",		// <=
-			"GreaterOrEqual",	// >=
+			L"Less",				// <
+			L"Greater",			// >
+			L"LessOrEqual",		// <=
+			L"GreaterOrEqual",	// >=
 
-			"LogicNegation",	// !
-			"LogicAnd",			// &&
-			"LogicOr",			// ||
-			"LogicExclusive",	// ^
+			L"LogicNegation",	// !
+			L"LogicAnd",			// &&
+			L"LogicOr",			// ||
+			L"LogicExclusive",	// ^
 
-			"Increment",		// ++
-			"Decrement"			// --
+			L"Increment",		// ++
+			L"Decrement"			// --
 		};
 
-		char findSubtype(char type, std::string subtypeName)
+		char findSubtype(char type, std::wstring subtypeName)
 		{
 			switch (type)
 			{

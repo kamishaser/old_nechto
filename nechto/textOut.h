@@ -4,15 +4,15 @@
 
 namespace nechto
 {
-	const std::string to_string(nodePtr address)
+	const std::wstring to_string(nodePtr address)
 	{
-		return static_cast<std::string>("[") + std::to_string((int)address.getFirst()) + ' ' + std::to_string((int)address.getSecond()) + ']';
+		return static_cast<std::wstring>(L"[") + std::to_wstring((int)address.getFirst()) + L' ' + std::to_wstring((int)address.getSecond()) + L']';
 	}
-	const std::string nodeType(nodePtr address)
+	const std::wstring nodeType(nodePtr address)
 	{
 		return typeName::nodeT[address->getType()];
 	}
-	const std::string nodeSubtype(nodePtr address)
+	const std::wstring nodeSubtype(nodePtr address)
 	{
 		switch (address->getType())
 		{
@@ -23,13 +23,13 @@ namespace nechto
 		case node::Tag:
 			return typeName::tagT[address->getSubtype()];
 		default:
-			return "error";
+			return L"error";
 		}
 	}
-	const std::string nodeData(nodePtr v1)
+	const std::wstring nodeData(nodePtr v1)
 	{
 		if (v1 == nullNodePtr)
-			return "error";
+			return L"error";
 		size_t data = v1->getData<size_t>();
 		void* temptr = &data;
 		switch (v1->getType())
@@ -38,35 +38,35 @@ namespace nechto
 			switch (v1->getSubtype())
 			{
 			case baseValueType::Int64:
-				return std::to_string(*static_cast<int64_t*>(temptr));
+				return std::to_wstring(*static_cast<int64_t*>(temptr));
 			case baseValueType::Double:
-				return std::to_string(*static_cast<double*>(temptr));
+				return std::to_wstring(*static_cast<double*>(temptr));
 			default:
-				return "error";
+				return L"error";
 			}
 		case node::Tag:
 			return tag::getData(v1);
 		case node::ExteralFunction:
 			if (v1->getData<externalFunction*>() == nullptr)
-				return "nullptr Error";
+				return L"nullptr Error";
 			else 
 				return v1->getData<externalFunction*>()->name;
 		}
-		return "error";
+		return L"error";
 	}
 
-	std::string nodeProperties(const nodePtr v1)
+	std::wstring nodeProperties(const nodePtr v1)
 	{
 		if (v1 == nullNodePtr)
-			return "nullNodePtr";
-		return std::string(to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1) + ' ' + nodeData(v1));
+			return L"nullNodePtr";
+		return std::wstring(to_string(v1) + L' ' + nodeType(v1) + L' ' + nodeSubtype(v1) + L' ' + nodeData(v1));
 	}
-	std::string ConnectionsListText(const nodePtr v1)
+	std::wstring ConnectionsListText(const nodePtr v1)
 	{
-		std::string temp;
+		std::wstring temp;
 		connectionIterator i(v1);
 		do {
-			temp += to_string(i.get()) + '\n';
+			temp += to_string(i.get()) + L'\n';
 			if (i.position % 4 == 3)
 				temp += '\n';
 		} while (++i);

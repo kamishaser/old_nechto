@@ -18,7 +18,7 @@ namespace nechto
 		uniqueNodePtr(uniqueNodePtr&& uv2) noexcept
 			:v(uv2.v)
 		{
-			std::cout << nodeProperties(v) << std::endl;
+			std::wcout << nodeProperties(v) << std::endl;
 			uv2.v = nullNodePtr;
 		}
 		const uniqueNodePtr& operator=(uniqueNodePtr&& uv2) noexcept
@@ -37,7 +37,7 @@ namespace nechto
 		}
 		void del()
 		{
-			std::cout << "del " << to_string(v) << std::endl;
+			std::wcout << "del " << to_string(v) << std::endl;
 			if (exist())
 				deleteNode(v);
 		}

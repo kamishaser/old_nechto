@@ -183,19 +183,19 @@ namespace nechto
 				writeElement(&data);
 			if (hasStaticAdData(v1))
 			{
-				std::string adData;
+				std::wstring adData;
 				if(v1->getType() == node::Tag)
 					adData = tag::getData(v1);
 				if(v1->getType() == node::ExteralFunction)
 					if (v1->getData<externalFunction*>() == nullptr)
-						adData = "error";
+						adData = L"error";
 					else
 						adData = v1->getData<externalFunction*>()->name;
 				const uint32_t adDataSize = static_cast<uint32_t>(adData.size());
 				writeElement(&adDataSize);
 				for (uint32_t i = 0; i < adDataSize; i++)
 				{
-					char temp = adData[i];
+					wchar_t temp = adData[i];
 					writeElement(&temp);
 				}
 			}
@@ -265,7 +265,7 @@ namespace nechto
 				read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
 				vload->setData(dataBuffer);
 			}
-			std::string adData;
+			std::wstring adData;
 			if (hasStaticAdData(vload))
 			{
 				uint32_t adDataSize = 0;
@@ -276,8 +276,8 @@ namespace nechto
 					adData.resize(adDataSize);
 					for (uint32_t i = 0; i < adDataSize; i++)
 					{
-						char temp;
-						read(&temp, 1);
+						wchar_t temp;
+						read(reinterpret_cast<char*>(&temp), sizeof(temp));
 						adData[i] = temp;
 					}
 				}

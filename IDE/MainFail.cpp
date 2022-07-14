@@ -1,7 +1,6 @@
 #include "nechto.h"
 
 #include "client.h"
-#include "ideWindow.h"
 #include "nodeBoard.h"
 #include "mHandlers.h"
 #include "autoExpandHandler.h"
@@ -14,7 +13,7 @@ int main()
 	setlocale(LC_ALL, "Rus");
 	std::shared_ptr<graph> nGraph = std::make_shared<graph>();
 	cracalk(nGraph);
-	client c(std::make_shared<sfmlIdeWindow>(), std::make_shared<nodeBoard>(nGraph));
+	client c(std::make_shared<ideDisplay>(), std::make_shared<nodeBoard>(nGraph));
 	
 	while (c.update())
 		std::this_thread::sleep_for(2ms);
@@ -26,11 +25,10 @@ void cracalk(std::shared_ptr<graph> nGraph)
 	nodePtr sl1 = createVariable(0.0);
 	nodePtr sl2 = createVariable(0.0);
 	nodePtr result = createVariable(0.0);
-	nodePtr summator = createMathOperator
-	(mathOperator::Addition, result, sl1, sl2);
-	nodePtr printer = createExternalFunction("consoleOut");
-	nodePtr reader1 = createExternalFunction("consoleIn");
-	nodePtr reader2 = createExternalFunction("consoleIn");
+	nodePtr summator = createMathOperator(mathOperator::Addition, result, sl1, sl2);
+	nodePtr printer = createExternalFunction(L"consoleOut");
+	nodePtr reader1 = createExternalFunction(L"consoleIn");
+	nodePtr reader2 = createExternalFunction(L"consoleIn");
 
 	
 

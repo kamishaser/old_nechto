@@ -9,10 +9,11 @@ namespace nechto::ide::handler
 	{
 		float scalar(float distance, float averageSize)
 		{
-			float scal = (1.0f / glm::abs(distance - averageSize);
+			float scal = (1 / glm::abs(distance - averageSize));
+			//if()
 			return scal;
 		}
-		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
+		glm::vec2 f(visualNode& v1, visualNode& v2)
 		{
 			float distance = glm::length(v1.position - v2.position);
 			
@@ -20,24 +21,23 @@ namespace nechto::ide::handler
 			glm::vec2 averageSize = (v1.size + v2.size) / 2.0f;
 			return glm::vec2
 			(
-				scalar(distance, averageSize.x) * normal.x * force * (timeInterval / 1ms),
-				scalar(distance, averageSize.y) * normal.y * force * (timeInterval / 1ms)
+				scalar(distance, averageSize.x) * normal.x * speed,
+				scalar(distance, averageSize.y) * normal.y * speed
 			);
 		}
 	public:
-		float force;
-		
-		repulsionHandler(float fc)
-			:force(fc) {}
+		float speed;
+		repulsionHandler(float sp ,milliseconds minPeriod, milliseconds maxPeriod = 0ms)
+			:speed(sp), graph::handler(minPeriod, maxPeriod) {}
 
 		virtual ~repulsionHandler() override {}
 
-		virtual void update(milliseconds timeInterval) override
+		virtual void update() override
 		{
 			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
 				for (auto i2 = nGraph->nodes.begin(); i2 != nGraph->nodes.end(); ++i2)
 					if(i1->first != i2->first)
-						i1->second.stepPosExchange += f(i1->second, i2->second, timeInterval);
+						i1->second.position += f(i1->second, i2->second);
 		}
 	};
 
@@ -50,7 +50,7 @@ namespace nechto::ide::handler
 			std::cout << scal << std::endl;
 			return scal;
 		}
-		glm::vec2 f(visualNode& v1, visualNode& v2, microseconds timeInterval)
+		glm::vec2 f(visualNode& v1, visualNode& v2)
 		{
 			float distance = glm::length(v1.position - v2.position);
 
@@ -58,56 +58,55 @@ namespace nechto::ide::handler
 			glm::vec2 averageSize = (v1.size + v2.size) * 0.5f;
 			return glm::vec2
 			(
-				scalar(distance, averageSize.x) * normal.x * force * (timeInterval / 1ms),
-				scalar(distance, averageSize.x) * normal.y * force * (timeInterval / 1ms)
+				scalar(distance, averageSize.x) * normal.x * speed,
+				scalar(distance, averageSize.x) * normal.y * speed
 			);
 		}
 	public:
-		float force;
-		
-		attractionHandler(float fc)
-			:force(fc) {}
+		float speed;
+		attractionHandler(float sp, milliseconds minPeriod, milliseconds maxPeriod = 0ms)
+			:speed(sp), graph::handler(minPeriod, maxPeriod) {}
 
 		virtual ~attractionHandler() override {}
 
-		virtual void update(milliseconds timeInterval) override
+		virtual void update() override
 		{
 			for (auto i1 = nGraph->connections.begin(); i1 != nGraph->connections.end(); ++i1)
-				nGraph->findNode(i1->first.first).stepPosExchange +=
-				f(nGraph->findNode(i1->first.first), nGraph->findNode(i1->first.second), timeInterval);
+				nGraph->findNode(i1->first.first).position +=
+				f(nGraph->findNode(i1->first.first), nGraph->findNode(i1->first.second));
 		}
 	};
 	class centripetalHandler : public graph::handler
 	{
-		glm::vec2 centripet(visualNode& v1, microseconds timeInterval)
+		glm::vec2 centripet(visualNode& v1)
 		{
 			float distance = glm::length(v1.position-center);
 			
 			glm::vec2 normal = glm::normalize(v1.position-center);
 			return glm::vec2
 			(
-				-glm::sqrt(distance) * normal.x * force * (timeInterval / 1ms),
-				-glm::sqrt(distance) * normal.y * force * (timeInterval / 1ms)
+				-glm::sqrt(distance) * normal.x * speed,
+				-glm::sqrt(distance) * normal.y * speed
 			);
 		}
 	public:
-		float force;
+		float speed;
 		glm::vec2 center;
-		centripetalHandler(float fc, glm::vec2 c)
-			:force(fc), center(c) {}
+		centripetalHandler(float sp, glm::vec2 c, milliseconds minPeriod, milliseconds maxPeriod = 0ms)
+			:speed(sp), center(c), graph::handler(minPeriod, maxPeriod) {}
+
 
 		virtual ~centripetalHandler() override {}
 
-		virtual void update(milliseconds timeInterval) override
+		virtual void update() override
 		{
 			
 			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
 			{
-				i1->second.stepPosExchange += centripet(i1->second, timeInterval);
+				i1->second.position += centripet(i1->second);
 				
 			}
 		}
 	};
 
-	
 }

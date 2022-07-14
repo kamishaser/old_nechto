@@ -8,28 +8,25 @@ namespace nechto::ide
 	{
 		std::vector<std::shared_ptr<graph::handler>> handlerSet;
 		std::shared_ptr<graph> nGraph;
-		periodLimiter plim;
 
 		nodeBoard(std::shared_ptr<graph> nG)
-			:nGraph(nG), plim(10ms, 12ms) {}
+			:nGraph(nG){}
 
 		void update()
 		{
-			if (plim.moreThanMin())
-			{
-				for (auto i = handlerSet.begin(); i != handlerSet.end(); ++i)
-					if (*i)
-						if((*i)->switchedOn)
-							(*i)->update(plim.currentPeriod());
+
+			for (auto i = handlerSet.begin(); i != handlerSet.end(); ++i)
+				if (*i)
+					if ((*i)->switchedOn)
+						if ((*i)->plim.moreThanMin())
+						{
+							(*i)->update();
+							(*i)->plim.reset();
+						}
+						else;
 					else
 						i = handlerSet.erase(i);
-				plim.reset();
-			}
-			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
-			{
-				i1->second.position += i1->second.stepPosExchange;
-				i1->second.stepPosExchange = glm::vec2(0, 0);
-			}
+
 		}
 		void addHandler(std::shared_ptr<graph::handler> handler)
 		{

@@ -5,57 +5,36 @@
 
 namespace nechto::ide
 {
-	class ideWindow
-	{
-	public:
-		struct drawSettings
-		{
-			int64_t charapterSize = 18;
-			float baseLineThickness = 6;
-		};
-
-		drawSettings dSettings;
-		virtual void editToDisplayCorrectly(visualNode&) {};
-
-		virtual bool active() 
-		{ return false; }
-		virtual glm::vec2 getSize() 
-		{ return glm::vec2(0, 0); }
-		virtual glm::vec2 getCursorPosition()
-		{ return glm::vec2(0, 0); }
-
-		virtual ~ideWindow() {}
-
-		virtual bool update(std::shared_ptr<graph>) { return false; }
-	};
-
-	class sfmlIdeWindow : public ideWindow
+	class ideDisplay
 	{
 	public:
 		sf::Font vnFont;
 		sf::RenderWindow window;
 		periodLimiter plim;
 
-		sfmlIdeWindow() 
+		struct settings
+		{
+			float baseLineThickness = 6;
+			int characterSize = 18;
+		};
+		settings dSettings;
+
+		ideDisplay()
 			:window(sf::VideoMode(1000, 1000), "nechtoIDE"),
 			plim(20ms, 100ms)
 		{
 			assert(vnFont.loadFromFile("Fonts/arial.ttf"));
 		}
 
-		virtual ~sfmlIdeWindow() {}
-		virtual bool active() override { return window.hasFocus(); };
-
-		virtual glm::vec2 getSize() override
+		glm::vec2 getSize()
 		{
 			return glm::vec2(window.getSize().x, window.getSize().y);
 		}
-		virtual glm::vec2 getCursorPosition() override
+		glm::vec2 getCursorPosition()
 		{
 			return glm::vec2(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y);
 		}
-
-		virtual bool update(std::shared_ptr<graph> nGraph) override
+		virtual bool update(std::shared_ptr<graph> nGraph)
 		{
 			sf::Event event;
 			while (window.pollEvent(event))
@@ -84,15 +63,15 @@ namespace nechto::ide
 		{
 			//////////////////////////////////////////////////////////////////
 			sf::Text text;
-			int characterSize = 18;
+			
 			text.setFont(vnFont);
 			text.setString(vNode.nodeText);
-			text.setCharacterSize(characterSize);
+			text.setCharacterSize(dSettings.characterSize);
 			text.setStyle(1);
 			//////////////////////////////////////////////////////////////////
 			sf::FloatRect bounds = text.getLocalBounds();
 			glm::vec2 size(bounds.width, bounds.height);
-			vNode.size = size + glm::vec2(characterSize, characterSize);
+			vNode.size = size + glm::vec2(dSettings.characterSize, dSettings.characterSize);
 			text.setPosition(sf::Vector2f(
 				vNode.position.x - bounds.width / 2.0f,
 				vNode.position.y - bounds.height / 2.0f));

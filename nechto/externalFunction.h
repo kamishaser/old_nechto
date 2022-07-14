@@ -64,7 +64,7 @@ namespace nechto
 			setBlock.unlock();
 			return Error;
 		}
-		static bool exist(const std::string& name) noexcept
+		static bool exist(const std::wstring& name) noexcept
 		{
 			const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
 			setBlock.lock();
@@ -72,7 +72,7 @@ namespace nechto
 			setBlock.unlock();
 			return result;
 		}
-		static const externalFunction* get(const std::string& name) noexcept
+		static const externalFunction* get(const std::wstring& name) noexcept
 		{
 			const externalFunction temp(name, nullptr, nullptr);//си≈сть большой костыль
 			setBlock.lock();
@@ -83,7 +83,7 @@ namespace nechto
 		}
 	};
 	const externalFunction externalFunction::Error =
-		externalFunction(std::string("error"), [](nodePtr c) {return false; }, [](nodePtr) {});
+		externalFunction(std::wstring(L"error"), [](nodePtr c) {return false; }, [](nodePtr) {});
 	std::mutex externalFunction::setBlock;
 	std::set<externalFunction> externalFunction::funSet;
 	

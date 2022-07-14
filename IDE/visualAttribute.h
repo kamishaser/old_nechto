@@ -35,7 +35,7 @@ namespace nechto::ide
 	//			std::move(uniqueNodePtr(node::Variable, baseValueType::Int64))).first;
 	//		i->second.get()->setData<double>(startValue);
 	//	}
-	//	void add(const comName& n, std::string startValue)
+	//	void add(const comName& n, std::wstring startValue)
 	//	{
 	//		auto i = attributes.emplace(n,
 	//			std::move(uniqueNodePtr(node::Tag, tag::Comment))).first;
@@ -73,7 +73,7 @@ namespace nechto::ide
 	//		assert(type(n) == Double);
 	//		return attributes.at(n).get()->getData<double>();
 	//	}
-	//	std::string getStringData(const comName& n)
+	//	std::wstring getStringData(const comName& n)
 	//	{
 	//		assert(contains(n));
 	//		assert(type(n) == String);

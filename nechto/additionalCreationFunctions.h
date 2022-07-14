@@ -53,7 +53,7 @@ namespace nechto
 		if (wrongWay.exist())NumHubConnect(temp, wrongWay, 2);
 		return temp;
 	}
-	nodePtr createExternalFunction(std::string funName)
+	nodePtr createExternalFunction(std::wstring funName)
 	{
 		nodePtr temp = newNode();
 		setTypeAndSubtype(temp, node::ExteralFunction);

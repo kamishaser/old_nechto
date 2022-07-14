@@ -22,7 +22,7 @@ namespace nechto
 			}
 			else
 			{
-				assert(typeSubtypeCompare(base, node::Pointer, pointer::Array));
+				//assert(typeSubtypeCompare(base, node::Pointer, pointer::Array));
 				baseNode = base;
 				currentNode = base->connection[0];
 			}

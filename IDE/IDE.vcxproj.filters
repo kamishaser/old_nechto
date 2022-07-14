@@ -18,11 +18,8 @@
     <Filter Include="Исходные файлы\projection\visual\fabric">
       <UniqueIdentifier>{f4fe9a40-0d0b-4de6-972e-3701d9a6cd55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\projection\visual\fabric\display">
-      <UniqueIdentifier>{8f3c7e9a-25c3-4671-8f1f-79ea32632b3f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\projection\visual\fabric\display\sfmlDisplay">
-      <UniqueIdentifier>{184dab61-083e-4756-9115-72304b64b492}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\projection\graph">
+      <UniqueIdentifier>{f86be5bd-c31e-473d-a12e-7ff3d9945879}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -31,25 +28,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graph.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="mHandlers.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeDisplay.h">
-      <Filter>Исходные файлы\projection\visual\fabric\display</Filter>
-    </ClInclude>
     <ClInclude Include="client.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="ideWindow.h">
-      <Filter>Исходные файлы\projection\visual\fabric\display\sfmlDisplay</Filter>
-    </ClInclude>
     <ClInclude Include="nodeBoard.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="autoExpandHandler.h">
       <Filter>Исходные файлы\projection</Filter>
     </ClInclude>
     <ClInclude Include="visualConnection.h">
@@ -72,6 +54,21 @@
     </ClInclude>
     <ClInclude Include="visualNodeFabric.h">
       <Filter>Исходные файлы\projection\visual\fabric</Filter>
+    </ClInclude>
+    <ClInclude Include="graph.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="autoExpandHandler.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="mHandlers.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="userH.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="ideDisplay.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

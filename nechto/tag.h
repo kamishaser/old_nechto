@@ -57,26 +57,26 @@ namespace nechto
 		}
 
 		static std::mutex tagAdDataBlock[nechto::nodeStorage::maxNumOfAllocators];
-		void setData(nodePtr tag, const std::string& data) noexcept
+		void setData(nodePtr tag, const std::wstring& data) noexcept
 		{
 			assert(tag.exist());
 			assert(tag->getType() == node::Tag);
 			tagAdDataBlock[tag.getFirst()].lock();
-			if (tag->getData<std::string*>() == nullptr)
-				tag->setData(new std::string(data));
+			if (tag->getData<std::wstring*>() == nullptr)
+				tag->setData(new std::wstring(data));
 			else
-				*tag->getData<std::string*>() = data;
+				*tag->getData<std::wstring*>() = data;
 			tagAdDataBlock[tag.getFirst()].unlock();
 		}
 
-		std::string getData(nodePtr tag) noexcept
+		std::wstring getData(nodePtr tag) noexcept
 		{
 			assert(tag.exist());
 			assert(tag->getType() == node::Tag);
-			std::string temp;
+			std::wstring temp;
 			tagAdDataBlock[tag.getFirst()].lock();
-			if (tag->getData<std::string*>() != nullptr)
-				temp = *tag->getData<std::string*>();
+			if (tag->getData<std::wstring*>() != nullptr)
+				temp = *tag->getData<std::wstring*>();
 			tagAdDataBlock[tag.getFirst()].unlock();
 			return temp;
 		}
@@ -85,9 +85,9 @@ namespace nechto
 			assert(tag.exist());
 			assert(tag->getType() == node::Tag);
 			tagAdDataBlock[tag.getFirst()].lock();
-			if (tag->getData<std::string*>() != nullptr)
-				delete tag->getData<std::string*>();
-			tag->setData<std::string*>(nullptr);
+			if (tag->getData<std::wstring*>() != nullptr)
+				delete tag->getData<std::wstring*>();
+			tag->setData<std::wstring*>(nullptr);
 			tagAdDataBlock[tag.getFirst()].unlock();
 		}
 		auto operator <=> (const nodePtr& tag1, const nodePtr& tag2)

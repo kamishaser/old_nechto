@@ -50,33 +50,6 @@ namespace nechto
 
 
 
-
-
-
-
-	void addHub(nodePtr vertex, nodePtr lastHub)
-	{//добавление хаба к элементу
-		assert(vertex.exist());
-		assert(lastHub.exist());
-		nodePtr hub = newNode();
-		setTypeAndSubtype(hub, node::Hub, 0);
-		hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
-		//адресс расширяемого элемента
-		nodePtr temp = nullNodePtr;//ввиду того, что compare_excha
-		if (!lastHub->hubConnection.compare_exchange_strong(temp, hub))
-			deleteNode(hub);
-		//если присоединить хаб не удалось, значит он уже есть
-	}
-	const nodePtr getHubParrent(const nodePtr hub)
-	{
-		assert(hub->getType() == node::Hub);
-		return hub->getData<std::pair<nodePtr, nodePtr>>().first;
-	}
-
-
-
-
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
 	bool typeCompare(nodePtr v1, char type)
@@ -199,7 +172,7 @@ namespace nechto
 		assert(v1.exist() && v2.exist());
 
 		if (!v1->hubConnection.load().exist())
-			addHub(v1, v1);
+			hub::add(v1, v1);
 		nodePtr hubIterator = v1->hubConnection;
 		nodePtr temp;
 		while (true)
@@ -216,7 +189,7 @@ namespace nechto
 			temp = nullNodePtr;
 			if (hubIterator->connection[3].compare_exchange_strong(temp, v2))
 				return;
-			addHub(v1, hubIterator);
+			hub::add(v1, hubIterator);
 			hubIterator = hubIterator->hubConnection;
 		}
 	}
@@ -294,9 +267,6 @@ namespace nechto
 		{
 		case node::Tag:
 			tag::deleteData(v1);
-			break;
-		case node::Pointer:
-			pointer::deletePointer(v1);
 			break;
 		default:
 			break;

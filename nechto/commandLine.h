@@ -8,81 +8,81 @@ using namespace nechto;
 
 void loadNode(nodePtr v1)
 {
-	std::cout << nodeProperties(v1) << std::endl;
+	std::wcout << nodeProperties(v1) << std::endl;
 }
 class commandLine
 {
 	externalConnection v1;
-	std::string cutWord				(std::string& line);
-	std::string commandNew			(std::string& line);
-	std::string commandDelete		(std::string& line);
-	std::string commandHubHub		(std::string& line);
-	std::string commandNumHub		(std::string& line);
-	std::string commandHubNum		(std::string& line);
-	std::string commandGo			(std::string& line);
-	std::string commandThis			(std::string& line);
-	std::string commandStep			(std::string& line);
-	std::string commandSet			(std::string& line);
-	std::string commandSetType		(std::string& line);
-	std::string commandSetSubtype	(std::string& line);
-	std::string commandSetData		(std::string& line);
-	std::string commandIsCorrect	(std::string& line);
-	std::string commandConnections	(std::string& line);
-	std::string commandDisconnect	(std::string& line);
+	std::wstring cutWord				(std::wstring& line);
+	std::wstring commandNew			(std::wstring& line);
+	std::wstring commandDelete		(std::wstring& line);
+	std::wstring commandHubHub		(std::wstring& line);
+	std::wstring commandNumHub		(std::wstring& line);
+	std::wstring commandHubNum		(std::wstring& line);
+	std::wstring commandGo			(std::wstring& line);
+	std::wstring commandThis			(std::wstring& line);
+	std::wstring commandStep			(std::wstring& line);
+	std::wstring commandSet			(std::wstring& line);
+	std::wstring commandSetType		(std::wstring& line);
+	std::wstring commandSetSubtype	(std::wstring& line);
+	std::wstring commandSetData		(std::wstring& line);
+	std::wstring commandIsCorrect	(std::wstring& line);
+	std::wstring commandConnections	(std::wstring& line);
+	std::wstring commandDisconnect	(std::wstring& line);
 
 	fileStream filehan;
-	std::string commandSave			(std::string& line);
-	std::string commandIsSaved		(std::string& line);
-	std::string commandEnd		(std::string& line);
-	std::string commandLoad			(std::string& line);
+	std::wstring commandSave			(std::wstring& line);
+	std::wstring commandIsSaved		(std::wstring& line);
+	std::wstring commandEnd		(std::wstring& line);
+	std::wstring commandLoad			(std::wstring& line);
 public:
-	nodePtr stoptr(std::string& line);
+	nodePtr stoptr(std::wstring& line);
 
 	commandLine()
-		:v1(nullNodePtr, std::string("commandLine")){}
-	std::string operator()(std::string line)
+		:v1(nullNodePtr, std::wstring(L"commandLine")){}
+	std::wstring operator()(std::wstring line)
 	{
-		std::string command;
+		std::wstring command;
 		command = cutWord(line);
-		if (command == "new")			return commandNew(line);
-		if (command == "delete")		return commandDelete(line);
-		if (command == "hubhub")		return commandHubHub(line);
-		if (command == "numhub")		return commandNumHub(line);
-		if (command == "hubnum")		return commandHubNum(line);
-		if (command == "connections")	return commandConnections(line);
-		if (command == "disconnect")	return commandDisconnect(line);
-		if (command == "go")			return commandGo(line);
-		if (command == "this")			return commandThis(line);
-		if (command == "step") 			return commandStep(line);
-		if (command == "setData") 		return commandSetData(line);
-		if (command == "setType")		return commandSetType(line);
-		if (command == "setSubtype")	return commandSetSubtype(line);
-		if (command == "isCorrect")		return commandIsCorrect(line);
+		if (command == L"new")			return commandNew(line);
+		if (command == L"delete")		return commandDelete(line);
+		if (command == L"hubhub")		return commandHubHub(line);
+		if (command == L"numhub")		return commandNumHub(line);
+		if (command == L"hubnum")		return commandHubNum(line);
+		if (command == L"connections")	return commandConnections(line);
+		if (command == L"disconnect")	return commandDisconnect(line);
+		if (command == L"go")			return commandGo(line);
+		if (command == L"this")			return commandThis(line);
+		if (command == L"step") 			return commandStep(line);
+		if (command == L"setData") 		return commandSetData(line);
+		if (command == L"setType")		return commandSetType(line);
+		if (command == L"setSubtype")	return commandSetSubtype(line);
+		if (command == L"isCorrect")		return commandIsCorrect(line);
 
-		if (command == "save")			return commandSave(line);
-		if (command == "isSaved")		return commandIsSaved(line);
-		if (command == "end")			return commandEnd(line);
-		if (command == "load")			return commandLoad(line);
+		if (command == L"save")			return commandSave(line);
+		if (command == L"isSaved")		return commandIsSaved(line);
+		if (command == L"end")			return commandEnd(line);
+		if (command == L"load")			return commandLoad(line);
 
 		
-		return "unknown command";
+		return L"unknown command";
 
 	}
 };
 
-std::string commandLine::cutWord(std::string& line)
+std::wstring commandLine::cutWord(std::wstring& line)
 {
 	size_t separator= line.find(' ');
 	if (separator == -1)
 		return line;
-	std::string word = line.substr(0, separator);
+	std::wstring word = line.substr(0, separator);
 	while ((separator < line.size()) && line[separator] == ' ')
 		++separator;
 	line.erase(line.begin(), line.begin() + separator);
 	return word;
 }
 
-nodePtr commandLine::stoptr(std::string& line)
+nodePtr commandLine::stoptr(std::wstring& line)
 {
 	nodePtr address;
 	try
@@ -99,16 +99,16 @@ nodePtr commandLine::stoptr(std::string& line)
 	return address;
 }
 
-std::string commandLine::commandNew(std::string& line)
+std::wstring commandLine::commandNew(std::wstring& line)
 {
-	std::string word;
+	std::wstring word;
 	v1 = newNode();
 	if (line.empty())
 		return to_string(v1);
 	word = cutWord(line);
 	char type = typeName::find(typeName::nodeT, word);
 	if (type == 0)
-		return (to_string(v1) + "unknownType: " + word);
+		return (to_string(v1) + L"unknownType: " + word);
 	if (hasSubType(v1))
 	{
 		char subtype;
@@ -117,50 +117,50 @@ std::string commandLine::commandNew(std::string& line)
 		word = cutWord(line);
 		subtype = typeName::findSubtype(type, word);
 		if (type == 0)
-			return (to_string(v1) + "unknownSubype: " + word);
+			return (to_string(v1) + L"unknownSubype: " + word);
 		setTypeAndSubtype(v1, type, subtype);
 	}
 	setTypeAndSubtype(v1, type);
 	return to_string(v1);
 }
 
-std::string commandLine::commandDelete(std::string& line)
+std::wstring commandLine::commandDelete(std::wstring& line)
 {
 	if (line.empty())
 	{
 		deleteNode(v1);
-		return to_string(v1) + " was deleted";
+		return to_string(v1) + L" was deleted";
 	}
 	nodePtr temp = stoptr(line);
 	if (temp == nullNodePtr)
-		return "error";
+		return L"error";
 	deleteNode(temp);
-	return to_string(temp) + " was deleted";
+	return to_string(temp) + L" was deleted";
 }
-std::string commandLine::commandSetType(std::string& line)
+std::wstring commandLine::commandSetType(std::wstring& line)
 {
 	if (line.empty())
-		return "error";
+		return L"error";
 	char type = typeName::find(typeName::nodeT, line);
 	if (type == 0)
-		return (to_string(v1) + "unknownType: " + line);
+		return (to_string(v1) + L"unknownType: " + line);
 	setTypeAndSubtype(v1, type);
 	return nodeProperties(v1);
 }
-std::string commandLine::commandSetSubtype(std::string& line)
+std::wstring commandLine::commandSetSubtype(std::wstring& line)
 {
 	if (line.empty())
-		return "error";
+		return L"error";
 	char subtype = typeName::findSubtype(v1->getType(), line);
 	if (subtype == 0)
-		return (to_string(v1) + "unknownSubype: " + line);
+		return (to_string(v1) + L"unknownSubype: " + line);
 	setTypeAndSubtype(v1, v1->getType(), subtype);
 	return nodeProperties(v1);
 }
-std::string commandLine::commandSetData(std::string& line)
+std::wstring commandLine::commandSetData(std::wstring& line)
 {
 	if (line.empty())
-		return "error";
+		return L"error";
 	nodePtr ptemp;
 	int64_t itemp = 0;
 	double  dtemp = 0;
@@ -171,23 +171,23 @@ std::string commandLine::commandSetData(std::string& line)
 		{
 		case baseValueType::Int64:
 			try { itemp = std::stoll(line); }
-			catch (...) { return "error"; }
+			catch (...) { return L"error"; }
 			v1->setData<int64_t>(itemp);
 			return commandThis(line);
 		case baseValueType::Double:
 			try { dtemp = std::stod(line); }
-			catch (...) { return "error"; }
+			catch (...) { return L"error"; }
 			v1->setData<double>(dtemp);
 			return commandThis(line);
 		default:
-			return "error";
+			return L"error";
 		}
 	case node::Tag:
 		tag::setData(v1, line);
 		return nodeProperties(v1);
 	case node::ExteralFunction:
 		if (!externalFunction::exist(line))
-			return "the function named " + line + " isn't exist";
+			return L"the function named " + line + L" isn't exist";
 		v1->setData(externalFunction::get(line));
 		return nodeProperties(v1);
 
@@ -196,19 +196,19 @@ std::string commandLine::commandSetData(std::string& line)
 	}
 	return commandThis(line);
 }
-std::string commandLine::commandHubHub(std::string& line)
+std::wstring commandLine::commandHubHub(std::wstring& line)
 {
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
-		return "error";
+		return L"error";
 	HubHubConnect(v1, v2);
 	return to_string(v1);
 }
-std::string commandLine::commandNumHub(std::string& line)
+std::wstring commandLine::commandNumHub(std::wstring& line)
 {
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
-		return "error";
+		return L"error";
 	ushort nc1;
 	try 
 	{ 
@@ -217,16 +217,16 @@ std::string commandLine::commandNumHub(std::string& line)
 	}
 	catch (std::exception e)
 	{
-		return e.what();
+		return std::wstring(L"error");
 	}
 	
 	return to_string(v1);
 }
-std::string commandLine::commandHubNum(std::string& line)
+std::wstring commandLine::commandHubNum(std::wstring& line)
 {
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
-		return "error";
+		return L"error";
 	ushort nc1;
 	try 
 	{ 
@@ -235,98 +235,98 @@ std::string commandLine::commandHubNum(std::string& line)
 	}
 	catch (std::exception e)
 	{
-		return e.what();
+		return L"error";
 	}
 	
 	return to_string(v1);
 }
-std::string commandLine::commandGo(std::string& line)
+std::wstring commandLine::commandGo(std::wstring& line)
 {
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
-		return "error";
+		return L"error";
 	v1 = v2;
-	return to_string(v1) + ' ' + nodeType(v1) + ' ' + nodeSubtype(v1);
+	return to_string(v1) + L' ' + nodeType(v1) + L' ' + nodeSubtype(v1);
 }
-std::string commandLine::commandThis(std::string& line)
+std::wstring commandLine::commandThis(std::wstring& line)
 {
 	return nodeProperties(v1);
 }
-std::string commandLine::commandConnections(std::string& line)
+std::wstring commandLine::commandConnections(std::wstring& line)
 {
-	std::string temp;
+	std::wstring temp;
 	nodePtr vTemp = v1;
 	while (true)
 	{
 		for (int i = 0; i < 4; i++)
-			temp = temp + nodeProperties(vTemp->connection[i].load()) + '\n';
+			temp = temp + nodeProperties(vTemp->connection[i].load()) + L'\n';
 		if (!isHubExist(vTemp))
-			return temp + "\nnH";
+			return temp + L"\nnH";
 		vTemp = v1->hubConnection;
-		temp += "\n";
+		temp += L"\n";
 	}
 }
-std::string commandLine::commandDisconnect(std::string& line)
+std::wstring commandLine::commandDisconnect(std::wstring& line)
 {
 	nodePtr v2 = stoptr(line);
 	if (!v2.exist())
-		return "error";
+		return L"error";
 	disconnect(v1, v2);
 	return to_string(v1);
 }
 // 
-std::string commandLine::commandStep(std::string& line)
+std::wstring commandLine::commandStep(std::wstring& line)
 {
 	if (!v1.get().isCorrect())
-		return "the node isn't correct";
+		return L"the node isn't correct";
 	nodePtr nPos = step(v1);
 	if (nPos.exist())
 		v1 = nPos;
 	else
-		return "end";
+		return L"end";
 	return commandThis(line);
 }
-//std::string commandLine::commandSet(std::string& line)
-std::string commandLine::commandIsCorrect(std::string& line)
+//std::wstring commandLine::commandSet(std::wstring& line)
+std::wstring commandLine::commandIsCorrect(std::wstring& line)
 {
 	if (v1.get().isCorrect())
-		return "the node is correct";
+		return L"the node is correct";
 	else
-		return "the node isn't correct";
+		return L"the node isn't correct";
 }
 
-std::string commandLine::commandSave(std::string& line)
+std::wstring commandLine::commandSave(std::wstring& line)
 {
 	std::filesystem::path path(line);
 	if (!filehan.isOpen())
 		filehan.saveStart(path);
 	if (!filehan.isOpen())
-		return "error";
+		return L"error";
 	if (!filehan.isSaved(v1))
 		filehan.save(v1);
-	else return "error";
-	return "success";
+	else return L"error";
+	return L"success";
 }
-std::string commandLine::commandEnd(std::string& line)
+std::wstring commandLine::commandEnd(std::wstring& line)
 {
 	if (!filehan.isOpen())
-		return "error";
+		return L"error";
 	filehan.end();
-	return "success";
+	return L"success";
 }
-std::string commandLine::commandLoad(std::string& line)
+std::wstring commandLine::commandLoad(std::wstring& line)
 {
 	std::filesystem::path path(line);
 	if (!filehan.isOpen())
 		filehan.loadStart(path);
 	if (!filehan.isOpen())
-		return "file " + path.string() + " isn't detected";
+		return L"file " + path.wstring() + L" isn't detected";
 	return nodeProperties(filehan.load());
 }
-std::string commandLine::commandIsSaved(std::string& line)
+std::wstring commandLine::commandIsSaved(std::wstring& line)
 {
 	if (filehan.isSaved(v1))
-		return "true";
+		return L"true";
 	else
-		return "false";
+		return L"false";
 }
