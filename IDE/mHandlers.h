@@ -47,7 +47,6 @@ namespace nechto::ide::handler
 		{
 			float scal = (distance > averageSize) ?
 				(distance - averageSize) / (averageSize) : 0;
-			std::cout << scal << std::endl;
 			return scal;
 		}
 		glm::vec2 f(visualNode& v1, visualNode& v2)

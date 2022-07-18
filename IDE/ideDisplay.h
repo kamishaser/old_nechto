@@ -16,6 +16,7 @@ namespace nechto::ide
 		{
 			float baseLineThickness = 6;
 			int characterSize = 18;
+			
 		};
 		settings dSettings;
 
@@ -32,7 +33,7 @@ namespace nechto::ide
 		}
 		glm::vec2 getCursorPosition()
 		{
-			return glm::vec2(sf::Mouse::getPosition().x, sf::Mouse::getPosition().y);
+			return glm::vec2(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
 		}
 		virtual bool update(std::shared_ptr<graph> nGraph)
 		{
@@ -74,7 +75,7 @@ namespace nechto::ide
 			vNode.size = size + glm::vec2(dSettings.characterSize, dSettings.characterSize);
 			text.setPosition(sf::Vector2f(
 				vNode.position.x - bounds.width / 2.0f,
-				vNode.position.y - bounds.height / 2.0f));
+				vNode.position.y - bounds.height / 2.0f - dSettings.characterSize/4));
 
 			//////////////////////////////////////////////////////////////////
 
@@ -100,6 +101,12 @@ namespace nechto::ide
 			int g = (shc.g > 128) ? 4 : 255;
 			int b = (shc.b > 64) ? 32 : 223;
 			text.setFillColor(sf::Color(r, g, b));
+			//////////////////////////////////////////////////////////////////
+			if (vNode.lightColor != sf::Color(0, 0, 0))
+			{
+				nShape.setOutlineColor(vNode.lightColor);
+				nShape.setOutlineThickness(dSettings.baseLineThickness);
+			}
 			//////////////////////////////////////////////////////////////////
 
 			window.draw(nShape);

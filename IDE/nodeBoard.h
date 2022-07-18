@@ -8,7 +8,6 @@ namespace nechto::ide
 	{
 		std::vector<std::shared_ptr<graph::handler>> handlerSet;
 		std::shared_ptr<graph> nGraph;
-
 		nodeBoard(std::shared_ptr<graph> nG)
 			:nGraph(nG){}
 
@@ -23,9 +22,13 @@ namespace nechto::ide
 							(*i)->update();
 							(*i)->plim.reset();
 						}
-						else;
-					else
-						i = handlerSet.erase(i);
+						else{}
+					else{}
+				else
+				{
+					std::cout << "erase handler" << std::endl;
+					i = handlerSet.erase(i);
+				}
 
 		}
 		void addHandler(std::shared_ptr<graph::handler> handler)

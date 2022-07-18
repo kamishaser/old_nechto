@@ -37,6 +37,10 @@ namespace nechto
 		{
 			return exConTag->connection[0].load();
 		}
+		std::wstring getName() const
+		{
+			return tag::getData(exConTag);
+		}
 		node* operator->() const
 		{
 			return *exConTag->connection[0].load();
@@ -46,48 +50,16 @@ namespace nechto
 			return exConTag;
 		}
 		///////////////////////////////////////////////////
-		//дополнительные функции для работы с переменными
-
-		//operator int64_t()//возввращает значение переменной
-		//{
-		//	nodePtr v1 = exConTag->connection[0];
-		//	assert(v1.exist());
-		//	assert(exConTag->getType() == node::Variable);
-		//	if (v1->getSubtype() == baseValueType::Int64)
-		//		return v1->getData<int64_t>();
-		//	return static_cast<int64_t>(v1->getData<double>());
-		//}
-		//operator double()//возввращает значение переменной
-		//{
-		//	nodePtr v1 = exConTag->connection[0];
-		//	assert(v1.exist());
-		//	assert(exConTag->getType() == node::Variable);
-		//	if (v1->getSubtype() == baseValueType::Double)
-		//		return v1->getData<double>();
-		//	return static_cast<double>(v1->getData<int64_t>());
-		//}
-
-		//const externalConnection& operator=(const int64_t value)
-		//{
-		//	nodePtr v1 = exConTag->connection[0];
-		//	assert(v1.exist());
-		//	assert(exConTag->getType() == node::Variable);
-		//	if (v1->getSubtype() == baseValueType::Int64)
-		//		v1->setData<int64_t>(value);
-		//	else
-		//		v1->setData<double>(static_cast<double>(value));
-		//	return *this;
-		//}
-		//const externalConnection& operator=(const double value)
-		//{
-		//	nodePtr v1 = exConTag->connection[0];
-		//	assert(v1.exist());
-		//	assert(exConTag->getType() == node::Variable);
-		//	if (v1->getSubtype() == baseValueType::Int64)
-		//		v1->setData<int64_t>(static_cast<int64_t>(value));
-		//	else
-		//		v1->setData<double>(value);
-		//	return *this;
-		//}
+		
+		externalConnection(const externalConnection& exCon)
+			:externalConnection(exCon.getTag(), exCon.getName()) 
+		{}
+		externalConnection& operator= (const externalConnection& exCon)
+		{
+			if(exCon.get().exist())
+				NumHubConnect(exConTag, exCon.get(), 0);
+			tag::setData(exConTag, exCon.getName());
+			return *this;
+		}
 	};
 }

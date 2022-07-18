@@ -62,7 +62,7 @@ namespace nechto
 			temp->correctnessÑhecked = pointer::isCorrect((*this));
 			break;
 		default:
-			temp->correctnessÑhecked = false;
+			assert(false);
 		}
 		return temp->correctnessÑhecked;
 	}

@@ -158,8 +158,9 @@
     <ClInclude Include="graph.h" />
     <ClInclude Include="ideDisplay.h" />
     <ClInclude Include="visualNode.h" />
-    <ClInclude Include="visualNodeFabric.h" />
+    <ClInclude Include="visualNodeFill.h" />
     <ClInclude Include="visualWay.h" />
+    <ClInclude Include="vnDataUpdateH.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

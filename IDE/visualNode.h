@@ -12,10 +12,15 @@ namespace nechto::ide
 		glm::vec2 position{ 500,500 };
 		glm::vec2 stepPosExchange{ 0,0 };
 		glm::vec2 size{10,10};
+
+		color shapeColor = color::White;
+		color lightColor = color(0, 0, 0);
 		geometricShape nShape;
 		std::wstring nodeText = L"а кириллица тут работает?";
-		//externalConnection exCon;
-		
-		//visualNode(nodePtr v1,)
+
+		externalConnection exCon;		
+		visualNode()
+			:exCon(nullNodePtr, L"nechto.ide.visualNode"_cmn) {}
+
 	};
 }

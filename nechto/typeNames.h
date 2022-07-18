@@ -55,7 +55,7 @@ namespace nechto
 			L"Assigment",		// =		
 			L"UnaryMinus",		// -
 
-			L"Addition",			// +
+			L"Addition+",			// +
 			L"Subtraction",		// -
 
 			L"Multiplication",	// *
@@ -77,6 +77,36 @@ namespace nechto
 			L"Increment",		// ++
 			L"Decrement"			// --
 		};
+
+		const std::vector<std::wstring> mathOperatorShortT
+		{
+			L"Error",
+			L"=",
+			L"-=",
+
+			L"+",
+			L"-",
+
+			L"*",
+			L"/",
+
+			L"==",
+			L"!=",
+
+			L"<",
+			L">",
+			L"<=",
+			L">=",
+
+			L"!",
+			L"&&",
+			L"||",
+			L"^",
+
+			L"++",
+			L"--"
+		};
+
 
 		char findSubtype(char type, std::wstring subtypeName)
 		{

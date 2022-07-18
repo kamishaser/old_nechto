@@ -8,7 +8,8 @@ namespace nechto::ide
 	{
 		const nodePtr first;
 		const nodePtr second;
-		visualConnectionID(nodePtr f, nodePtr s)
+		
+		visualConnectionID(nodePtr f = nullNodePtr, nodePtr s = nullNodePtr)
 			:first((f < s) ? f : s), second((f < s) ? s : f) {}
 
 		bool operator< (const visualConnectionID& c2) const

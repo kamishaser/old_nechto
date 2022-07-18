@@ -27,7 +27,6 @@ namespace nechto::ide
 							if (!nGraph->containsNode(i.get()))
 							{
 								newNodes.emplace(i.get());
-								std::wcout << L"node added: " << to_string(i.get()) << std::endl;
 							}
 							newConnections.emplace(visualConnectionID(nodeI->first, i.get()));
 							/*nGraph->determineConnectionNumbers(

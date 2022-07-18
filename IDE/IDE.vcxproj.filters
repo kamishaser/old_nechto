@@ -15,9 +15,6 @@
     <Filter Include="Исходные файлы\projection\visual">
       <UniqueIdentifier>{2a9005a1-2161-48b2-9ceb-7a539c902a77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\projection\visual\fabric">
-      <UniqueIdentifier>{f4fe9a40-0d0b-4de6-972e-3701d9a6cd55}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\projection\graph">
       <UniqueIdentifier>{f86be5bd-c31e-473d-a12e-7ff3d9945879}</UniqueIdentifier>
     </Filter>
@@ -52,9 +49,6 @@
     <ClInclude Include="visualWay.h">
       <Filter>Исходные файлы\projection\visual</Filter>
     </ClInclude>
-    <ClInclude Include="visualNodeFabric.h">
-      <Filter>Исходные файлы\projection\visual\fabric</Filter>
-    </ClInclude>
     <ClInclude Include="graph.h">
       <Filter>Исходные файлы\projection\graph</Filter>
     </ClInclude>
@@ -69,6 +63,12 @@
     </ClInclude>
     <ClInclude Include="ideDisplay.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNodeFill.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="vnDataUpdateH.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

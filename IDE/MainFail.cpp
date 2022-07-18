@@ -17,6 +17,7 @@ int main()
 	
 	while (c.update())
 		std::this_thread::sleep_for(2ms);
+	std::cout << "end" << std::endl;
 }
 
 

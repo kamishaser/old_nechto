@@ -37,7 +37,6 @@ namespace nechto
 		}
 		void del()
 		{
-			std::wcout << "del " << to_string(v) << std::endl;
 			if (exist())
 				deleteNode(v);
 		}
