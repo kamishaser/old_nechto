@@ -30,9 +30,6 @@
     <ClInclude Include="node.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="baseValueTypes.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="mathOperator.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
@@ -78,19 +75,19 @@
     <ClInclude Include="pointer.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="comName.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="uniqueNodePtr.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="attribute.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="connectionIterator.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="hub.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="performer.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="array.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
   </ItemGroup>

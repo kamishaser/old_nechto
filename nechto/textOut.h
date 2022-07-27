@@ -37,16 +37,16 @@ namespace nechto
 		case node::Variable:
 			switch (v1->getSubtype())
 			{
-			case baseValueType::Int64:
-				return std::to_wstring(*static_cast<int64_t*>(temptr));
-			case baseValueType::Double:
-				return std::to_wstring(*static_cast<double*>(temptr));
+			case baseValueType::I64:
+				return std::to_wstring(*static_cast<i64*>(temptr));
+			case baseValueType::F64:
+				return std::to_wstring(*static_cast<f64*>(temptr));
 			default:
 				return L"error";
 			}
 		case node::Tag:
 			return tag::getData(v1);
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			if (v1->getData<externalFunction*>() == nullptr)
 				return L"nullptr Error";
 			else 

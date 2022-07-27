@@ -2,7 +2,6 @@
 #include "node.h"
 #include "tag.h"
 #include "mathOperator.h"
-#include "baseValueTypes.h"
 #include "nodeOperations.h"
 #include "externalFunction.h"
 #include "Pointer.h"
@@ -14,15 +13,14 @@ namespace nechto
 		switch (v1->getType())
 		{
 		case node::MathOperator:
-		case node::TypeCastOperator:
 		case node::ConditionalBranching:
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			return true;
 		default:
 			return false;
 		}
 	}
-	bool nodePtr::isCorrect() const
+	bool nodePtr::check() const
 	{
 		nodePtr temp = *this;
 		if (temp->correctnessÑhecked.load())
@@ -40,26 +38,23 @@ namespace nechto
 				 && !temp->hasConnection(2) && !temp->hasConnection(3)
 				 && temp->getSubtype() != baseValueType::Error);
 			break;
-		case node::TypeCastOperator:
-			temp->correctnessÑhecked = isTypeCastOperatorCorrect(*this);
-			break;
 		case node::MathOperator:
-			temp->correctnessÑhecked = mathOperator::isCorrect(*this);
+			temp->correctnessÑhecked = mathOperator::check(*this);
 			break;
 		case node::Tag:
-			temp->correctnessÑhecked = tag::isCorrect(*this);
+			temp->correctnessÑhecked = tag::check(*this);
 			break;
 		case node::ConditionalBranching:
 			temp->correctnessÑhecked = ((temp->hasConnection(0)) && (temp->connection[0].load()->getType() == node::Variable));
 			break;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			if (temp->getData<externalFunction*>() == nullptr)
 				temp->correctnessÑhecked = false;
-			else if (temp->getData<externalFunction*>()->isCorrect((*this)))
+			else if (temp->getData<externalFunction*>()->check((*this)))
 				temp->correctnessÑhecked = true;
 			break;
 		case node::Pointer:
-			temp->correctnessÑhecked = pointer::isCorrect((*this));
+			temp->correctnessÑhecked = pointer::check((*this));
 			break;
 		default:
 			assert(false);
@@ -69,7 +64,7 @@ namespace nechto
 	
 	nodePtr step(nodePtr flag)
 	{
-		assert(flag.isCorrect());
+		assert(flag.check());
 		assert(isAction(flag));
 		nodePtr nextPosition;
 		switch (flag->getType())
@@ -91,7 +86,7 @@ namespace nechto
 			if (!nextPosition.exist())
 				return nullNodePtr;
 			return nextPosition;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			(flag->getData<externalFunction*>())->perform(flag);
 			nextPosition = flag->connection[3].load();
 			if (!nextPosition.exist())

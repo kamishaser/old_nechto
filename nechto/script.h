@@ -1,7 +1,7 @@
 #pragma once
 #include "node.h"
 #include "checkAndStep.h"
-
+#include "externalConnection.h"
 #include <set>
 #include <stack>
 
@@ -10,7 +10,7 @@ namespace nechto
 {
 	class script
 	{
-		nodePtr startNode;
+		externalConnection begin;
 	public:
 		script(nodePtr sNode)
 			:startNode(sNode)

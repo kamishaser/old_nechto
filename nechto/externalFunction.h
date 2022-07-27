@@ -1,93 +1,153 @@
 #pragma once
 #include "node.h"
 #include "baseValueTypes.h"
-#include "comName.h"
 
 #include <functional>
 #include <set>
-//Внимание! Приготовьтесь! Вас ждёт страна костылей!!!
 
-namespace nechto
+//внешняя функция, подключаемая в нечто из с++
+namespace nechto::externalFunction
 {
-	class externalFunction
+	//структура, описывающая саму функцию
+	struct fn
 	{
-	private:
-		static std::mutex setBlock;
-		static std::set<externalFunction> funSet;
+		//проверка корректности подключения
+		std::atomic<bool(*)(nodePtr)> correctCheckPtr;
+		std::atomic<void(*)(nodePtr)> fnPtr;
+		//комменария, описание действия
+		std::wstring comment;
+		
+		//список нод, использующих эту функцию
+		std::atomic<i64> numberOfUsers = 0;
 
-	public:
-		comName name;
-		mutable std::atomic<bool(*)(nodePtr)> isCorrectPtr;
-		mutable std::atomic<void(*)(nodePtr)> FuncPtr;
-
-		externalFunction(comName fname, bool(*check)(nodePtr), void(*Function)(nodePtr))
-			:name(fname),isCorrectPtr(check), FuncPtr(Function)
-		{}
-		externalFunction(const externalFunction& f)
-			:name(f.name), isCorrectPtr(f.isCorrectPtr.load()), FuncPtr(f.FuncPtr.load()) {}
-		const externalFunction& operator=(const externalFunction& f)
-		{
-			name = f.name;
-			isCorrectPtr = f.isCorrectPtr.load();
-			FuncPtr = f.FuncPtr.load();
-		}
-
-		bool isCorrect(nodePtr v1)
-		{
-			return isCorrectPtr.load()(v1);
-		}
+		fn(bool(*t)(nodePtr), void(*f)(nodePtr), const std::wstring& c)
+			:correctCheckPtr(t), fnPtr(f), comment(c) {}
+		//выполнить
 		void perform(nodePtr v1)
 		{
-			FuncPtr.load()(v1);
+			(fnPtr.load())(v1);
 		}
-		auto operator <=> (const externalFunction& exCon)const
+		//проверить
+		bool check(nodePtr v1)
 		{
-			return name <=> exCon.name;
-		}
-
-		static const externalFunction Error;
-
-
-		static const externalFunction add(const externalFunction newFun) noexcept
-		{
-			setBlock.lock();
-			if (funSet.contains(newFun))
-			{//проверяется только по имени
-				auto ExtFun = funSet.find(newFun);//стрёмная конструкция(проверка только по имени)
-				const externalFunction oldFun(newFun.name, ExtFun->isCorrectPtr.load(), ExtFun->FuncPtr.load());
-				ExtFun->isCorrectPtr = newFun.isCorrectPtr.load();
-				ExtFun->FuncPtr = newFun.FuncPtr.load();
-				setBlock.unlock();
-				return oldFun;
-			}
-			funSet.emplace(newFun);
-			setBlock.unlock();
-			return Error;
-		}
-		static bool exist(const std::wstring& name) noexcept
-		{
-			const externalFunction temp(name, nullptr, nullptr);//сиЕсть большой костыль
-			setBlock.lock();
-			bool result = funSet.contains(temp);//проверяется только по имени
-			setBlock.unlock();
-			return result;
-		}
-		static const externalFunction* get(const std::wstring& name) noexcept
-		{
-			const externalFunction temp(name, nullptr, nullptr);//сиЕсть большой костыль
-			setBlock.lock();
-			const externalFunction* function = (funSet.contains(temp)) ? &(*funSet.find(temp)) : nullptr;
-			//проверяется только по имени
-			setBlock.unlock();
-			return function;
+			bool (correctCheckPtr.load())(v1);
 		}
 	};
-	const externalFunction externalFunction::Error =
-		externalFunction(std::wstring(L"error"), [](nodePtr c) {return false; }, [](nodePtr) {});
-	std::mutex externalFunction::setBlock;
-	std::set<externalFunction> externalFunction::funSet;
-	
-	
+	//в качестве данных нода содержит 
+	//указатель (реализован итератором) на функцию
+	using exFun = std::map<std::wstring, fn>::iterator;
 
-	
+	//к сожалению попытка запихнуть имя и функцию в одну структуру привела 
+	//к жесточайшим костылям. Такую структуру ни в map, ни в set без костылей
+	//типа mutable не запихнёшь
+
+	static_assert(sizeof(exFun) == 8);
+
+	fn Error =
+		fn
+		(
+			[](nodePtr) {return false; },
+			[](nodePtr) {},
+			L"error: undefined function"
+
+		);
+	//map используемых функций
+	struct map
+	{
+		std::map<std::wstring, fn> funset;
+		std::mutex mblock;
+
+		map()
+		{
+			insert
+			(
+				L"Error",
+				Error
+			);
+		}
+		bool contains(const std::wstring& name) noexcept
+		{
+			mblock.lock();
+			bool temp = funset.contains(name);
+			mblock.unlock();
+			return temp;
+		}
+		exFun insert(const std::wstring& name, const fn& fn) noexcept
+		{
+			mblock.lock();
+			exFun temp = funset.emplace(name, fn).first;
+			mblock.unlock();
+			return temp;
+		}
+		exFun find(const std::wstring& name) noexcept
+		{
+			assert(contains(name));
+			mblock.lock();
+			exFun temp = funset.find(name);
+			mblock.unlock();
+			return temp;
+		}
+		bool erase(const std::wstring& name) noexcept
+		{
+			if (!contains(name))
+				return false;
+			
+			mblock.lock();
+			bool result = funset.at(name).isNotUsed();
+			if(result)
+				funset.erase(name);
+			mblock.unlock();
+			return result;
+		}
+	};
+	using shmap = std::shared_ptr<map>;
+	//заполняет новую пустую ноду
+	void set(nodePtr v1, shmap funMap, const std::wstring name) noexcept
+	{
+		exFun temp = funMap->contains(name) ?
+			funMap->find(name) :
+			funMap->insert
+			(
+				name,
+				Error
+			);
+		--v1->getData<exFun>()->second.numberOfUsers;
+		v1->setData<exFun>(temp);
+		++temp->second.numberOfUsers;
+
+	}
+	void initialize(nodePtr v1, shmap funMap, const std::wstring name = L"Error")
+	{
+		exFun temp = funMap->contains(name) ?
+			funMap->find(name) :
+			funMap->insert
+			(
+				name,
+				Error
+			);
+		v1->setData<exFun>(temp);
+		++temp->second.numberOfUsers;
+	}
+	//сбрасывает функцию
+	void reset(nodePtr v1)
+	{
+		exFun temp = v1->getData<exFun>();
+		--temp->second.numberOfUsers;
+	}
+	void perform(nodePtr v1)
+	{
+		v1->getData<exFun>()->second.perform();
+	}
+	bool check(nodePtr v1)
+	{
+		return (v1->getData<exFun>()->second.perform();
+	}
+	//присваивание значения ноде того же типа
+	void assigment(nodePtr v0, nodePtr v1)
+	{
+		exFun temp = v1->getData<exFun>();
+		--v0->getData<exFun>()->second.numberOfUsers;
+		v0->setData<exFun>(temp);
+		++temp->second.numberOfUsers;
+	}
 }

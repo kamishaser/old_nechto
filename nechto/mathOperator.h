@@ -1,822 +1,428 @@
 #pragma once
 #include "node.h"
-#include "baseValueTypes.h"
 
 namespace nechto
 {
 	namespace mathOperator
 	{
-		enum Types
+		struct operatorData
 		{
-			Error,
-			Assigment,		// =		
-			UnaryMinus,		// -
+			//данные математического оператора.
+			//Оператор должен работать с разными типами переменных и в разных ситуациях
+			//однако каждый раз всё проверять - страшная потеря производительности
+			//ввиду большого количества запросов в оперативку.
+			//operatorData сводка о типах данных и соединений
 
-			Addition,		// +
-			Subtraction,	// -
+			//true, если оператор работает с данными одного типа напрямую
+			bool isSimple;
+			//type: f64 - false, i64 = true
 
-			Multiplication, // *
-			Division,		// /
+			//IsDirect: true если переменная подключена напрямую, 
+			//false - через указатель
 
-			Equal,			// ==
-			NotEqual,		// !=
-
-			Less,			// <
-			Greater,		// >
-			LessOrEqual,	// <=
-			GreaterOrEqual,	// >=
-
-			LogicNegation,	// !
-			LogicAnd,		// &&
-			LogicOr,		// ||
-			LogicExclusive,	// ^
-
-			Increment,		// ++
-			Decrement,		// --
-		};
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		bool isCorrect(nodePtr operatorNode);//проверка корректности узла оператора
-
-		template <class TCon>
-		size_t unaryMinus(void* firstValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) = -(*static_cast<TCon*>(firstValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t logicNegation(void* firstValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) = !(*static_cast<TCon*>(firstValue));
-			return temp;
-		}
-
-		template <class TCon>
-		size_t addition(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) + (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t substraction(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0; temp;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) - (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t multiplication(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) * (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t division(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) / (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t equal(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) == (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t notEqual(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) != (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t less(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) < (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t greater(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) > (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t lessOrEqual(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) <= (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t greaterOrEqual(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) >= (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-
-		template <class TCon>
-		size_t logicAnd(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) && (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t logicOr(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) || (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-		template <class TCon>
-		size_t logicExclusive(void* firstValue, void* secondValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<int64_t*>(temptr) =
-				(*static_cast<TCon*>(firstValue)) ^ (*static_cast<TCon*>(secondValue));
-			return temp;
-		}
-
-		template <class TCon>
-		size_t increment(void* firstValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) = *static_cast<TCon*>(firstValue) + 1;
-			return temp;
-		}
-		template <class TCon>
-		size_t decrement(void* firstValue)
-		{
-			size_t temp = 0;
-			void* temptr = &temp;
-			*static_cast<TCon*>(temptr) = *static_cast<TCon*>(firstValue) - 1;
-			return temp;
-		}
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		void mathOperation(nodePtr operatorNode)
-		{
-			assert(operatorNode.isCorrect());
-
-
-			ushort resultType = operatorNode->connection[0].load()->getSubtype();
-			ushort comVarType;
-			size_t temp;
-			size_t firstValue;
-			size_t secondValue;
-
-			switch (operatorNode->getSubtype())
+			struct connectionProperties
 			{
-			case  Assigment:
-				operatorNode->connection[0].load()->
-					setData<size_t>(operatorNode->connection[1].load()->getData<size_t>());
-				break;
+				bool arguType;
+				bool isDirect;
+			};
+			connectionProperties conProperties[3];
 
-			case  UnaryMinus:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = unaryMinus<int64_t>(&firstValue);
-					break;
-				case baseValueType::Double:
-					temp = unaryMinus<double>(&firstValue);
-					break;
-				default:
-					throw;
+			//заполнить данные
+			bool fill(nodePtr v1, int numOfConnections)
+			{
+				//возващает true, если подключено корректно
+				for (int i = 0; i < numOfConnections; ++i)
+				{
+					nodePtr vcon = v1->connection[i].load();
+					if (!vcon.exist())
+						return false;
+					else
+					{
+						if (vcon->getType() == node::Pointer)
+						{
+							conProperties[i].isDirect = false;
+							vcon = vcon->connection[0].load();
+							if (!vcon.exist())
+								return false;
+						}
+						else
+							conProperties[i].isDirect = true;
+						if (vcon->getType() != node::Variable)
+							return false;
+						conProperties[i].arguType = vcon->getSubtype();
+					}
 				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+				setIsSimple();
+				return true;
+			}
+		private:
+			void setIsSimple()
+			{
+				if (!conProperties[0].isDirect() ||
+					!conProperties[1].isDirect() ||
+					!conProperties[2].isDirect())
+					isSimple = false;
+				else if ((conProperties[0].arguType != conProperties[1].arguType) ||
+					(conProperties[0].arguType != conProperties[2].arguType))
+					isSimple = false;
+				else isSimple = true;
+			}
+		};
+
+		static_assert(sizeof(operatorData) <= 8);
+
+		template<class TCon>
+		void algebraicOperation(TCon* buffer, char operationType)
+		{
+			static_assert(sizeof(TCon) == 8);
+			switch (operationType)
+			{
+			case Type::Assigment:
+				buffer[0] = buffer[1];
 				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Addition:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = addition<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = addition<double>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+			case Type::UnaryMinus:
+				buffer[0] = -buffer[1];
 				break;
-			case  Subtraction:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = substraction<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = substraction<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+			case Type::Addition:
+				buffer[0] = buffer[1] + buffer[2];
 				break;
-			case  Multiplication:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = multiplication<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = multiplication<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+			case Type::Subtraction:
+				buffer[0] = buffer[1] - buffer[2];
 				break;
-			case  Division:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = division<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = division<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+			case Type::Multiplication:
+				buffer[0] = buffer[1] * buffer[2];
 				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Equal:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = equal<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = equal<double>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
+			case Type::Division:
+				buffer[0] = buffer[1] / buffer[2];
 				break;
-			case  NotEqual:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = notEqual<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = notEqual<double>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  Less:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = less<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = less<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  Greater:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = greater<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = greater<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  LessOrEqual:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = lessOrEqual<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = lessOrEqual<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  GreaterOrEqual:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = greaterOrEqual<int64_t>(&firstValue, &secondValue);
-					break;
-				case baseValueType::Double:
-					temp = greaterOrEqual<double>(&firstValue, &secondValue);
-						break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  LogicNegation:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = logicNegation<int64_t>(&firstValue);
-					break;	
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  LogicAnd:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = logicAnd<int64_t>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  LogicOr:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = logicOr<int64_t>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  LogicExclusive:
-				firstValue = operatorNode->connection[1].load()->getData<size_t>();
-				secondValue = operatorNode->connection[2].load()->getData<size_t>();
-				comVarType = operatorNode->connection[1].load()->getSubtype();
-				switch (comVarType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = logicExclusive<int64_t>(&firstValue, &secondValue);
-					break;
-				default:
-					throw;
-				}
-				if (resultType != baseValueType::Int64)//по необходимости преобразование типа
-					typeCast(&temp, &temp, baseValueType::Int64, resultType);
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Increment:
-				firstValue = operatorNode->connection[0].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = increment<int64_t>(&firstValue);
-					break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			case  Decrement:
-				firstValue = operatorNode->connection[0].load()->getData<size_t>();
-				switch (resultType)
-				{//выбор используемой функции в зависимости от типа данных
-				case baseValueType::Int64:
-					temp = decrement<int64_t>(&firstValue);
-					break;
-				default:
-					throw;
-				}
-				operatorNode->connection[0].load()->setData(temp);//запись результата
-				break;
-			default:
-				throw;
 			}
 		}
-
-		bool isCorrect(nodePtr operatorNode)
+		template<class TCon>
+		void comparisonOperation(i64* result, TCon* buffer, char operationType)
 		{
-			assert(operatorNode->getType() == node::MathOperator);
-			if (!operatorNode->hasConnection(0))
-				return false;
-			switch (operatorNode->getSubtype())
+			static_assert(sizeof(TCon) == 8);
+			switch (operationType)
 			{
-			case  Assigment://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1))
-					return false;//соответствие типов данных
+			case Type::Equal:
+				*result = buffer[0] == buffer[1];
 				break;
-
-			case  UnaryMinus://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1))
-					return false;//соответствие типов данных
+			case Type::NotEqual:
+				*result = buffer[0] != buffer[1];
 				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Addition://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1)
-					|| operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов данных
+			case Type::Less:
+				*result = buffer[0] < buffer[1];
 				break;
-
-			case  Subtraction://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1)
-					|| operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов данных
+			case Type::Greater:
+				*result = buffer[0] > buffer[1];
 				break;
-
-			case  Multiplication://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1)
-					|| operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов данных
+			case Type::LessOrEqual:
+				*result = buffer[0] <= buffer[1];
 				break;
-
-			case  Division://////////////////////////////////////////////
-				if (   !operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(1)
-					|| operatorNode->connectionSubtype(0)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов данных
-				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Equal://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-
-			case  NotEqual://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-
-			case  Less:		//////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-			case  Greater:		//////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-			case  LessOrEqual://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-
-			case  GreaterOrEqual://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  LogicNegation://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(1) == baseValueType::Double)
-					return false;
-				break;
-
-			case  LogicAnd://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				break;
-
-			case  LogicOr://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				break;
-
-			case  LogicExclusive://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0)//наличие соединения
-					|| !operatorNode->hasConnection(1)
-					|| !operatorNode->hasConnection(2))
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable
-					|| operatorNode->connectionType(1) != node::Variable
-					|| operatorNode->connectionType(2) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				if (operatorNode->connectionSubtype(1)
-					!= operatorNode->connectionSubtype(2))
-					return false;//соответствие типов аргументов
-				break;
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case  Increment://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0))//наличие соединения
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
-				break;
-			case  Decrement://////////////////////////////////////////////
-				if (!operatorNode->hasConnection(0))//наличие соединения
-					return false;
-				if (operatorNode->connectionType(0) != node::Variable)
-					return false;//проверка типа (только переменные)
-				if (operatorNode->connectionSubtype(0) == baseValueType::Double)
-					return false;//только целочисленное возвращаемое значение
+			case Type::GreaterOrEqual:
+				*result = buffer[0] >= buffer[1];
 				break;
 			default:
+				assert(false);
+			}
+		}
+		void logicOperation(i64* buffer, char operationType)
+		{
+			switch (operationType)
+			{
+			case Type::LogicNegation:
+				buffer[0] = !buffer[1];
+				break;
+			case Type::LogicAnd:
+				buffer[0] = buffer[1] && buffer[2];
+				break;
+			case Type::LogicOr:
+				buffer[0] = buffer[1] || buffer[2];
+				break;
+			default:
+				assert(false);
+			}
+		}
+		void In_De_crement(i64* buffer, char operationType)
+		{
+			switch (operationType)
+			{
+			case Type::Increment:
+				++buffer[0];
+				break;
+			case Type::Decrement:
+				--buffer[0];
+				break
+			default:
+				assert(false);
+			}
+		}
+		enum class prType
+		{
+			Algebraic,
+			Comparison,
+			Logic,
+			In_De_crement
+		};
+		char numberOfArguments(char operType)
+		{
+			switch (operType)
+			{
+			case Increment:		// ++
+				return 0;
+				break;
+			case Decrement:		// --
+				return 0;
+				break;
+			
+			case Assigment:		// =
+				return 1;
+			case UnaryMinus:	// 0-
+				return 1;
+			case LogicNegation:	// !
+				return 1;
+			default:
+				return 2;
+			}
+		}
+		prType operationPrType(char operType)
+		{
+			if (operType <= Type::Division)
+				return prType::Algebraic;
+			if (operType <= Type::GreaterOrEqual)
+				return prType::Comparison;
+			if (operType <= Type::LogicOr)
+				return prType::Logic;
+			return prType::In_De_crement;
+		}
+		//простое вычисление. Используется, когда нет необходимости в преобразовании типа данных
+		inline void simpleCompute(void* buffer, const operatorData opdat, prType prop, char operType)
+		{
+			//type: f64 - false, i64 = true
+			if (opdat.conProperties[1].arguType)
+			{
+				switch (prop)
+				{
+				case prType::Algebraic:
+					algebraicOperation<i64>
+						(reinterpret_cast<i64*>(buffer), operType);
+					break;
+				case prType::Comparison:
+					comparisonOperation<i64>
+						(reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer) + 1, operType);
+					break;
+				case prType::Logic:
+					logicOperation
+						(reinterpret_cast<i64*>(buffer), operType);
+					break;
+				case prType::In_De_crement:
+					In_De_crement(reinterpret_cast<i64*>(buffer), operType);
+				}
+			}
+			else
+			{
+				if (prop == prType::Algebraic)
+					algebraicOperation<f64>
+					(reinterpret_cast<f64*>(buffer), operType);
+				else
+					comparisonOperation<f64>
+					(reinterpret_cast<i64*>(buffer), reinterpret_cast<f64*>(buffer) + 1, operType);
+			}
+		}
+		inline nodePtr getVariableByPointerOrDirect(nodePtr v1, operatorData opdata, char number)
+		{
+			if (opdata.conProperties[number].isDirect)
+				return v1->connection[number].load();
+			//при подключении через указатель приходится каждый раз проходить проверку
+			nodePtr temp =
+				v1->connection[number].load()->connection[0].load();
+			if (!temp.exist())
+				return temp;
+			if (temp->getType() != node::Variable || 
+				temp->getSubtype() != opdata.conProperties[number].arguType)
+				return nullNodePtr;
+			return temp;
+		}
+		inline void convert_f_to_i(void* address)
+		{
+			*static_cast<i64*>(address) =
+				static_cast<i64>(static_cast<f64*>(address);
+		}
+		inline void convert_i_to_f(void* address)
+		{
+			*static_cast<f64*>(address) =
+				static_cast<f64>(static_cast<i64*>(address);
+		}
+		inline void hardAlgebraic(void* buffer, const operatorData opdat, prType prop, char operType)
+		{
+			if (operType <= UnaryMinus) //унарный оператор
+				if (opdat.conProperties[1].arguType)
+					algebraicOperation<i64>(
+						reinterpret_cast<i64*>(buffer), operType);
+				else
+					algebraicOperation<f64>(
+						reinterpret_cast<f64*>(buffer), operType);
+			//бинарный оператор
+			//если оба аргумента имеют тип i64, то осуществляется i64 операция, иначе f64
+			bool vType = opdat.conProperties[1].arguType && opdat.conProperties[2].arguType;
+			if (vType)//i64
+			{
+				algebraicOperation<i64>(
+					reinterpret_cast<i64*>(buffer), operType);
+				//если результат f64 (тип результата не соответствует типу операции)
+				if (!opdat.conProperties[0].arguType)
+					convert_i_to_f(buffer);
+			}
+			else
+			{
+				//не более одного из аргументов имеет тип i64
+				//если первый аргумент имеет тип i64
+				if (opdat.conProperties[1].arguType)
+					convert_i_to_f(&buffer[1]);
+				else if (opdat.conProperties[2].arguType)
+					convert_i_to_f(&buffer[2]);
+
+				algebraicOperation<f64>(
+					reinterpret_cast<f64*>(buffer), operType);
+				//если результат i64 (тип результата не соответствует типу операции)
+				if (opdat.conProperties[0].arguType)
+					convert_f_to_i(buffer);
+			}
+		}
+		inline void hardComparison(void* buffer, const operatorData opdat, prType prop, char operType)
+		{
+			bool vType = opdat.conProperties[1].arguType && opdat.conProperties[2].arguType;
+			if (vType)//i64
+			{
+				comparisonOperation<i64>(
+					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer+1), operType);
+			}
+			else
+			{
+				//не более одного из аргументов имеет тип i64
+				//если первый аргумент имеет тип i64
+				if (opdat.conProperties[1].arguType)
+					convert_i_to_f(&buffer[1]);
+				else if (opdat.conProperties[2].arguType)
+					convert_i_to_f(&buffer[2]);
+
+				comparisonOperation<i64>(
+					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer + 1), operType);
+			}
+		}
+		inline void hardCompute(void* buffer, const operatorData opdat, prType prop, char operType)
+		{
+			switch (prop)
+			{
+			case prType::Algebraic:
+				hardAlgebraic(buffer, opdat, prop, operType);
+				break;
+			case prType::Comparison:
+				hardComparison(buffer, opdat, prop, operType);
+				break;
+			case prType::Logic:
+				logicOperation
+				(reinterpret_cast<i64*>(buffer), operType);
+				break;
+			case prType::In_De_crement:
+				In_De_crement(reinterpret_cast<i64*>(buffer), operType);
+			}
+		}
+		bool perform(nodePtr v1)
+		{
+			try
+			{
+				operatorData opdat = v1->getData<operatorData>();
+				size_t buffer[3];
+				char operType = v1->getSubtype();
+				char numOfArg = numberOfArguments(operType);
+				if (opdat.isSimple)//простые операции просчитываются отдельно (оптимизация)
+				{
+					switch (numOfArg)
+					{
+					case 0://0 это только инкремент и декремент
+						buffer[0] = v1->connection[0].load()->getData<size_t>();
+						break;
+					case 1:
+						buffer[1] = v1->connection[1].load()->getData<size_t>();
+						break;
+					case 2:
+						buffer[1] = v1->connection[1].load()->getData<size_t>();
+						buffer[2] = v1->connection[2].load()->getData<size_t>();
+						break;
+					}
+					simpleCompute(buffer, operationPrType(operType), 
+						operType, opdat.conProperties[1].arguType);
+					v1->connection[0].load()->setData(buffer[0]);
+					return true;
+				}
+				//если операция сложная: с преобразованием типов или
+				//используется указатель
+				//частичная проверка осуществляется каждый раз
+
+				/*так как переменная может быть доступна не только напрямую,
+				но и через указатель необходимо промежуточное сохранение
+				адресов переменных*/
+				nodePtr connection[3];
+
+				connection[0] = getVariableByPointerOrDirect(v1, opdat, 0);
+				if (!connection[0].exist())
+					return false;
+				switch (numOfArg)
+				{
+				case 0://0 это только инкремент и декремент
+					buffer[0] = connection[0]->getData<size_t>();
+					break;
+				case 2:
+					connection[2] = getVariableByPointerOrDirect(v1, opdat, 2);
+					if (!connection[2].exist())
+						return false;
+					buffer[2] = connection[2]->getData<size_t>();
+				case 1:
+					connection[1] = getVariableByPointerOrDirect(v1, opdat, 1);
+					if (!connection[1].exist())
+						return false;
+					buffer[1] = connection[1]->getData<size_t>();
+				}
+				
+			}
+			catch (...)
+			{
 				return false;
 			}
 			return true;
 		}
-	}
 
-	/*
-	switch (toType)
+		
+		void reset(nodePtr v1) {}
+
+		bool check(nodePtr v1)
+		{
+			char numOfConnections = numberOfArguments() + 1;
+			char operType = v1->getSubtype();
+			operatorData opdat;
+			if (!opdat.fill())
+				return false;
+
+			switch (operationPrType(operType))
 			{
-			case baseValueType::Bool:
-
+			case prType::Comparison:
+			case prType::In_De_crement:
+				if (!opdat.conProperties[0])//только i64
+					return false;
 				break;
-			case baseValueType::Int8:
+			case prType::Logic:
+				if (!opdat.conProperties[0])//только i64
+					return false;
+				if (!opdat.conProperties[1])//только i64
+					return false;
+				if (!opdat.conProperties[2] && operType != LogicNegation)//только i64
+					return false;
+			}
+			v1->setData(opdat);
+			return true;
+		}
+		void set(nodePtr v1) {}
+		void copy(nodePtr v1, nodePtr v2) {}
 
-				break;
-			case baseValueType::uInt8:
-
-				break;
-			case baseValueType::Int16:
-
-				break;
-			case baseValueType::uInt16:
-
-				break;
-			case baseValueType::Int32:
-
-				break;
-			case baseValueType::uInt32:
-
-				break;
-			case baseValueType::Int64:
-
-				break;
-			case baseValueType::uInt64:
-
-				break;
-			case baseValueType::Float:
-
-				break;
-			case baseValueType::Double:
-
-				break;
-			}*/
+	}
 }

@@ -79,6 +79,7 @@ namespace nechto
 
 		std::set<nodePtr> savedNodes;//список сохранённых нод
 		std::map<nodePtr, nodePtr> loadedNodes;//map загруженных нод
+		externalFunction::shmap exFunMap;
 		//ноды сохраняются с теми адресами, которые занимали на момент сохранения
 		//соответственно и связи прописаны по ним
 		//однако при загрузке им выдают новые адреса, по которым и надо коннектиться
@@ -186,7 +187,7 @@ namespace nechto
 				std::wstring adData;
 				if(v1->getType() == node::Tag)
 					adData = tag::getData(v1);
-				if(v1->getType() == node::ExteralFunction)
+				if(v1->getType() == node::ExternalFunction)
 					if (v1->getData<externalFunction*>() == nullptr)
 						adData = L"error";
 					else
@@ -283,12 +284,12 @@ namespace nechto
 				}
 				if (vload->getType() == node::Tag)
 					tag::setData(vload, adData);
-				if (vload->getType() == node::ExteralFunction)
+				if (vload->getType() == node::ExternalFunction)
 				{
 					//если функции нет, создаётся затычка, которую потом можно заместить
 					if (!externalFunction::exist(adData))
 						externalFunction::add(
-							externalFunction(adData, externalFunction::Error.isCorrectPtr, 
+							externalFunction(adData, externalFunction::Error.checkPtr, 
 								externalFunction::Error.FuncPtr));
 					vload->setData(externalFunction::get(adData));
 				}

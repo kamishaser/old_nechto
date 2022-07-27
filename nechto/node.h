@@ -22,6 +22,9 @@ namespace nechto
 	}
 	
 	using ushort = unsigned short;
+	using i64 = int64_t;
+	using f64 = double;
+
 	struct node //один узел nechto
  	{
 		class ptr
@@ -57,7 +60,7 @@ namespace nechto
 			{
 				return exist();
 			}
-			bool isCorrect() const;
+			bool check() const;
 			
 			node* operator-> ();
 			node* operator* ();
@@ -82,14 +85,15 @@ namespace nechto
 			auto operator<=>(const ptr&) const = default;
 		};
 	private:
-		std::atomic<size_t> data = 0;//данные ноды
 		std::atomic<char> type;//тип ноды
 		std::atomic<char> subtype;//подтип ноды
 		std::atomic<bool> correctnessСhecked = false;
 	public:
+		std::atomic<size_t> data = 0;//данные ноды
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 	
+		static_assert(std::atomic<size_t>::is_always_lock_free);
 		friend void setTypeAndSubtype(ptr, char, char);
 		
 
@@ -141,19 +145,99 @@ namespace nechto
 		}
 		enum Type //список типов нод
 		{
-			Error,
+			Deleted,
 			Hub,					//разветвитель
 			Variable,				//объект-переменная базового типа, хранящаяся внутри алгоритма (одинаков для всех исполнителей)
-			TypeCastOperator,		//оператор преобразования типа данных
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
-			ExteralFunction,		//функция, не являющаяся частью nechto
+			ExternalFunction,		//функция, не являющаяся частью nechto
 			Tag,					//метка
-			Pointer,					//указатель на объект
+			Pointer,				//указатель на объект
 			Array
 		};
-		
 	};
+	namespace variable
+	{
+		enum Type
+		{
+			F64 = 0,//false
+			I64 = 1 //true
+		};
+	}
+	namespace mathOperator
+	{
+		enum Type
+		{
+			Assigment,		// =
+			UnaryMinus,		// 0-
+
+			Addition,		// +
+			Subtraction,	// -
+
+			Multiplication, // *
+			Division,		// /
+
+			Equal,			// ==
+			NotEqual,		// !=
+
+			Less,			// <
+			Greater,		// >
+			LessOrEqual,	// <=
+			GreaterOrEqual,	// >=
+
+			LogicNegation,	// !
+			LogicAnd,		// &&
+			LogicOr,		// ||
+
+			Increment,		// ++
+			Decrement,		// --
+		};
+	}
+	namespace tag
+	{
+
+		enum Type
+		{
+			Comment, //стандартный текстовый комментарий
+			Name,
+
+			ExternalConnection, //внешнее подключение. Данная нода может использоваться извне.
+			//ноду имеющую внешнее подключение нельзя удалять.
+			//комонента связности, не имеющаа внешнего подключение считается утеренной и 
+			//может быть удалена сборщиком мусора, (когда он будет разработан)
+			Attribute
+		};
+	}
+	namespace array
+	{
+		enum Type
+		{
+			List = 128,
+			//список. Неупорядоченный набор связей (по 4 на хаб)
+			Table,
+			//фактически тот же список, но каждый элемент - 1 хаб (до 4 связей)
+
+			Stack,
+			Queue
+		};
+	}
+	namespace pointer
+	{
+		enum Type
+		{
+			Reference = 0,//одиночный
+			ConIter,
+			ArrayIter
+		};
+	}	
+	namespace hub
+	{
+		enum Type
+		{
+			ConHub,
+			ArrayHub
+		};
+	}
 
 	using nodePtr = node::ptr;
 	using nodeEvent = std::function<void(nodePtr)>;

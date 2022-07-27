@@ -6,58 +6,88 @@ namespace nechto
 	void deleteNode(nodePtr v1);
 	namespace pointer
 	{
-		enum Type
-		{
-			Single,		//одиночный
-			Iterator,	//итератор 
-		};
-		//single указатель - связь, нода, указывающая на другую. Сам по себе не является действием.
-		//array  указатель - массив NumHub соединений
-		bool isCorrect(nodePtr v1)
-		{
-			assert(v1->getType() == node::Pointer);
-			switch (v1->getSubtype())
-			{
-			case Single:
-				return true;
-			/*case Array:
-				if (!v1->hasConnection(0) || !v1->hasConnection(1))
-					return false;
-				if (v1->connectionType(0) != node::Hub || v1->connectionType(1) != node::Hub)
-					return false;
-				if (v1->getData<int64_t>() < 0)
-					return false;
-				return true;*/
+		void reset(nodePtr v1);
+		void perform(nodePtr v1);
+		bool check(nodePtr v1);
+		
 
-			default:
-				break;
-			}
-			return false;
-		}
-		//nodePtr getNodePtrFromArray(nodePtr v1, int64_t number)
-		//{
-		//	assert(v1->getType() == node::Pointer);
-		//	assert(v1->getSubtype() == Array);
-		//	int64_t size = v1->getData<int64_t>();
-		//	if (number < 0 || number >= size)
-		//		return nullNodePtr;
-		//	//в будующем надо будет доделать отимизацию: ход с двух сторон
-		//	nodePtr vIterator = v1->connection[0];
-		//	int64_t hubNumber = number >> 2;
-		//	int64_t connectionNumber = number - (hubNumber << 2);
-		//	for (int64_t i = 0; i < hubNumber; i++)
-		//		vIterator = vIterator->hubConnection;
-		//	return vIterator->connection[connectionNumber];
-		//}
-		/*void deletePointer(nodePtr v1)
+		//что хранится в итераторе:
+		//в поле данных номер элемента
+		//к нулевому соединению подключен массив (в случае coniter основная нода)
+		//к первому текущий хаб(внимание: односторонее соединение!!!)
+
+		//присваивание значения ноде того же типа
+		void assigment(nodePtr v0, const nodePtr v1)
 		{
+			assert(v1.exist());
 			assert(v1->getType() == node::Pointer);
-			if (v1->getSubtype() == Array)
+			char subtype = v1->getSubtype();
+			if (!subtype)//reference
 			{
-				nodePtr vIterator = v1->connection[0];
-				deleteNode(vIterator);
+				NumHubConnect(v0, v1->connection[0], 0);
+				v1->setData<i64>(0);
 			}
-		}*/		
+			else
+			{
+				NumHubConnect(v0, v1->connection[0], 0);
+				NumConnect(v0, v1->connection[1], 1);
+				v0->setData<i64>(v1->getData<i64>());
+			}
+		}
+		void set(nodePtr v1, const nodePtr sourse, bool atBegin = true)
+		{
+			assert(sourse.exist());
+			char subtype = v1->getSubtype();
+			if (!subtype)//reference
+			{
+				NumHubConnect(v1, sourse, 0);
+			}
+			else if (subtype == pointer::ConIter)
+			{
+				NumHubConnect(v1, sourse, 0);
+				if (atBegin)
+				{
+					v1->setData<i64>(0);
+				}
+				else
+				{//так как номер последнего хаба нигде не записан приходится перебирать
+					nodePtr i = sourse;
+					int64_t position = 3;
+					while (true)
+					{
+						nodePtr hub = i->hubConnection();
+						if (!hub.exist())
+						{
+							v1->setData<i64>()
+						}
+						position += 4;
+						i = i->hubConnection();
+					}
+				}
+			}
+
+			assert(v1->getSubtype() == sourse->getSubtype())
+			char sourseType = sourse->getType();
+			if (sourseType == node::Hub)//нельзя подключаться к хабам
+				return false;
+			else 
+		}
+		nodePtr follow(nodePtr v1)
+		{
+			assert(v1.exist());
+			assert(v1->getType() == node::Pointer);
+			if (!v1->getSubtype())//reference
+			{
+				return v1->connection[0].load();
+			}
+			else
+			{
+				nodePtr hub = v1->connection[0];
+				if (!hub.exist())
+					return nullNodePtr;
+				return hub->connection[v1->getData<i64>() & 3ll];
+			}
+		}
 	}
 
 }

@@ -20,7 +20,7 @@ namespace nechto::ide
 
 		externalConnection exCon;		
 		visualNode()
-			:exCon(nullNodePtr, L"nechto.ide.visualNode"_cmn) {}
+			:exCon(nullNodePtr, L"nechto.ide.visualNode") {}
 
 	};
 }

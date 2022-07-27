@@ -23,7 +23,7 @@ namespace nechto::ide
 	};
 	struct visualConnectionData
 	{
-		using oneConNumbers = std::pair<int64_t, int64_t>;
+		using oneConNumbers = std::pair<i64, i64>;
 		std::vector<oneConNumbers> connections;
 	};
 }

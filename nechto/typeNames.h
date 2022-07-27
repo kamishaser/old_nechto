@@ -21,28 +21,25 @@ namespace nechto
 		}
 		const std::vector<std::wstring> nodeT
 		{
-			L"Error",				
+			L"Deleted",				
 			L"Hub",					//разветвитель
 			L"Variable",				//объект-переменная базового типа, хнанящаяся внутри алгоритма (одинаков для всех исполнителей)
-			L"TypeCastOperator",		//оператор преобразования типа данных
 			L"MathOperator",			//математический оператор
 			L"ConditionalBranching",	//if
 			L"ExternalFunction",		//функция, не являющаяся частью nechto
-			L"Tag",					//помечнный извне объект (односторонняя связь может быть только к метке 
-									//(о метке знает только один объект))
-			L"Pointer"
+			L"Tag",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
+			L"Pointer",
+			L"Array"
 		};
 		
 		const std::vector<std::wstring> variableT
 		{
-			L"Error",
-			L"Int64",
-			L"Double",
+			L"F64",
+			L"I64",
 		};
 
 		const std::vector<std::wstring> tagT
 		{
-			L"Error",
 			L"Comment",
 			L"Name",
 			L"ExternalConnection",
@@ -51,38 +48,35 @@ namespace nechto
 		
 		const std::vector<std::wstring> mathOperatorT
 		{
-			L"Error",
-			L"Assigment",		// =		
-			L"UnaryMinus",		// -
+			L"Assigment",			// =		
+			L"UnaryMinus",			// -
 
 			L"Addition+",			// +
-			L"Subtraction",		// -
+			L"Subtraction",			// -
 
-			L"Multiplication",	// *
+			L"Multiplication",		// *
 			L"Division",			// /
 
-			L"Equal",			// ==
+			L"Equal",				// ==
 			L"NotEqual",			// !=
 
 			L"Less",				// <
-			L"Greater",			// >
-			L"LessOrEqual",		// <=
-			L"GreaterOrEqual",	// >=
+			L"Greater",				// >
+			L"LessOrEqual",			// <=
+			L"GreaterOrEqual",		// >=
 
-			L"LogicNegation",	// !
+			L"LogicNegation",		// !
 			L"LogicAnd",			// &&
-			L"LogicOr",			// ||
-			L"LogicExclusive",	// ^
+			L"LogicOr",				// ||
 
-			L"Increment",		// ++
+			L"Increment",			// ++
 			L"Decrement"			// --
 		};
 
 		const std::vector<std::wstring> mathOperatorShortT
 		{
-			L"Error",
 			L"=",
-			L"-=",
+			L"0-",
 
 			L"+",
 			L"-",
@@ -101,7 +95,6 @@ namespace nechto
 			L"!",
 			L"&&",
 			L"||",
-			L"^",
 
 			L"++",
 			L"--"

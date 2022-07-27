@@ -7,20 +7,6 @@ namespace nechto
 {
 	namespace tag
 	{
-		//вспомогательная информация
-		
-		enum Type
-		{
-			Error,
-			Comment, //стандартный текстовый комментарий
-			Name,
-
-			ExternalConnection, //внешнее подключение. Данная нода может использоваться извне.
-			//ноду имеющую внешнее подключение нельзя удалять.
-			//комонента связности, не имеющаа внешнего подключение считается утеренной и 
-			//может быть удалена сборщиком мусора, (когда он будет разработан)
-			Attribute
-		};
 		bool isConnectedToNumber(nodePtr v1)
 		{
 			nodePtr vtemp = v1;
@@ -45,7 +31,7 @@ namespace nechto
 			}
 			return false;
 		}
-		bool isCorrect(nodePtr tag)
+		bool check(nodePtr tag)
 		{
 			assert(tag.exist());
 			assert(tag->getType() == node::Tag);
@@ -90,16 +76,33 @@ namespace nechto
 			tag->setData<std::wstring*>(nullptr);
 			tagAdDataBlock[tag.getFirst()].unlock();
 		}
-		auto operator <=> (const nodePtr& tag1, const nodePtr& tag2)
+
+		void initialize(nodePtr v1)
 		{
-			assert(tag1.exist());
-			assert(tag1->getType() == node::Tag);
-			assert(tag2.exist());
-			assert(tag2->getType() == node::Tag);
-			return tag::getData(tag1) <=> tag::getData(tag2);
+			assert(v1.exist());
+			assert(v1->getType() == node::Tag);
+			v1->setData<std::wstring*>(nullptr);
+		}
+		void initialize(nodePtr v1, const std::wstring& text)
+		{
+			v1->setData<std::wstring*>(nullptr);
+			setData(v1, text);
+		}
+		void reset(nodePtr v1)
+		{
+			assert(v1.exist());
+			assert(v1->getType() == node::Tag);
+			deleteData(v1);
+		}
+		//присваивание значения ноде того же тип
+		nodePtr assigment(nodePtr v0, nodePtr v1)
+		{
+			setData(v0, getData(v1);
 		}
 	}
 	//std::function<void(nodePtr, size_t)>addTag;
 	//std::function<nodePtr(size_t)> GetAddressByID;
 	//std::function<>
+
+	
 }

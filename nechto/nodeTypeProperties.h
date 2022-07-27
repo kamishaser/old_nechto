@@ -17,7 +17,7 @@ namespace nechto
 			return true;
 		case node::ConditionalBranching:
 			return false;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			return false;
 		case node::Tag:
 			return true;
@@ -40,7 +40,7 @@ namespace nechto
 			return false;
 		case node::ConditionalBranching:
 			return false;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			return false;
 		case node::Tag:
 			return true;
@@ -63,7 +63,7 @@ namespace nechto
 			return false;
 		case node::ConditionalBranching:
 			return false;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			return true;
 		case node::Tag:
 			return true;
@@ -86,7 +86,7 @@ namespace nechto
 			return;
 		case node::ConditionalBranching:
 			return;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			return;
 		case node::Tag:
 			return;

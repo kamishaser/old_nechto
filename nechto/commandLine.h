@@ -13,15 +13,15 @@ void loadNode(nodePtr v1)
 class commandLine
 {
 	externalConnection v1;
-	std::wstring cutWord				(std::wstring& line);
+	std::wstring cutWord			(std::wstring& line);
 	std::wstring commandNew			(std::wstring& line);
 	std::wstring commandDelete		(std::wstring& line);
 	std::wstring commandHubHub		(std::wstring& line);
 	std::wstring commandNumHub		(std::wstring& line);
 	std::wstring commandHubNum		(std::wstring& line);
 	std::wstring commandGo			(std::wstring& line);
-	std::wstring commandThis			(std::wstring& line);
-	std::wstring commandStep			(std::wstring& line);
+	std::wstring commandThis		(std::wstring& line);
+	std::wstring commandStep		(std::wstring& line);
 	std::wstring commandSet			(std::wstring& line);
 	std::wstring commandSetType		(std::wstring& line);
 	std::wstring commandSetSubtype	(std::wstring& line);
@@ -57,7 +57,7 @@ public:
 		if (command == L"setData") 		return commandSetData(line);
 		if (command == L"setType")		return commandSetType(line);
 		if (command == L"setSubtype")	return commandSetSubtype(line);
-		if (command == L"isCorrect")		return commandIsCorrect(line);
+		if (command == L"check")		return commandIsCorrect(line);
 
 		if (command == L"save")			return commandSave(line);
 		if (command == L"isSaved")		return commandIsSaved(line);
@@ -162,22 +162,22 @@ std::wstring commandLine::commandSetData(std::wstring& line)
 	if (line.empty())
 		return L"error";
 	nodePtr ptemp;
-	int64_t itemp = 0;
-	double  dtemp = 0;
+	i64 itemp = 0;
+	f64  dtemp = 0;
 	switch (v1->getType())
 	{
 	case node::Variable:
 		switch (v1->getSubtype())
 		{
-		case baseValueType::Int64:
+		case baseValueType::I64:
 			try { itemp = std::stoll(line); }
 			catch (...) { return L"error"; }
-			v1->setData<int64_t>(itemp);
+			v1->setData<i64>(itemp);
 			return commandThis(line);
-		case baseValueType::Double:
+		case baseValueType::F64:
 			try { dtemp = std::stod(line); }
 			catch (...) { return L"error"; }
-			v1->setData<double>(dtemp);
+			v1->setData<f64>(dtemp);
 			return commandThis(line);
 		default:
 			return L"error";
@@ -185,7 +185,7 @@ std::wstring commandLine::commandSetData(std::wstring& line)
 	case node::Tag:
 		tag::setData(v1, line);
 		return nodeProperties(v1);
-	case node::ExteralFunction:
+	case node::ExternalFunction:
 		if (!externalFunction::exist(line))
 			return L"the function named " + line + L" isn't exist";
 		v1->setData(externalFunction::get(line));
@@ -277,7 +277,7 @@ std::wstring commandLine::commandDisconnect(std::wstring& line)
 // 
 std::wstring commandLine::commandStep(std::wstring& line)
 {
-	if (!v1.get().isCorrect())
+	if (!v1.get().check())
 		return L"the node isn't correct";
 	nodePtr nPos = step(v1);
 	if (nPos.exist())
@@ -289,7 +289,7 @@ std::wstring commandLine::commandStep(std::wstring& line)
 //std::wstring commandLine::commandSet(std::wstring& line)
 std::wstring commandLine::commandIsCorrect(std::wstring& line)
 {
-	if (v1.get().isCorrect())
+	if (v1.get().check())
 		return L"the node is correct";
 	else
 		return L"the node isn't correct";

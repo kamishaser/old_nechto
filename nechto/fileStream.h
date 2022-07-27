@@ -9,7 +9,7 @@ namespace nechto
 	{
 		stream			nechtoStream;
 		std::fstream	fStream;
-
+		
 	public:
 		explicit fileStream()
 			:nechtoStream([&](const char* c, int32_t s) {fStream.write(c, s); },

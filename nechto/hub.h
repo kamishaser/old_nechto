@@ -6,12 +6,6 @@ namespace nechto
 	
 	namespace hub
 	{
-		enum Type
-		{
-			Error,
-			Extender,
-			Array
-		};
 		void add(nodePtr vertex, nodePtr lastHub)
 		{//добавление хаба к элементу
 			assert(vertex.exist());
@@ -30,5 +24,11 @@ namespace nechto
 			assert(hub->getType() == node::Hub);
 			return hub->getData<std::pair<nodePtr, nodePtr>>().first;
 		}
+
+		void fill(nodePtr v1, char subtype);
+		void reset(nodePtr v1);
+		void perform(nodePtr v1);
+		bool check(nodePtr v1);
+		void copy(nodePtr v1);
 	}
 }

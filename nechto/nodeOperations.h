@@ -24,7 +24,7 @@ namespace nechto
 	bool hasConnection(nodePtr v1, nodePtr v2);
 	bool hasMultipleConnection(nodePtr v1);
 
-	int64_t getConnectionNumber(nodePtr v1, nodePtr v2);
+	i64 getConnectionNumber(nodePtr v1, nodePtr v2);
 	std::vector<nodePtr> allNodeConnections(nodePtr v1);
 	//создание
 	const nodePtr newNode();
@@ -34,12 +34,13 @@ namespace nechto
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
 	void HubConnect(nodePtr v1, nodePtr v2);
 	//создание двухстороннего соединени
+	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
-	void numDisconnect(nodePtr v1, int64_t conNum);
+	void numDisconnect(nodePtr v1, i64 conNum);
 	//смена типа
 	void reset(nodePtr v1);
 	void setTypeAndSubtype(nodePtr v1, char type, char subtype = 0);
@@ -98,10 +99,10 @@ namespace nechto
 		}
 	}
 	//номер подключения v2 к v1 нод. -1, если соединение не найдено
-	int64_t getConnectionNumber(nodePtr v1, nodePtr v2)
+	i64 getConnectionNumber(nodePtr v1, nodePtr v2)
 	{
 		assert(v1.exist());
-		int64_t number = 0;
+		i64 number = 0;
 		nodePtr hubIterator = v1;
 		while (true)
 		{
@@ -195,6 +196,12 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание двухстороннего соединения
+	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2)
+	{
+		assert(v1.exist() && v2.exist());
+		NumConnect(v1, v2, number1);
+		NumConnect(v2, v1, number2);
+	}
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1)
 	{
 		assert(v1.exist() && v2.exist());
@@ -244,13 +251,13 @@ namespace nechto
 		oneSideDisconnect(v1, v2);
 		oneSideDisconnect(v2, v1);
 	}
-	void numDisconnect(nodePtr v1, int64_t conNum)
+	void numDisconnect(nodePtr v1, i64 conNum)
 	{
 		assert(v1.exist());
-		int64_t hubNumber = conNum >> 2;
+		i64 hubNumber = conNum >> 2;
 
 		nodePtr hubIterator = v1;
-		for (int64_t i = 0; i < (conNum >> 2); ++i)
+		for (i64 i = 0; i < (conNum >> 2); ++i)
 		{
 			if (!v1->hasHub())
 				return;
@@ -282,17 +289,17 @@ namespace nechto
 		switch (v1->getType())
 		{
 		case node::Tag:
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			v1->setData(nullptr);
 			break;
 		case node::Variable:
 			switch (v1->getSubtype())
 			{
-			case baseValueType::Int64:
-				v1->setData<int64_t>(0);
+			case baseValueType::I64:
+				v1->setData<i64>(0);
 				break;
-			case baseValueType::Double:
-				v1->setData<double>(0);
+			case baseValueType::F64:
+				v1->setData<f64>(0);
 				break;
 			default:
 				break;

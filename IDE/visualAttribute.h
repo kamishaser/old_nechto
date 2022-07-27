@@ -2,7 +2,6 @@
 #include <map>
 
 #include "visual.h"
-#include "comName.h"
 #include "uniqueNodePtr.h"
 
 namespace nechto::ide
@@ -14,8 +13,8 @@ namespace nechto::ide
 	//	enum Type
 	//	{
 	//		Error,
-	//		Int64,
-	//		Double,
+	//		I64,
+	//		F64,
 	//		String
 	//	};
 
@@ -23,17 +22,17 @@ namespace nechto::ide
 	//	{
 	//		attributes.emplace(n, std::move(uniqueNodePtr(node::Variable)));
 	//	}
-	//	void add(const comName& n, double startValue)
+	//	void add(const comName& n, f64 startValue)
 	//	{
 	//		auto i = attributes.emplace(n,
-	//			std::move(uniqueNodePtr(node::Variable, baseValueType::Double))).first;
-	//		i->second.get()->setData<double>(startValue);
+	//			std::move(uniqueNodePtr(node::Variable, baseValueType::F64))).first;
+	//		i->second.get()->setData<f64>(startValue);
 	//	}
-	//	void add(const comName& n, int64_t startValue)
+	//	void add(const comName& n, i64 startValue)
 	//	{
 	//		auto i = attributes.emplace(n,
-	//			std::move(uniqueNodePtr(node::Variable, baseValueType::Int64))).first;
-	//		i->second.get()->setData<double>(startValue);
+	//			std::move(uniqueNodePtr(node::Variable, baseValueType::I64))).first;
+	//		i->second.get()->setData<f64>(startValue);
 	//	}
 	//	void add(const comName& n, std::wstring startValue)
 	//	{
@@ -52,26 +51,26 @@ namespace nechto::ide
 	//		nodePtr v1 = attributes.at(n).get();
 	//		if (v1->getType() == node::Variable)
 	//		{
-	//			if (v1->getSubtype() == baseValueType::Int64)
-	//				return Type::Int64;
-	//			if (v1->getSubtype() == baseValueType::Double)
-	//				return Type::Double;
+	//			if (v1->getSubtype() == baseValueType::I64)
+	//				return Type::I64;
+	//			if (v1->getSubtype() == baseValueType::F64)
+	//				return Type::F64;
 	//		}
 	//		if (v1->getType() == node::Tag)
 	//			return Type::String;
 	//		return Error;
 	//	}
-	//	int64_t getIntData(const comName& n)
+	//	i64 getIntData(const comName& n)
 	//	{
 	//		assert(contains(n));
-	//		assert(type(n) == Int64);
-	//		return attributes.at(n).get()->getData<int64_t>();
+	//		assert(type(n) == I64);
+	//		return attributes.at(n).get()->getData<i64>();
 	//	}
-	//	double getDoubleData(const comName& n)
+	//	f64 getF64Data(const comName& n)
 	//	{
 	//		assert(contains(n));
-	//		assert(type(n) == Double);
-	//		return attributes.at(n).get()->getData<double>();
+	//		assert(type(n) == F64);
+	//		return attributes.at(n).get()->getData<f64>();
 	//	}
 	//	std::wstring getStringData(const comName& n)
 	//	{

@@ -23,12 +23,12 @@ namespace nechto::ide::handler
 		std::shared_ptr<ideDisplay> display;
 
 		externalConnection cursored =
-			externalConnection(nullNodePtr, L"nechto.ide.cursored"_cmn);
+			externalConnection(nullNodePtr, L"nechto.ide.cursored");
 		glm::vec2 lastCPos;
 
 
 		externalConnection moveCursored =
-			externalConnection(createVariable(0ll), L"moveCursored"_cmn);
+			externalConnection(createVariable(0ll), L"moveCursored");
 		glm::vec2 offset;
 		bool last = false;
 	public:
@@ -56,9 +56,9 @@ namespace nechto::ide::handler
 					{
 						if (i1->second.exCon.getTag() != last)
 						{
-							NumHubConnect(cursored.getTag(), i1->second.exCon.getTag(), 0);
 							std::wcout << L"cursored: " << nodeProperties(i1->first) << std::endl;
 						}
+						NumHubConnect(cursored.getTag(), i1->second.exCon.getTag(), 0);
 					}
 				}
 			}

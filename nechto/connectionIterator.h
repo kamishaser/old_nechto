@@ -2,15 +2,63 @@
 #include "node.h"
 #include "pointer.h"
 
-namespace nechto
+namespace nechto::iterator
 {
+	struct iteratorData
+	{
+		nodePtr baseNode = nullNodePtr;
+		nodePtr currentNode = nullNodePtr;
+		i64 position;
+	};
+	namespace con
+	{
+		bool stepForward(iteratorData iterdat)
+		{
+			++iterdat.position;
+			if ((iterdat.position & 3ll) != 0)
+				return true;
+			else
+			{
+				nodePtr nextNode = iterdat.currentNode->hubConnection.load();
+				iterdat.currentNode = nextNode;
+				if (nextNode->getType() != node::Hub)
+				{
+					iterdat.currentNode = nextNode;
+					return true;
+				}
+				else
+				{
+					iterdat.currentNode = iterdat.baseNode;
+					iterdat.position = 0;
+					return false;
+				}
+			}
+		}
+		bool stepBack(iteratorData iterdat)
+		{
+			--iterdat.position
+		}
+		bool atFirst(iteratorData iterdat);
+		bool atLast(iteratorData iterdat);
+		bool insertHub(iteratorData iterdat);
+		bool eraseHub(iteratorData iterdat);
+		
+	}
+	namespace array
+	{
+		bool stepForward(iteratorData iterdat);
+		bool stepBack(iteratorData iterdat);
+		bool atFirst(iteratorData iterdat);
+		bool atLast(iteratorData iterdat);
+		bool insertHub(iteratorData iterdat);
+		bool eraseHub(iteratorData iterdat);
+
+	}
 	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
 	class connectionIterator
 	{
 	public:
-		nodePtr baseNode = nullNodePtr;
-		nodePtr currentNode = nullNodePtr;
-		int64_t position = 0;
+		
 
 		connectionIterator() {};
 		connectionIterator(nodePtr base, bool isArrayIterator = false)
@@ -27,35 +75,14 @@ namespace nechto
 				currentNode = base->connection[0];
 			}
 		}
+
 		bool operator++()
-		{
-			++position;
-			if ((position & 3ll) != 0)
-			{
-				
-				return true;
-			}
-			else
-			{
-				nodePtr nextNode = currentNode->hubConnection.load();
-				if (nextNode.exist())
-				{
-					currentNode = nextNode;
-					return true;
-				}
-				else
-				{
-					currentNode = baseNode;
-					position = 0;
-					return false;
-				}
-			}
-		}
+		
 		nodePtr get()
 		{
 			return currentNode->connection[position & 3ll].load();
 		}
-		int64_t positionNumber()
+		i64 positionNumber()
 		{
 			return position;
 		}

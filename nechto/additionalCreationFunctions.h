@@ -15,7 +15,7 @@ namespace nechto
 	nodePtr createFunction(externalFunction* Func)
 	{
 		nodePtr temp = newNode();
-		setTypeAndSubtype(temp, node::ExteralFunction);
+		setTypeAndSubtype(temp, node::ExternalFunction);
 		temp->setData(Func);
 		return temp;
 	}
@@ -56,11 +56,11 @@ namespace nechto
 	nodePtr createExternalFunction(std::wstring funName)
 	{
 		nodePtr temp = newNode();
-		setTypeAndSubtype(temp, node::ExteralFunction);
+		setTypeAndSubtype(temp, node::ExternalFunction);
 		
 		if (!externalFunction::exist(funName))
 			externalFunction::add(
-				externalFunction(funName, externalFunction::Error.isCorrectPtr,
+				externalFunction(funName, externalFunction::Error.checkPtr,
 					externalFunction::Error.FuncPtr));
 		temp->setData(externalFunction::get(funName));
 		return temp;
@@ -85,8 +85,8 @@ namespace nechto
 		nodePtr temp = newNode();
 		if (std::is_same<TCon, bool>())
 		{
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Int64);
-			temp->setData(static_cast<int64_t>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::I64);
+			temp->setData(static_cast<i64>(startValue));
 			
 			return temp;
 		}
@@ -94,39 +94,39 @@ namespace nechto
 		{
 			assert(sizeof(TCon) == 4);
 			
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Int64);
-			temp->setData(static_cast<int64_t>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::I64);
+			temp->setData(static_cast<i64>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, int>())
 		{
 			assert(sizeof(TCon) == 4);
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Int64);
-			temp->setData(static_cast<int64_t>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::I64);
+			temp->setData(static_cast<i64>(startValue));
 			return temp;
 		}
-		if (std::is_same<TCon, int64_t>())
+		if (std::is_same<TCon, i64>())
 		{
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Int64);
-			temp->setData(static_cast<int64_t>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::I64);
+			temp->setData(static_cast<i64>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, size_t>())
 		{
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Int64);
-			temp->setData(static_cast<int64_t>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::I64);
+			temp->setData(static_cast<i64>(startValue));
 			return temp;
 		}
 		if (std::is_same<TCon, float>())
 		{
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Double);
-			temp->setData(static_cast<double>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::F64);
+			temp->setData(static_cast<f64>(startValue));
 			return temp;
 		}
-		if (std::is_same<TCon, double>())
+		if (std::is_same<TCon, f64>())
 		{
-			setTypeAndSubtype(temp, node::Variable, baseValueType::Double);
-			temp->setData(static_cast<double>(startValue));
+			setTypeAndSubtype(temp, node::Variable, baseValueType::F64);
+			temp->setData(static_cast<f64>(startValue));
 			return temp;
 		}
 		throw;

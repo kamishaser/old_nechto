@@ -2,7 +2,6 @@
 #include "tag.h"
 #include "nodeOperations.h"
 #include "uniqueNodePtr.h"
-#include "comName.h"
 
 namespace nechto
 {
@@ -11,10 +10,10 @@ namespace nechto
 	protected:
 		uniqueNodePtr exConTag;
 	public:
-		externalConnection(const nodePtr conNode, const comName& name)
+		externalConnection(const nodePtr conNode, const std::wstring& name)
 			:exConTag(node::Tag, tag::ExternalConnection)
 		{
-			tag::setData(exConTag, name.str());
+			tag::setData(exConTag, name);
 			if(conNode.exist())
 				NumHubConnect(exConTag, conNode, 0);
 		}

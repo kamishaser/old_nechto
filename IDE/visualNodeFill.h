@@ -24,11 +24,11 @@ namespace nechto::ide
 			{
 			case baseValueType::Error:
 				vn1.nodeText = L"error-type\nvariable";
-			case baseValueType::Int64:
-				vn1.nodeText = std::to_wstring(n1->getData<int64_t>());
+			case baseValueType::I64:
+				vn1.nodeText = std::to_wstring(n1->getData<i64>());
 				break;
-			case baseValueType::Double:
-				vn1.nodeText = std::to_wstring(n1->getData<double>());
+			case baseValueType::F64:
+				vn1.nodeText = std::to_wstring(n1->getData<f64>());
 				break;
 			default:
 				assert(false);
@@ -48,7 +48,7 @@ namespace nechto::ide
 		case node::ConditionalBranching:
 			vn1.nodeText = L"if";
 			break;
-		case node::ExteralFunction:
+		case node::ExternalFunction:
 			if (n1->getData<externalFunction*>() == nullptr)
 				vn1.nodeText = L"error\nnullptr";
 			else

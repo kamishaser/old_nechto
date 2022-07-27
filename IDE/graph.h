@@ -122,7 +122,7 @@ namespace nechto::ide
 					vcn.push_back(nPair(i.position, -1));
 
 			} while (++i);
-			int64_t number = 0;
+			i64 number = 0;
 			do
 			{
 				if (i.get() == c1.second)
