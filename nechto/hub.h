@@ -3,32 +3,85 @@
 namespace nechto
 {
 	const nodePtr newNode();
+	void disconnect(nodePtr v1, nodePtr v2);
 	
 	namespace hub
 	{
-		void add(nodePtr vertex, nodePtr lastHub)
-		{//добавление хаба к элементу
-			assert(vertex.exist());
-			assert(lastHub.exist());
-			nodePtr hub = newNode();
-			setTypeAndSubtype(hub, node::Hub, Extender);
-			hub->setData(std::pair<nodePtr, nodePtr>(vertex, lastHub));
-			//адресс расширяемого элемента
-			nodePtr temp = nullNodePtr;
-			if (!lastHub->hubConnection.compare_exchange_strong(temp, hub))
-				deleteNode(hub);
-			//если присоединить хаб не удалось, значит он уже есть
+		//хаб каждый хаб обязательно содержит следующие данные:
+		//hubConnection: следующий хаб
+		//data: пара адресов: предыдущий хаб и основная нода
+
+		//создаёт новый хаб и вставляет в цепочку после текущего.
+		inline nodePtr insert(nodePtr previous, nodePtr mainNode)
+		{//добавлеет хаб в цепочку после текущего
+
+			const nodePtr hub = newNode(node::Hub);
+			hub->setData(std::pair<nodePtr, nodePtr>(previous, mainNode));
+			
+			nodePtr next = previous->hubConnection;
+			if (next.exist())
+			{
+				hub->hubConnection = next;
+				next->setData(std::pair<nodePtr, nodePtr>(hub, mainNode));
+			}
+			return hub;
 		}
-		const nodePtr getParrent(const nodePtr hub)
+		const nodePtr getMain(const nodePtr hub)
 		{
 			assert(hub->getType() == node::Hub);
-			return hub->getData<std::pair<nodePtr, nodePtr>>().first;
+			return hub->getData<std::pair<nodePtr, nodePtr>>().second;
+		}
+		//конец цепочки хабов (!внимание! не работает с массивами)
+		nodePtr chainEnd(nodePtr v1)
+		{
+			nodePtr iter = v1;
+			nodePtr next = iter->hubConnection;
+			while (next.exist())
+			{
+				nodePtr iter = next;
+				nodePtr next = iter->hubConnection;
+			}
+			return iter;
+		}
+		//предыдущий хаб
+		nodePtr previous(nodePtr v1)
+		{
+			if (v1->getType() == node::Hub)
+				return v1->getData<std::pair<nodePtr, nodePtr>>().first;
+			//если v1 не хаб, то она не содержит данных о последнем хабе
+			//придётся скакать в конец цепочки
+			return chainEnd(v1);
+		}
+		//проверяет, пустой ли хаб
+		bool empty(nodePtr v1)
+		{
+			if (v1->hasConnection(0) || v1->hasConnection(1) ||
+				v1->hasConnection(2) || v1->hasConnection(3))
+				return false;
+			return true;
+		}
+		//исключает хаб из цепочки
+		void hubDisconnect(nodePtr v1, i64 number)
+		{
+			v1->connection[number].exchange(nullNodePtr), getMain(v1));
+
+		}
+		void erase(nodePtr v1, nodePtr mainNode)
+		{
+			assert(typeCompare(v1, node::Hub));
+			nodePtr previous = previous(v1);
+			nodePtr next = v1->hubConnection;
+			for (int i = 0; i < 4; ++i)
+				hubDisconnect(v1, i);
+			previous->hubConnection = next;
+			if (next.exist())
+				next->setData(std::pair<nodePtr, nodePtr>(previous, mainNode));
 		}
 
-		void fill(nodePtr v1, char subtype);
+		/*void fill(nodePtr v1, char subtype);
 		void reset(nodePtr v1);
 		void perform(nodePtr v1);
 		bool check(nodePtr v1);
-		void copy(nodePtr v1);
+		void copy(nodePtr v1);*/
 	}
 }

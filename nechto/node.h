@@ -230,14 +230,6 @@ namespace nechto
 			ArrayIter
 		};
 	}	
-	namespace hub
-	{
-		enum Type
-		{
-			ConHub,
-			ArrayHub
-		};
-	}
 
 	using nodePtr = node::ptr;
 	using nodeEvent = std::function<void(nodePtr)>;

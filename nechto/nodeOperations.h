@@ -190,7 +190,7 @@ namespace nechto
 			temp = nullNodePtr;
 			if (hubIterator->connection[3].compare_exchange_strong(temp, v2))
 				return;
-			hub::add(v1, hubIterator);
+			hub::add(hubIterator, v1);
 			hubIterator = hubIterator->hubConnection;
 		}
 	}
@@ -253,6 +253,7 @@ namespace nechto
 	}
 	void numDisconnect(nodePtr v1, i64 conNum)
 	{
+		//переделать под удаление хаба из массмва
 		assert(v1.exist());
 		i64 hubNumber = conNum >> 2;
 

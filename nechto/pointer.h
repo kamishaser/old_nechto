@@ -13,9 +13,9 @@ namespace nechto
 
 		//что хранится в итераторе:
 		//в поле данных номер элемента
-		//к нулевому соединению подключен массив (в случае coniter основная нода)
-		//к первому текущий хаб(внимание: односторонее соединение!!!)
-
+		//к нулевому текущий хаб(внимание: односторонее соединение!!!)
+		//к первому соединению подключен массив(в случае coniter основная нода)
+		
 		//присваивание значения ноде того же типа
 		void assigment(nodePtr v0, const nodePtr v1)
 		{
@@ -29,12 +29,13 @@ namespace nechto
 			}
 			else
 			{
-				NumHubConnect(v0, v1->connection[0], 0);
-				NumConnect(v0, v1->connection[1], 1);
+				NumConnect(v0, v1->connection[0], 0);
+				NumHubConnect(v0, v1->connection[1], 1);
 				v0->setData<i64>(v1->getData<i64>());
 			}
 		}
-		void set(nodePtr v1, const nodePtr sourse, bool atBegin = true)
+		//инициализирует ссылку или итератор
+		void initialize(nodePtr v1, const nodePtr sourse, bool atBegin = true)
 		{
 			assert(sourse.exist());
 			char subtype = v1->getSubtype();
@@ -44,26 +45,34 @@ namespace nechto
 			}
 			else if (subtype == pointer::ConIter)
 			{
-				NumHubConnect(v1, sourse, 0);
+				NumHubConnect(v1, sourse, 1);
 				if (atBegin)
 				{
 					v1->setData<i64>(0);
+					NumConnect(v1, sourse, 0);
 				}
 				else
 				{//так как номер последнего хаба нигде не записан приходится перебирать
-					nodePtr i = sourse;
+					nodePtr i = sourse;//итератор перехода по хабам
 					int64_t position = 3;
 					while (true)
 					{
 						nodePtr hub = i->hubConnection();
 						if (!hub.exist())
-						{
-							v1->setData<i64>()
-						}
+							break;
 						position += 4;
 						i = i->hubConnection();
 					}
+					NumConnect(v1, i, 0);
+					v1->setData<i64>(position);
 				}
+			}
+			else//ArrayIter
+			{
+				if (atBegin)
+					assigment(v1, sourse->connection[0]);
+				else
+					assigment(v1, sourse->connection[1]);
 			}
 
 			assert(v1->getSubtype() == sourse->getSubtype())
