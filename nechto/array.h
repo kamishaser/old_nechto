@@ -7,17 +7,21 @@ namespace nechto
 {
 	namespace array
 	{
-		//к основной ноде массива подключены 2 ноды итераторов: begin, end (0, 1)
-		//которые указывают на цепочку хабов
+		//к основной ноде массива подключена замкнутая цепочка хабов [0]
+		//в data хранится размер массива
 
-		void initializeEmpty(nodePtr array, char subtype)
+		void initializeEmpty(nodePtr array)
 		{
-			nodePtr begin = newNode(node::Pointer, subtype);
-			nodePtr end = newNode(node::Pointer, subtype);
-			NumConnect(array, begin, 0);
-			NumConnect(array, end, 0);
+			//первый хаб массива. (замкнут сам на себя)
+			nodePtr hub = newNode(node::Hub);
+			hub->hubConnection = hub;
+			hub->setData(std::pair<nodePtr, nodePtr>(hub, array));
+
+			array->setData<i64>(1);
+			array->connection[0] = hub;
 		}
-		void reset(nodePtr v1);
+		void reset(nodePtr v1)
+
 		void perform(nodePtr v1);
 		bool check(nodePtr v1);
 		void copy(nodePtr v1);

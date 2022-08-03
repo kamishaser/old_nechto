@@ -1,6 +1,5 @@
 #pragma once
 #include "node.h"
-#include "baseValueTypes.h"
 
 #include <functional>
 #include <set>
@@ -101,7 +100,7 @@ namespace nechto::externalFunction
 		}
 	};
 	using shmap = std::shared_ptr<map>;
-	//заполняет новую пустую ноду
+	//учтанавливает функцию в ноду
 	void set(nodePtr v1, shmap funMap, const std::wstring name) noexcept
 	{
 		exFun temp = funMap->contains(name) ?
@@ -116,6 +115,7 @@ namespace nechto::externalFunction
 		++temp->second.numberOfUsers;
 
 	}
+	//заполняет ноду функции
 	void initialize(nodePtr v1, shmap funMap, const std::wstring name = L"Error")
 	{
 		exFun temp = funMap->contains(name) ?

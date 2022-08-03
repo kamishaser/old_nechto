@@ -6,27 +6,11 @@
 
 namespace nechto
 {
-	nodePtr createNode(char type, char subtype)
-	{
-		nodePtr temp = newNode();
-		setTypeAndSubtype(temp, type, subtype);
-		return temp;
-	}
 	nodePtr createFunction(externalFunction* Func)
 	{
 		nodePtr temp = newNode();
 		setTypeAndSubtype(temp, node::ExternalFunction);
 		temp->setData(Func);
-		return temp;
-	}
-	nodePtr createTypeCastOperator(nodePtr from, nodePtr to)
-	{
-		nodePtr temp = newNode();
-		assert(from->getType() == node::Variable);
-		assert(to->getType() == node::Variable);
-		setTypeAndSubtype(temp, node::TypeCastOperator);
-		NumHubConnect(temp, from, 1);
-		NumHubConnect(temp, to, 0);
 		return temp;
 	}
 	nodePtr createMathOperator(char subtype, nodePtr result,
@@ -53,7 +37,7 @@ namespace nechto
 		if (wrongWay.exist())NumHubConnect(temp, wrongWay, 2);
 		return temp;
 	}
-	nodePtr createExternalFunction(std::wstring funName)
+	nodePtr createExternalFunction(const externalFunction::map& funMap,const std::wstring& funName)
 	{
 		nodePtr temp = newNode();
 		setTypeAndSubtype(temp, node::ExternalFunction);

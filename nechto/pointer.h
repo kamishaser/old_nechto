@@ -4,11 +4,36 @@
 namespace nechto
 {
 	void deleteNode(nodePtr v1);
+	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
+	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
+
 	namespace pointer
 	{
-		void reset(nodePtr v1);
-		void perform(nodePtr v1);
-		bool check(nodePtr v1);
+		bool check(nodePtr v1)
+		{
+			assert(v1->getType() == node::Pointer);
+			char subtype = v1->getSubtype();
+			if (subtype == pointer::Reference)
+				return true;
+			nodePtr currentHub = v1->connection[0];
+			nodePtr mainNode = v1->connection[1];
+			if (!currentHub.exist() || !mainNode.exist())
+				return false;
+			if (currentHub->getData<std::pair<nodePtr, nodePtr>>().second != mainNode)
+				return false;
+			if (subtype == pointer::ConIter)
+			{
+				
+			}
+			else
+			{
+				if (mainNode->getType() != node::Array)
+					return false;
+				if (currentHub->getType() != node::Hub)
+					return false;
+			}
+			return true;
+		}
 		
 
 		//что хранится в итераторе:
@@ -25,7 +50,7 @@ namespace nechto
 			if (!subtype)//reference
 			{
 				NumHubConnect(v0, v1->connection[0], 0);
-				v1->setData<i64>(0);
+				v0->setData<i64>(0);
 			}
 			else
 			{
@@ -34,54 +59,8 @@ namespace nechto
 				v0->setData<i64>(v1->getData<i64>());
 			}
 		}
-		//инициализирует ссылку или итератор
-		void initialize(nodePtr v1, const nodePtr sourse, bool atBegin = true)
-		{
-			assert(sourse.exist());
-			char subtype = v1->getSubtype();
-			if (!subtype)//reference
-			{
-				NumHubConnect(v1, sourse, 0);
-			}
-			else if (subtype == pointer::ConIter)
-			{
-				NumHubConnect(v1, sourse, 1);
-				if (atBegin)
-				{
-					v1->setData<i64>(0);
-					NumConnect(v1, sourse, 0);
-				}
-				else
-				{//так как номер последнего хаба нигде не записан приходится перебирать
-					nodePtr i = sourse;//итератор перехода по хабам
-					int64_t position = 3;
-					while (true)
-					{
-						nodePtr hub = i->hubConnection();
-						if (!hub.exist())
-							break;
-						position += 4;
-						i = i->hubConnection();
-					}
-					NumConnect(v1, i, 0);
-					v1->setData<i64>(position);
-				}
-			}
-			else//ArrayIter
-			{
-				if (atBegin)
-					assigment(v1, sourse->connection[0]);
-				else
-					assigment(v1, sourse->connection[1]);
-			}
-
-			assert(v1->getSubtype() == sourse->getSubtype())
-			char sourseType = sourse->getType();
-			if (sourseType == node::Hub)//нельзя подключаться к хабам
-				return false;
-			else 
-		}
-		nodePtr follow(nodePtr v1)
+		
+		nodePtr follow(const nodePtr v1)
 		{
 			assert(v1.exist());
 			assert(v1->getType() == node::Pointer);

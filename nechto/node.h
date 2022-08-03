@@ -89,26 +89,26 @@ namespace nechto
 		std::atomic<char> subtype;//подтип ноды
 		std::atomic<bool> correctnessСhecked = false;
 	public:
-		std::atomic<size_t> data = 0;//данные ноды
+		std::atomic<i64> data = 0;//данные ноды
 		std::atomic<ptr> connection[4];
 		std::atomic<ptr> hubConnection;
 	
-		static_assert(std::atomic<size_t>::is_always_lock_free);
+		static_assert(std::atomic<i64>::is_always_lock_free);
 		friend void setTypeAndSubtype(ptr, char, char);
 		
 
 		template <class TCon>
 		const TCon getData() const //получение данных в формате <TCon>
 		{
-			assert(sizeof(TCon) <= sizeof(size_t));
-			size_t temp = data.load();
+			assert(sizeof(TCon) <= sizeof(i64));
+			i64 temp = data.load();
 			return *static_cast<TCon*>(static_cast<void*>(&temp));
 		}
 		template <class TCon>
 		void setData(TCon Data) //запись данных в формате TCon
 		{
-			assert(sizeof(TCon) <= sizeof(size_t));
-			size_t temp = *static_cast<size_t*>(static_cast<void*>(&Data));
+			assert(sizeof(TCon) <= sizeof(i64));
+			i64 temp = *static_cast<i64*>(static_cast<void*>(&Data));
 			data.store(temp);
 		}
 
@@ -208,26 +208,13 @@ namespace nechto
 			Attribute
 		};
 	}
-	namespace array
-	{
-		enum Type
-		{
-			List = 128,
-			//список. Неупорядоченный набор связей (по 4 на хаб)
-			Table,
-			//фактически тот же список, но каждый элемент - 1 хаб (до 4 связей)
-
-			Stack,
-			Queue
-		};
-	}
 	namespace pointer
 	{
 		enum Type
 		{
-			Reference = 0,//одиночный
-			ConIter,
-			ArrayIter
+			Reference = 0,//одиночная ссылка
+			ConIter,//итератор соединений
+			ArrayIter//итератор массива
 		};
 	}	
 

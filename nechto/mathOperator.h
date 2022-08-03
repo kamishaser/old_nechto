@@ -55,12 +55,17 @@ namespace nechto
 				setIsSimple();
 				return true;
 			}
+			template<int number>
+			bool intCon()
+			{
+				return conProperties[number].arguType;
+			}
 		private:
 			void setIsSimple()
 			{
-				if (!conProperties[0].isDirect() ||
-					!conProperties[1].isDirect() ||
-					!conProperties[2].isDirect())
+				if (!conProperties[0].isDirect ||
+					!conProperties[1].isDirect ||
+					!conProperties[2].isDirect)
 					isSimple = false;
 				else if ((conProperties[0].arguType != conProperties[1].arguType) ||
 					(conProperties[0].arguType != conProperties[2].arguType))
@@ -294,7 +299,7 @@ namespace nechto
 			if (vType)//i64
 			{
 				comparisonOperation<i64>(
-					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer+1), operType);
+					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer)+1, operType);
 			}
 			else
 			{
@@ -306,7 +311,7 @@ namespace nechto
 					convert_i_to_f(&buffer[2]);
 
 				comparisonOperation<i64>(
-					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer + 1), operType);
+					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer)+1, operType);
 			}
 		}
 		inline void hardCompute(void* buffer, const operatorData opdat, prType prop, char operType)
@@ -350,8 +355,7 @@ namespace nechto
 						buffer[2] = v1->connection[2].load()->getData<size_t>();
 						break;
 					}
-					simpleCompute(buffer, operationPrType(operType), 
-						operType, opdat.conProperties[1].arguType);
+					simpleCompute(buffer, opdat, operationPrType(operType), operType);
 					v1->connection[0].load()->setData(buffer[0]);
 					return true;
 				}
@@ -397,25 +401,25 @@ namespace nechto
 
 		bool check(nodePtr v1)
 		{
-			char numOfConnections = numberOfArguments() + 1;
+			char numOfConnections = numberOfArguments(v1) + 1;
 			char operType = v1->getSubtype();
 			operatorData opdat;
-			if (!opdat.fill())
+			if (!opdat.fill(v1, numOfConnections))
 				return false;
 
 			switch (operationPrType(operType))
 			{
 			case prType::Comparison:
 			case prType::In_De_crement:
-				if (!opdat.conProperties[0])//только i64
+				if (!opdat.intCon<0>())//только i64
 					return false;
 				break;
 			case prType::Logic:
-				if (!opdat.conProperties[0])//только i64
+				if (!opdat.intCon<0>())//только i64
 					return false;
-				if (!opdat.conProperties[1])//только i64
+				if (!opdat.intCon<1>())//только i64
 					return false;
-				if (!opdat.conProperties[2] && operType != LogicNegation)//только i64
+				if (!opdat.intCon<2>() && operType != LogicNegation)//только i64
 					return false;
 			}
 			v1->setData(opdat);

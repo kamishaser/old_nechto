@@ -5,11 +5,11 @@
 #include <cassert>
 #include <set>
 
-#include "baseValueTypes.h"
 #include "mathOperator.h"
 #include "tag.h"
 #include "pointer.h"
 #include "externalFunction.h"
+#include "connectionIterator.h"
 #include "hub.h"
 
 namespace nechto
@@ -37,6 +37,9 @@ namespace nechto
 	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
+
+	void IterHubConnect(hubIterator i1, nodePtr v2);
+	void IterIterConnect(hubIterator i1, hubIterator i2);
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
@@ -173,25 +176,15 @@ namespace nechto
 		assert(v1.exist() && v2.exist());
 
 		if (!v1->hubConnection.load().exist())
-			hub::add(v1, v1);
+			hub::pushBack(v1, v1);
 		nodePtr hubIterator = v1->hubConnection;
-		nodePtr temp;
 		while (true)
 		{
-			temp = nullNodePtr;
-			if (hubIterator->connection[0].compare_exchange_strong(temp, v2))
-				return;
-			temp = nullNodePtr;
-			if (hubIterator->connection[1].compare_exchange_strong(temp, v2))
-				return;
-			temp = nullNodePtr;
-			if (hubIterator->connection[2].compare_exchange_strong(temp, v2))
-				return;
-			temp = nullNodePtr;
-			if (hubIterator->connection[3].compare_exchange_strong(temp, v2))
-				return;
-			hub::add(hubIterator, v1);
-			hubIterator = hubIterator->hubConnection;
+			for (int i = 0; i < 4; ++i)
+				if (!hubIterator->hasConnection(i))
+					hubIterator->connection[i] = v2;
+			nodePtr next = hubIterator->hubConnection;
+			hubIterator = (next.exist()) ? next : hub::pushBack(hubIterator);
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,6 +212,23 @@ namespace nechto
 		HubConnect(v2, v1);
 	}
 
+	void IterHubConnect(hubIterator i1, nodePtr v2)
+	{
+		nodePtr oldCon1 = i1.oneSideConnect(v2);
+		if (oldCon1.exist())
+			oneSideDisconnect(oldCon1, i1.mainNode);
+		HubConnect(v2, i1.mainNode);
+	}
+	void IterIterConnect(hubIterator i1, hubIterator i2)
+	{
+		nodePtr oldCon1 = i1.oneSideConnect(i2.mainNode);
+		nodePtr oldCon2 = i2.oneSideConnect(i1.mainNode);
+		if (oldCon1.exist())
+			oneSideDisconnect(oldCon1, i1.mainNode);
+		if (oldCon2.exist())
+			oneSideDisconnect(oldCon2, i2.mainNode);
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//разрыв соединения
 
@@ -226,23 +236,12 @@ namespace nechto
 	void oneSideDisconnect(nodePtr v1, nodePtr v2)
 	{
 		assert(v1.exist() && v2.exist());
-		nodePtr temp = v2;
-		while (true)
+		connectionIterator i1(v1);
+		do
 		{
-			if (v1->connection[0].compare_exchange_strong(temp, nullNodePtr)) return;
-			else temp = v2;
-			if (v1->connection[1].compare_exchange_strong(temp, nullNodePtr)) return;
-			else temp = v2;
-			if (v1->connection[2].compare_exchange_strong(temp, nullNodePtr)) return;
-			else temp = v2;
-			if (v1->connection[3].compare_exchange_strong(temp, nullNodePtr)) return;
-			else temp = v2;
-
-			if (!(v1->hubConnection.load()))
-				return;
-			else
-				v1 = v1->hubConnection;
-		}
+			if (i1.get() == v2)
+				i1.oneSideConnect(nullNodePtr);
+		} while (i1.stepForward());
 	}
 	void disconnect(nodePtr v1, nodePtr v2)
 	{
@@ -253,7 +252,6 @@ namespace nechto
 	}
 	void numDisconnect(nodePtr v1, i64 conNum)
 	{
-		//переделать под удаление хаба из массмва
 		assert(v1.exist());
 		i64 hubNumber = conNum >> 2;
 
