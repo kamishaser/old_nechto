@@ -19,20 +19,25 @@ namespace nechto::ide
 				std::set<visualConnectionID> newConnections;
 				for (auto nodeI = nGraph->nodes.begin(); nodeI != nGraph->nodes.end(); ++nodeI)
 				{
-					connectionIterator i(nodeI->first, false);
+					connectionIterator i(nodeI->first);
 					do
 					{
-						if (i.get().exist())
+						nodePtr v1 = i.get();
+						if (!v1.exist())
+							continue;
+						if (typeCompare(v1, node::ExternalConnection))
 						{
-							if (!nGraph->containsNode(i.get()))
-							{
-								newNodes.emplace(i.get());
-							}
-							newConnections.emplace(visualConnectionID(nodeI->first, i.get()));
-							/*nGraph->determineConnectionNumbers(
-								visualConnectionID(nodeI->first, i.get()));*/
+							auto ptr = v1->getData<externalConnection*>();
+							if (ptr != nullptr)
+								if (ptr->getTypeName() == visualNode::vnTypeName)
+									continue;
 						}
-					} while (++i);
+						if (nGraph->containsNode(i.get()))
+							continue;
+						
+						newNodes.emplace(i.get());
+						newConnections.emplace(visualConnectionID(nodeI->first, i.get()));
+					} while (i.stepForward());
 				}
 				for (auto i : newNodes)
 					nGraph->addNode(i);

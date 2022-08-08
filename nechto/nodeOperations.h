@@ -6,54 +6,16 @@
 #include <set>
 
 #include "mathOperator.h"
-#include "tag.h"
+#include "text.h"
 #include "pointer.h"
 #include "externalFunction.h"
 #include "connectionIterator.h"
+#include "externalConnection.h"
+#include "array.h"
 #include "hub.h"
 
 namespace nechto
 {
-	//сравнение типов
-	bool typeCompare(nodePtr v1, char type);
-	bool subtypeCompare(nodePtr v1, char subtype);
-	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
-	//проверка наличи€ соединени€
-	bool isHubExist(nodePtr v1);
-	bool isNodeHasConnections(nodePtr v1);
-	bool hasConnection(nodePtr v1, nodePtr v2);
-	bool hasMultipleConnection(nodePtr v1);
-
-	i64 getConnectionNumber(nodePtr v1, nodePtr v2);
-	std::vector<nodePtr> allNodeConnections(nodePtr v1);
-	//создание
-	const nodePtr newNode();
-	const nodePtr newNode(char type, char subtype = 0, size_t data = 0);
-	
-	//создание одностороннего соединени€
-	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
-	void HubConnect(nodePtr v1, nodePtr v2);
-	//создание двухстороннего соединени
-	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
-	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
-	void HubHubConnect(nodePtr v1, nodePtr v2);
-
-	void IterHubConnect(hubIterator i1, nodePtr v2);
-	void IterIterConnect(hubIterator i1, hubIterator i2);
-	//разрыв соединени€
-	void oneSideDisconnect(nodePtr v1, nodePtr v2);
-	void disconnect(nodePtr v1, nodePtr v2);
-	void numDisconnect(nodePtr v1, i64 conNum);
-	//смена типа
-	void reset(nodePtr v1);
-	void setTypeAndSubtype(nodePtr v1, char type, char subtype = 0);
-	
-	//удаление
-	void deleteNode(nodePtr v);
-	
-
-
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//сравнение типов
 	bool typeCompare(nodePtr v1, char type)
@@ -139,21 +101,39 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
-	const nodePtr newNode()
+	const nodePtr newNode(char type, char subtype)
 	{
-		nodePtr v;
+		nodePtr v1;
 		nodePtr temp = nodeStorage::terminal.allocate();
-		v = temp;
-		return v;
-	}
-	const nodePtr newNode(char type, char subtype, size_t data)
-	{
-		nodePtr v;
-		nodePtr temp = nodeStorage::terminal.allocate();
-		v = temp;
-		setTypeAndSubtype(v, type, subtype);
-		v->setData(data);
-		return v;
+		v1 = temp;
+		v1->type = type;
+		v1->subtype = subtype;
+
+		switch (v1->getType())
+		{
+		case node::Variable:
+		case node::MathOperator:			//математический оператор
+		case node::ConditionalBranching:	//if
+			break;
+		case node::ExternalFunction:		//функци€, не €вл€юща€с€ частью nechto
+			externalFunction::initializeEmpty(v1);
+			break;
+		case node::Text:					//метка
+			text::initialize(v1);
+			break;
+		case node::ExternalConnection:		//внешнее подключение
+			externalConnection::intializeNode(v1);
+			break;
+		case node::Pointer:				//указатель на объект
+			pointer::initializeEmpty(v1);
+			break;
+		case node::Array:
+			array::initializeEmpty(v1);
+			break;
+		default:
+			break;
+		}
+		return v1;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//операции с хабами
@@ -182,9 +162,12 @@ namespace nechto
 		{
 			for (int i = 0; i < 4; ++i)
 				if (!hubIterator->hasConnection(i))
+				{
 					hubIterator->connection[i] = v2;
+					return;
+				}
 			nodePtr next = hubIterator->hubConnection;
-			hubIterator = (next.exist()) ? next : hub::pushBack(hubIterator);
+			hubIterator = (next.exist()) ? next : hub::pushBack(hubIterator, v1);
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,58 +248,40 @@ namespace nechto
 		oneSideDisconnect(hubIterator->connection[conNum & 3ll].exchange(nullNodePtr), v1);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	//смена типа
-	//сброс дополнительных данных
-	void reset(nodePtr v1)
-	{
-		switch (v1->getType())
-		{
-		case node::Tag:
-			tag::deleteData(v1);
-			break;
-		default:
-			break;
-		}
-	}
-	//установка типа и подтипа
-	void setTypeAndSubtype(nodePtr v1, char type, char subtype)
-	{
-		reset(v1);
-		v1->type = type;
-		v1->subtype = subtype;
-
-		switch (v1->getType())
-		{
-		case node::Tag:
-		case node::ExternalFunction:
-			v1->setData(nullptr);
-			break;
-		case node::Variable:
-			switch (v1->getSubtype())
-			{
-			case baseValueType::I64:
-				v1->setData<i64>(0);
-				break;
-			case baseValueType::F64:
-				v1->setData<f64>(0);
-				break;
-			default:
-				break;
-			}
-		default:
-			break;
-		}
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	// удаление
 	void deleteNode(nodePtr v1)
 	{
 		assert(v1.exist());
 		nodePtr vTemp = v1;
-		reset(v1);
+		switch (v1->getType())
+		{
+		case node::Hub:					//разветвитель
+			assert(false);//хабы удал€ютс€ отдельно
+			break;
+		case node::Variable:
+		case node::MathOperator:			//математический оператор
+		case node::ConditionalBranching:	//if
+			break;
+		case node::ExternalFunction:		//функци€, не €вл€юща€с€ частью nechto
+			externalFunction::reset(v1);
+			break;
+		case node::Text:					//метка
+			text::reset(v1);
+			break;
+		case node::ExternalConnection:		//внешнее подключение
+			externalConnection::resetNode(v1);
+			break;
+		case node::Pointer:				//указатель на объект
+			break;
+		case node::Array:
+			array::reset(v1);
+			break;
+		default:
+			break;
+		}
 		while (true)
 		{//цикл удалени€ узла со всеми хабами
-			setTypeAndSubtype(vTemp, node::Error, 0);
 			vTemp->setData<void*>(nullptr);
 			for (int i = 0; i < 4; i++)//разрыв соединени€
 				if (vTemp->connection[i].load().exist())

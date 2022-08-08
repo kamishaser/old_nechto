@@ -1,7 +1,5 @@
 #pragma once
 
-#include "staticAllocator.h"
-
 #include <memory>
 #include <vector>
 #include <atomic>
@@ -13,7 +11,6 @@
 #include <functional>
 #include <compare>
 
-class commandLine;
 namespace nechto
 {
 	namespace nodeStorage
@@ -37,7 +34,6 @@ namespace nechto
 				second = s;
 			}
 			friend class nodeStorage::Terminal;
-			friend class commandLine;
 		public:
 			ushort getFirst() const
 			{
@@ -94,8 +90,8 @@ namespace nechto
 		std::atomic<ptr> hubConnection;
 	
 		static_assert(std::atomic<i64>::is_always_lock_free);
-		friend void setTypeAndSubtype(ptr, char, char);
-		
+		friend const ptr newNode(char, char);
+		friend class nodeStorage::Terminal;
 
 		template <class TCon>
 		const TCon getData() const //получение данных в формате <TCon>
@@ -151,7 +147,8 @@ namespace nechto
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
 			ExternalFunction,		//функция, не являющаяся частью nechto
-			Tag,					//метка
+			Text,					//метка
+			ExternalConnection,		//внешнее подключение
 			Pointer,				//указатель на объект
 			Array
 		};
@@ -225,12 +222,123 @@ namespace nechto
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
-	//всё, что ниже этой строки тебе не понадобится
+	// объявления из nodeOperations
+	struct hubIterator; //определено в connectionIterator.h
+	
+	//сравнение типов
+	bool typeCompare(nodePtr v1, char type);
+	bool subtypeCompare(nodePtr v1, char subtype);
+	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
+	//проверка наличия соединения
+	bool isHubExist(nodePtr v1);
+	bool isNodeHasConnections(nodePtr v1);
+	bool hasConnection(nodePtr v1, nodePtr v2);
+	bool hasMultipleConnection(nodePtr v1);
 
+	i64 getConnectionNumber(nodePtr v1, nodePtr v2);
+	std::vector<nodePtr> allNodeConnections(nodePtr v1);
+	//создание
+	const nodePtr newNode(char type, char subtype = 0);
+
+	//создание одностороннего соединения
+	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
+	void HubConnect(nodePtr v1, nodePtr v2);
+	//создание двухстороннего соединени
+	void NumNumConnect(nodePtr v1, nodePtr v2, ushort number1, ushort number2);
+	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
+	void HubHubConnect(nodePtr v1, nodePtr v2);
+
+	void IterHubConnect(hubIterator i1, nodePtr v2);
+	void IterIterConnect(hubIterator i1, hubIterator i2);
+	//разрыв соединения
+	void oneSideDisconnect(nodePtr v1, nodePtr v2);
+	void disconnect(nodePtr v1, nodePtr v2);
+	void numDisconnect(nodePtr v1, i64 conNum);
+	//смена типа
+	void reset(nodePtr v1);
+	//удаление
+	void deleteNode(nodePtr v);
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////
+	//всё, что ниже этой строки тебе не понадобится
+	class nodeAllocator
+	{
+	private:
+		node content[65536]; //массив элементов
+		ushort occupancy[65536]; //массив занятости
+
+		//номер занимаемого элемента
+		std::atomic<ushort> gflag = 0;
+
+		//номер освобождаемого элемента
+		std::atomic<ushort> sflag = 0;
+
+		std::atomic<ushort> freespace = 65535; //свободное место
+
+
+		std::mutex alBlock;
+		/*
+		* не используется в самом аллокаторе,
+		но нужен для некоторых неатомарных операций с нодами.
+		Например работа с текстовыми объектами требует блокировки
+		*/
+	public:
+
+		nodeAllocator()
+		{//заполнение списка занятости
+			for (int i = 0; i <= 65535; i++)
+				occupancy[i] = i;
+		}
+		node* get(const ushort number)
+		{
+			return &content[number];
+		}
+		node* operator[](const ushort number)
+		{
+			return &content[number];
+		}
+
+
+		void deallocate(ushort number) //освобождение элемента
+		{
+			++freespace;
+			occupancy[sflag.fetch_add(1)] = number;
+		}
+		ushort allocate() //взятие элемента
+		{
+			--freespace;
+			return occupancy[gflag.fetch_add(1)];
+		}
+		ushort freeSpace() //количество элементов в очереди
+		{
+			return freespace.load();
+		}
+		void release()
+		{//полный сброс хранилища. Опасная операция!
+			gflag = 0;
+			sflag = 0;
+			freespace = 65535;
+			for (int i = 0; i <= 65535; i++)
+				occupancy[i] = i;
+		}
+		inline void lock()
+		{
+			alBlock.lock();
+		}
+		inline void unlock()
+		{
+			alBlock.unlock();
+		}
+		inline bool tryLock()
+		{
+			return alBlock.try_lock();
+		}
+	};
 	namespace nodeStorage
 	{
 		const int maxNumOfAllocators = 16; //максимальное количество выделяемых аллокаторов
-		static std::unique_ptr<staticAllocator<node>> content[maxNumOfAllocators]; //массив контейнеров
+		static std::unique_ptr<nodeAllocator> content[maxNumOfAllocators]; //массив контейнеров
 		static ushort occupancy[maxNumOfAllocators]; //массив занятости
 		static std::atomic<ushort> sflag; //номер занимаемого контейнера
 		static std::atomic<ushort> freeSpace; //количество созданных контейнеров
@@ -257,7 +365,7 @@ namespace nechto
 				if (!content[occupancy[number]])
 				{
 					changeAllocatorBlock.unlock();
-					content[occupancy[number]] = std::make_unique<staticAllocator<node>>();
+					content[occupancy[number]] = std::make_unique<nodeAllocator>();
 					return number;
 				}
 				if (content[occupancy[number]]->freeSpace() > 256)
@@ -269,7 +377,7 @@ namespace nechto
 
 		}
 
-		staticAllocator<node>* getAllocator(const ushort number)
+		nodeAllocator* getAllocator(const ushort number)
 		{
 			assert((number > 0) && (number < maxNumOfAllocators));
 			assert(content[number]);
@@ -289,6 +397,18 @@ namespace nechto
 			freeSpace = maxNumOfAllocators - 1;
 			changeAllocatorBlock.unlock();
 		}
+		inline void lock(nodePtr v1)
+		{
+			content[v1.getFirst()]->lock();
+		}
+		inline void unlock(nodePtr v1)
+		{
+			content[v1.getFirst()]->unlock();
+		}
+		inline bool tryLock(nodePtr v1)
+		{
+			return content[v1.getFirst()]->tryLock();
+		}
 
 		//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -296,7 +416,7 @@ namespace nechto
 		{//реализовано отдельным классом для корректной работы конструктора и деструктора
 			std::vector<ushort> localAllocatorSet;//список номеров зарезервированных контейнеров
 			ushort currentAllocatorNumber;//номер текущего контейнера
-			staticAllocator<node>* currentAllocator;//текущий контейнер
+			nodeAllocator* currentAllocator;//текущий контейнер
 
 			//смена используемого в данный момент контейнера
 			void changeCurrentAllocator()
@@ -345,9 +465,10 @@ namespace nechto
 				id.second = currentAllocator->allocate();
 				return id;
 			}
-			void deallocate(const nodePtr id)
+			void deallocate(nodePtr id)
 			{
 				assert(getAllocator(id.first) != nullptr);
+				id->type = node::Deleted;
 				getAllocator(id.first)->deallocate(id.second);
 			}
 		};

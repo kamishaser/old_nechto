@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+#include "pointer.h"
 
 namespace nechto
 {
@@ -31,7 +32,7 @@ namespace nechto
 			bool fill(nodePtr v1, int numOfConnections)
 			{
 				//возващает true, если подключено корректно
-				for (int i = 0; i < numOfConnections; ++i)
+				for (int i = 0; i < numOfConnections+1; ++i)
 				{
 					nodePtr vcon = v1->connection[i].load();
 					if (!vcon.exist())
@@ -41,7 +42,7 @@ namespace nechto
 						if (vcon->getType() == node::Pointer)
 						{
 							conProperties[i].isDirect = false;
-							vcon = vcon->connection[0].load();
+							vcon = pointer::follow(vcon);
 							if (!vcon.exist())
 								return false;
 						}
@@ -156,7 +157,7 @@ namespace nechto
 				break;
 			case Type::Decrement:
 				--buffer[0];
-				break
+				break;
 			default:
 				assert(false);
 			}
@@ -250,29 +251,29 @@ namespace nechto
 		inline void convert_f_to_i(void* address)
 		{
 			*static_cast<i64*>(address) =
-				static_cast<i64>(static_cast<f64*>(address);
+				static_cast<i64>(*static_cast<f64*>(address));
 		}
 		inline void convert_i_to_f(void* address)
 		{
 			*static_cast<f64*>(address) =
-				static_cast<f64>(static_cast<i64*>(address);
+				static_cast<f64>(*static_cast<i64*>(address));
 		}
 		inline void hardAlgebraic(void* buffer, const operatorData opdat, prType prop, char operType)
 		{
 			if (operType <= UnaryMinus) //унарный оператор
 				if (opdat.conProperties[1].arguType)
 					algebraicOperation<i64>(
-						reinterpret_cast<i64*>(buffer), operType);
+						static_cast<i64*>(buffer), operType);
 				else
 					algebraicOperation<f64>(
-						reinterpret_cast<f64*>(buffer), operType);
+						static_cast<f64*>(buffer), operType);
 			//бинарный оператор
 			//если оба аргумента имеют тип i64, то осуществляется i64 операция, иначе f64
 			bool vType = opdat.conProperties[1].arguType && opdat.conProperties[2].arguType;
 			if (vType)//i64
 			{
 				algebraicOperation<i64>(
-					reinterpret_cast<i64*>(buffer), operType);
+					static_cast<i64*>(buffer), operType);
 				//если результат f64 (тип результата не соответствует типу операции)
 				if (!opdat.conProperties[0].arguType)
 					convert_i_to_f(buffer);
@@ -282,12 +283,12 @@ namespace nechto
 				//не более одного из аргументов имеет тип i64
 				//если первый аргумент имеет тип i64
 				if (opdat.conProperties[1].arguType)
-					convert_i_to_f(&buffer[1]);
+					convert_i_to_f(&static_cast<i64*>(buffer)[1]);
 				else if (opdat.conProperties[2].arguType)
-					convert_i_to_f(&buffer[2]);
+					convert_i_to_f(&static_cast<i64*>(buffer)[2]);
 
 				algebraicOperation<f64>(
-					reinterpret_cast<f64*>(buffer), operType);
+					static_cast<f64*>(buffer), operType);
 				//если результат i64 (тип результата не соответствует типу операции)
 				if (opdat.conProperties[0].arguType)
 					convert_f_to_i(buffer);
@@ -299,19 +300,19 @@ namespace nechto
 			if (vType)//i64
 			{
 				comparisonOperation<i64>(
-					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer)+1, operType);
+					static_cast<i64*>(buffer), static_cast<i64*>(buffer)+1, operType);
 			}
 			else
 			{
 				//не более одного из аргументов имеет тип i64
 				//если первый аргумент имеет тип i64
 				if (opdat.conProperties[1].arguType)
-					convert_i_to_f(&buffer[1]);
+					convert_i_to_f(&static_cast<i64*>(buffer)[1]);
 				else if (opdat.conProperties[2].arguType)
-					convert_i_to_f(&buffer[2]);
+					convert_i_to_f(&static_cast<i64*>(buffer)[2]);
 
 				comparisonOperation<i64>(
-					reinterpret_cast<i64*>(buffer), reinterpret_cast<i64*>(buffer)+1, operType);
+					static_cast<i64*>(buffer), (static_cast<i64*>(buffer))+1, operType);
 			}
 		}
 		inline void hardCompute(void* buffer, const operatorData opdat, prType prop, char operType)
@@ -387,7 +388,8 @@ namespace nechto
 						return false;
 					buffer[1] = connection[1]->getData<size_t>();
 				}
-				
+				hardCompute(buffer, opdat, operationPrType(operType), operType);
+				v1->connection[0].load()->setData(buffer[0]);
 			}
 			catch (...)
 			{
@@ -401,8 +403,9 @@ namespace nechto
 
 		bool check(nodePtr v1)
 		{
-			char numOfConnections = numberOfArguments(v1) + 1;
 			char operType = v1->getSubtype();
+			char numOfConnections = numberOfArguments(operType);
+			
 			operatorData opdat;
 			if (!opdat.fill(v1, numOfConnections))
 				return false;

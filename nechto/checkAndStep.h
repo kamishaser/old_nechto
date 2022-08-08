@@ -1,10 +1,11 @@
 #pragma once
 #include "node.h"
-#include "tag.h"
+#include "text.h"
 #include "mathOperator.h"
 #include "nodeOperations.h"
 #include "externalFunction.h"
 #include "Pointer.h"
+#include "branching.h"
 
 namespace nechto
 {
@@ -27,31 +28,26 @@ namespace nechto
 			return true;
 		switch (temp->getType())
 		{
-		case node::Error:
+		case node::Deleted://åñëè ïðîâåðÿåìîé íîäû íå ñóùåñòâóåò - ÷òî-òî íå òàê
 			temp->correctnessÑhecked = false;
 			break;
-		case node::Hub:
-			temp->correctnessÑhecked = hub::getParrent(*this).exist();
+		case node::Hub://õàáû âîîáùå íå çäåñü ïðîâåðÿþòñÿ.
+			temp->correctnessÑhecked = false;
 			break;
-		case node::Variable:
-			temp->correctnessÑhecked = (!temp->hasConnection(0) && !temp->hasConnection(1)
-				 && !temp->hasConnection(2) && !temp->hasConnection(3)
-				 && temp->getSubtype() != baseValueType::Error);
+		case node::Variable://ïåðåìåííàÿ íå èìååò ñîáñòâåííûõ ïîäêëþ÷åíèé. 
+			temp->correctnessÑhecked = true;
 			break;
 		case node::MathOperator:
 			temp->correctnessÑhecked = mathOperator::check(*this);
 			break;
-		case node::Tag:
-			temp->correctnessÑhecked = tag::check(*this);
+		case node::Text:
+			temp->correctnessÑhecked = text::check(*this);
 			break;
 		case node::ConditionalBranching:
-			temp->correctnessÑhecked = ((temp->hasConnection(0)) && (temp->connection[0].load()->getType() == node::Variable));
+			temp->correctnessÑhecked = branching::check(*this);
 			break;
 		case node::ExternalFunction:
-			if (temp->getData<externalFunction*>() == nullptr)
-				temp->correctnessÑhecked = false;
-			else if (temp->getData<externalFunction*>()->check((*this)))
-				temp->correctnessÑhecked = true;
+			temp->correctnessÑhecked = externalFunction::check(*this);
 			break;
 		case node::Pointer:
 			temp->correctnessÑhecked = pointer::check((*this));
@@ -62,37 +58,32 @@ namespace nechto
 		return temp->correctnessÑhecked;
 	}
 	
-	nodePtr step(nodePtr flag)
+	nodePtr step(nodePtr v1)
 	{
-		assert(flag.check());
-		assert(isAction(flag));
+		assert(v1.check());
+		assert(isAction(v1));
 		nodePtr nextPosition;
-		switch (flag->getType())
+		char temp;
+		switch (v1->getType())
 		{
 		case node::MathOperator:
-			mathOperator::mathOperation(flag);
-			nextPosition = flag->connection[3].load();
-			if (!nextPosition.exist())
-				return nullNodePtr;
-			return nextPosition;
-		case node::TypeCastOperator:
-			typeCast(flag);
-			nextPosition = flag->connection[3].load();
+			assert(mathOperator::perform(v1));
+			nextPosition = v1->connection[3].load();
 			if (!nextPosition.exist())
 				return nullNodePtr;
 			return nextPosition;
 		case node::ConditionalBranching:
-			nextPosition = (boolCast(flag->connection[0])) ? flag->connection[1] : flag->connection[2];
-			if (!nextPosition.exist())
-				return nullNodePtr;
+			temp = branching::perform(v1);
+			assert(!temp);
+			nextPosition = v1->connection[temp];
 			return nextPosition;
 		case node::ExternalFunction:
-			(flag->getData<externalFunction*>())->perform(flag);
-			nextPosition = flag->connection[3].load();
+			assert(externalFunction::perform(v1));
+			nextPosition = v1->connection[3].load();
 			if (!nextPosition.exist())
 				return nullNodePtr;
 			return nextPosition;
-		default: throw;
+		default: assert(false);
 		}
 	}
 }

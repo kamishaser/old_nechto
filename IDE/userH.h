@@ -1,5 +1,6 @@
 #pragma once
 #include "ideDisplay.h"
+#include "textOut.h"
 #include "graph.h"
 
 namespace nechto::ide::handler
@@ -22,20 +23,23 @@ namespace nechto::ide::handler
 	{
 		std::shared_ptr<ideDisplay> display;
 
-		externalConnection cursored =
-			externalConnection(nullNodePtr, L"nechto.ide.cursored");
+		externalConnection cursored;
 		glm::vec2 lastCPos;
 
 
-		externalConnection moveCursored =
-			externalConnection(createVariable(0ll), L"moveCursored");
+		//externalConnection moveCursored =
+		//	externalConnection(createVariable(0ll), L"moveCursored");
 		glm::vec2 offset;
 		bool last = false;
 	public:
 		userH(std::shared_ptr<ideDisplay> d)
-		:graph::handler(20ms, 25ms), display(d), lastCPos(d->getCursorPosition()) {}
+		:graph::handler(20ms, 25ms), display(d), lastCPos(d->getCursorPosition()),
+		cursored(L"nechtoIDE.cursoredNode", newNode(node::ExternalConnection)) {}
 
-		virtual ~userH() {}
+		virtual ~userH() 
+		{
+			cursored.deleteExConNode();
+		}
 
 		virtual void update()
 		{
@@ -44,21 +48,21 @@ namespace nechto::ide::handler
 	private:
 		void updateCursored()
 		{
-			nodePtr last = cursored.getTag()->connection[0];
-			if (cursored.getTag()->hasConnection(0))
-				numDisconnect(cursored.getTag(), 0);
+			nodePtr last = cursored.getConnection(0);
+			if (last.exist())
+				numDisconnect(cursored.get(), 0);
 			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
 			{
 				if (vNodeContainsPoint(i1->second.position,
 					i1->second.size, display->getCursorPosition()))
 				{
-					if (i1->second.exCon.getTag().exist())
+					if (i1->second.get().exist())
 					{
-						if (i1->second.exCon.getTag() != last)
+						if (i1->second.get() != last)
 						{
 							std::wcout << L"cursored: " << nodeProperties(i1->first) << std::endl;
 						}
-						NumHubConnect(cursored.getTag(), i1->second.exCon.getTag(), 0);
+						NumHubConnect(cursored.get(), i1->second.get(), 0);
 					}
 				}
 			}

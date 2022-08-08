@@ -11,15 +11,13 @@ namespace nechto
 			return false;
 		case node::Variable:
 			return true;
-		case node::TypeCastOperator:
-			return false;
 		case node::MathOperator:
 			return true;
 		case node::ConditionalBranching:
 			return false;
 		case node::ExternalFunction:
 			return false;
-		case node::Tag:
+		case node::Text:
 			return true;
 		default:
 			assert(false);
@@ -34,15 +32,13 @@ namespace nechto
 			return false;
 		case node::Variable:
 			return true;
-		case node::TypeCastOperator:
-			return false;
 		case node::MathOperator:
 			return false;
 		case node::ConditionalBranching:
 			return false;
 		case node::ExternalFunction:
 			return false;
-		case node::Tag:
+		case node::Text:
 			return true;
 		default:
 			assert(false);
@@ -57,15 +53,13 @@ namespace nechto
 			return false;
 		case node::Variable:
 			return false;
-		case node::TypeCastOperator:
-			return false;
 		case node::MathOperator:
 			return false;
 		case node::ConditionalBranching:
 			return false;
 		case node::ExternalFunction:
 			return true;
-		case node::Tag:
+		case node::Text:
 			return true;
 		default:
 			assert(false);
@@ -88,7 +82,7 @@ namespace nechto
 			return;
 		case node::ExternalFunction:
 			return;
-		case node::Tag:
+		case node::Text:
 			return;
 		default:
 			assert(false);

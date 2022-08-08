@@ -21,9 +21,28 @@ namespace nechto
 			array->connection[0] = hub;
 		}
 		void reset(nodePtr v1)
+		{
+			nodePtr hubIter = v1->connection[0];
+			for (i64 i = 0; i < v1->data; ++i)
+			{
+				hub::deleteAllConnectionsInHub(hubIter, v1);
+				nodePtr next = hubIter->hubConnection;
+				deleteNode(hubIter);
+				hubIter = next;
+			}
+			hubIter->connection[0] = nullNodePtr;
+		}
+		bool check(nodePtr v1)
+		{
+			assert(v1->getType() == node::Array);
+			if (v1->data < 1)
+				return false;
+			//nodePtr hubIter = v1->connection[0];
 
-		void perform(nodePtr v1);
-		bool check(nodePtr v1);
-		void copy(nodePtr v1);
+			//if (!v1->getType())
+			return true;
+		}
+		//void copy(nodePtr v1);
+
 	}
 }

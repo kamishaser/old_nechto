@@ -2,7 +2,6 @@
 #include <map>
 
 #include "visual.h"
-#include "uniqueNodePtr.h"
 
 namespace nechto::ide
 {
@@ -37,7 +36,7 @@ namespace nechto::ide
 	//	void add(const comName& n, std::wstring startValue)
 	//	{
 	//		auto i = attributes.emplace(n,
-	//			std::move(uniqueNodePtr(node::Tag, tag::Comment))).first;
+	//			std::move(uniqueNodePtr(node::Text, tag::Comment))).first;
 	//		tag::setData(i->second.get(), startValue);
 	//	}*/
 
@@ -56,7 +55,7 @@ namespace nechto::ide
 	//			if (v1->getSubtype() == baseValueType::F64)
 	//				return Type::F64;
 	//		}
-	//		if (v1->getType() == node::Tag)
+	//		if (v1->getType() == node::Text)
 	//			return Type::String;
 	//		return Error;
 	//	}
@@ -76,7 +75,7 @@ namespace nechto::ide
 	//	{
 	//		assert(contains(n));
 	//		assert(type(n) == String);
-	//		return tag::getData(attributes.at(n).get());
+	//		return text::get(attributes.at(n).get());
 	//	}
 	//	void erase(const comName& n)
 	//	{

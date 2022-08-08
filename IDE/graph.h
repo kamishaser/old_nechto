@@ -58,9 +58,10 @@ namespace nechto::ide
 		virtual bool addNode(nodePtr v1)
 		{
 			assert(v1.exist());
-			visualNode temp;
+			visualNode temp(v1);
 			temp.position += randomOffset(400);
-			nodes.emplace(v1, temp);
+			nodes.insert(std::move(std::pair<const nodePtr, visualNode>
+				(std::move(temp.exCon), std::move(temp))));
 			return true;			
 		}
 		

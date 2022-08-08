@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "baseValueTypes.h"
 #include "mathOperator.h"
 
 #include <string>
@@ -109,7 +108,7 @@ namespace nechto
 				return find(variableT, subtypeName);
 			case node::MathOperator:
 				return find(mathOperatorT, subtypeName);
-			case node::Tag:
+			case node::Text:
 				return find(tagT, subtypeName);
 			default:
 				return 0;

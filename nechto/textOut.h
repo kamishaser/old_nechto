@@ -1,5 +1,6 @@
 #pragma once
 #include "typeNames.h"
+#include "text.h"
 #include "connectionIterator.h"
 
 namespace nechto
@@ -20,7 +21,7 @@ namespace nechto
 			return typeName::variableT[address->getSubtype()];
 		case node::MathOperator:
 			return typeName::mathOperatorT[address->getSubtype()];
-		case node::Tag:
+		case node::Text:
 			return typeName::tagT[address->getSubtype()];
 		default:
 			return L"error";
@@ -35,22 +36,18 @@ namespace nechto
 		switch (v1->getType())
 		{
 		case node::Variable:
-			switch (v1->getSubtype())
-			{
-			case baseValueType::I64:
+			if(v1->getSubtype())
 				return std::to_wstring(*static_cast<i64*>(temptr));
-			case baseValueType::F64:
+			else
 				return std::to_wstring(*static_cast<f64*>(temptr));
-			default:
-				return L"error";
-			}
-		case node::Tag:
-			return tag::getData(v1);
+		case node::Text:
+			return text::get(v1);
 		case node::ExternalFunction:
-			if (v1->getData<externalFunction*>() == nullptr)
+			/*if (v1->getData<externalFunction*>() == nullptr)
 				return L"nullptr Error";
 			else 
-				return v1->getData<externalFunction*>()->name;
+				return v1->getData<externalFunction*>()->name;*/
+			assert(false);
 		}
 		return L"error";
 	}
@@ -69,7 +66,7 @@ namespace nechto
 			temp += to_string(i.get()) + L'\n';
 			if (i.position % 4 == 3)
 				temp += '\n';
-		} while (++i);
+		} while (i.stepForward());
 		return temp;
 	}
 }

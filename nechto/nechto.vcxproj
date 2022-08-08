@@ -138,17 +138,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="additionalCreationFunctions.h" />
     <ClInclude Include="array.h" />
+    <ClInclude Include="branching.h" />
     <ClInclude Include="checkAndStep.h" />
-    <ClInclude Include="commandLine.h" />
+    <ClInclude Include="creationInCode.h" />
     <ClInclude Include="externalConnection.h" />
     <ClInclude Include="externalFunction.h" />
     <ClInclude Include="connectionIterator.h" />
     <ClInclude Include="hub.h" />
     <ClInclude Include="nodeOperations.h" />
     <ClInclude Include="mathOperator.h" />
-    <ClInclude Include="nechto.h" />
     <ClInclude Include="nodeTypeProperties.h" />
     <ClInclude Include="performer.h" />
     <ClInclude Include="pointer.h" />
@@ -156,11 +155,9 @@
     <ClInclude Include="stream.h" />
     <ClInclude Include="fileStream.h" />
     <ClInclude Include="node.h" />
-    <ClInclude Include="staticAllocator.h" />
-    <ClInclude Include="tag.h" />
+    <ClInclude Include="text.h" />
     <ClInclude Include="textOut.h" />
     <ClInclude Include="typeNames.h" />
-    <ClInclude Include="uniqueNodePtr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />

@@ -2,9 +2,6 @@
 #include "node.h"
 namespace nechto
 {
-	const nodePtr newNode();
-	void disconnect(nodePtr v1, nodePtr v2);
-	
 	//хаб каждый хаб об€зательно содержит следующие данные:
 		//hubConnection: следующий хаб
 		//data: пара адресов: предыдущий хаб и основна€ нода.
@@ -32,7 +29,7 @@ namespace nechto
 			nodePtr hub = newNode(node::Hub);
 			hub->setData(std::pair<nodePtr, nodePtr>(chainEnd, mainNode));
 			chainEnd->hubConnection = hub;
-			return hub
+			return hub;
 		}
 		const nodePtr getMain(const nodePtr hub)
 		{
@@ -77,26 +74,49 @@ namespace nechto
 				return false;
 			return true;
 		}
-		//исключает хаб из цепочки. ѕри наличии соединений в хабе 2-сторонне отключает
-		void erase(nodePtr v1, nodePtr mainNode)
+		//удал€ет все соединени€ хаба
+		void deleteAllConnectionsInHub(nodePtr v1, nodePtr mainNode)
 		{
-			assert(typeCompare(v1, node::Hub));
-			nodePtr previous = previous(v1);
-			nodePtr next = v1->hubConnection;
 			for (int i = 0; i < 4; ++i)
 			{
 				nodePtr con = v1->connection[i].exchange(nullNodePtr);
-				if(con.exist())
+				if (con.exist())
 					nechto::oneSideDisconnect(con, mainNode);
 			}
-			previous->hubConnection = next;
-			if (next.exist())
-				next->setData(std::pair<nodePtr, nodePtr>(previous, mainNode));
-			deleteNode(v1);
 		}
-		void deleteChain(nodePtr v1)
+		//удал€ет хаб
+		void deleteHub(nodePtr v1, nodePtr mainNode)
 		{
-
+			assert(v1->getType() == node::Hub);
+			deleteAllConnectionsInHub(v1, mainNode);
+		}
+		//исключает хаб из цепочки. ѕри наличии соединений в хабе 2-сторонних соединений отключает
+		void erase(nodePtr v1, nodePtr mainNode)
+		{
+			assert(typeCompare(v1, node::Hub));
+			nodePtr prev = previous(v1);
+			nodePtr next = v1->hubConnection;
+			prev->hubConnection = next;
+			if (next.exist())
+				next->setData(std::pair<nodePtr, nodePtr>(prev, mainNode));
+			deleteHub(v1, mainNode);
+		}
+		bool checkChain(nodePtr v1)
+		{
+			nodePtr hubIter = v1;
+			while (true)
+			{
+				nodePtr next = hubIter->hubConnection;
+				if (!next.exist())
+					return true;
+				if (next->getType() != node::Hub)
+					return false;
+				auto data = next->getData<std::pair<nodePtr, nodePtr>>();
+				if (data.first != hubIter || data.second != v1)
+					return false;
+				hubIter = next;
+				
+			}
 		}
 
 		/*void fill(nodePtr v1, char subtype);

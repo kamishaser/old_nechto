@@ -12,51 +12,71 @@ namespace nechto::externalFunction
 	{
 		//проверка корректности подключения
 		std::atomic<bool(*)(nodePtr)> correctCheckPtr;
-		std::atomic<void(*)(nodePtr)> fnPtr;
+		std::atomic<bool(*)(nodePtr)> fnPtr;
 		//комменария, описание действия
-		std::wstring comment;
+		std::wstring description;
 		
 		//список нод, использующих эту функцию
 		std::atomic<i64> numberOfUsers = 0;
 
-		fn(bool(*t)(nodePtr), void(*f)(nodePtr), const std::wstring& c)
-			:correctCheckPtr(t), fnPtr(f), comment(c) {}
-		//выполнить
-		void perform(nodePtr v1)
+		fn(bool(*t)(nodePtr), bool(*f)(nodePtr), const std::wstring& d)
+			:correctCheckPtr(t), fnPtr(f), description(d) {}
+		fn(const fn& f)
+			:correctCheckPtr(f.correctCheckPtr.load()), fnPtr(f.fnPtr.load()),
+			description(f.description), numberOfUsers(0) {}
+
+		const fn& operator= (const fn& f)
 		{
-			(fnPtr.load())(v1);
+			correctCheckPtr = f.correctCheckPtr.load();
+			fnPtr = f.fnPtr.load();
+			description = f.description;
+		}
+		//выполнить
+		bool perform(nodePtr v1)
+		{
+			return (fnPtr.load())(v1);
 		}
 		//проверить
 		bool check(nodePtr v1)
 		{
-			bool (correctCheckPtr.load())(v1);
+			return (correctCheckPtr.load())(v1);
 		}
 	};
 	//в качестве данных нода содержит 
 	//указатель (реализован итератором) на функцию
-	using exFun = std::map<std::wstring, fn>::iterator;
+	struct exFun
+	{//блое имя	/ функция для хранения в set
+		mutable fn function;
+		std::wstring name;
+
+		exFun(const std::wstring& n, const fn& fun)
+			:name(n), function(fun) {}
+
+		auto operator <=> (const exFun& exF) const
+		{
+			return name <=> exF.name;
+		}
+	};
 
 	//к сожалению попытка запихнуть имя и функцию в одну структуру привела 
 	//к жесточайшим костылям. Такую структуру ни в map, ни в set без костылей
 	//типа mutable не запихнёшь
 
-	static_assert(sizeof(exFun) == 8);
-
 	fn Error =
 		fn
 		(
 			[](nodePtr) {return false; },
-			[](nodePtr) {},
+			[](nodePtr) {return false; },
 			L"error: undefined function"
 
 		);
 	//map используемых функций
-	struct map
+	struct externalFunctionSet
 	{
-		std::map<std::wstring, fn> funset;
+		std::set<exFun> funset;
 		std::mutex mblock;
 
-		map()
+		externalFunctionSet()
 		{
 			insert
 			(
@@ -67,22 +87,22 @@ namespace nechto::externalFunction
 		bool contains(const std::wstring& name) noexcept
 		{
 			mblock.lock();
-			bool temp = funset.contains(name);
+			bool temp = funset.contains(exFun(name, Error));
 			mblock.unlock();
 			return temp;
 		}
-		exFun insert(const std::wstring& name, const fn& fn) noexcept
+		const exFun* insert(const std::wstring& name, const fn& fn) noexcept
 		{
 			mblock.lock();
-			exFun temp = funset.emplace(name, fn).first;
+			const exFun* temp = &(*funset.emplace(exFun(name, fn)).first);
 			mblock.unlock();
 			return temp;
 		}
-		exFun find(const std::wstring& name) noexcept
+		const exFun* find(const std::wstring& name) noexcept
 		{
 			assert(contains(name));
 			mblock.lock();
-			exFun temp = funset.find(name);
+			const exFun* temp = &(*funset.find(exFun(name, Error)));
 			mblock.unlock();
 			return temp;
 		}
@@ -92,62 +112,67 @@ namespace nechto::externalFunction
 				return false;
 			
 			mblock.lock();
-			bool result = funset.at(name).isNotUsed();
+			bool result = !funset.find(exFun(name, Error))->function.numberOfUsers;
 			if(result)
-				funset.erase(name);
+				funset.erase(exFun(name, Error));
 			mblock.unlock();
 			return result;
 		}
 	};
-	using shmap = std::shared_ptr<map>;
+	using shEFS = std::shared_ptr<externalFunctionSet>;
 	//учтанавливает функцию в ноду
-	void set(nodePtr v1, shmap funMap, const std::wstring name) noexcept
+	void set(nodePtr v1, shEFS funSet, const std::wstring name) noexcept
 	{
-		exFun temp = funMap->contains(name) ?
-			funMap->find(name) :
-			funMap->insert
+		const exFun* temp = funSet->contains(name) ?
+			funSet->find(name) :
+			funSet->insert
 			(
 				name,
 				Error
 			);
-		--v1->getData<exFun>()->second.numberOfUsers;
-		v1->setData<exFun>(temp);
-		++temp->second.numberOfUsers;
+		--v1->getData<const exFun*>()->function.numberOfUsers;
+		v1->setData<const exFun*>(temp);
+		++temp->function.numberOfUsers;
 
 	}
 	//заполняет ноду функции
-	void initialize(nodePtr v1, shmap funMap, const std::wstring name = L"Error")
+	void initializeEmpty(nodePtr v1)
+	{	
+		v1->setData<const exFun*>(nullptr);
+	}
+	void initialize(nodePtr v1, shEFS& funMap, const std::wstring name = L"Error")
 	{
-		exFun temp = funMap->contains(name) ?
+		const exFun* temp = funMap->contains(name) ?
 			funMap->find(name) :
 			funMap->insert
 			(
 				name,
 				Error
 			);
-		v1->setData<exFun>(temp);
-		++temp->second.numberOfUsers;
+		v1->setData<const exFun*>(temp);
+		++temp->function.numberOfUsers;
 	}
 	//сбрасывает функцию
 	void reset(nodePtr v1)
 	{
-		exFun temp = v1->getData<exFun>();
-		--temp->second.numberOfUsers;
+		const exFun* temp = v1->getData<exFun*>();
+		if(temp != nullptr)
+			--temp->function.numberOfUsers;
 	}
-	void perform(nodePtr v1)
+	bool perform(nodePtr v1)
 	{
-		v1->getData<exFun>()->second.perform();
+		return v1->getData<exFun*>()->function.perform(v1);
 	}
 	bool check(nodePtr v1)
 	{
-		return (v1->getData<exFun>()->second.perform();
+		return (v1->getData<exFun*>()->function.check(v1));
 	}
 	//присваивание значения ноде того же типа
 	void assigment(nodePtr v0, nodePtr v1)
 	{
-		exFun temp = v1->getData<exFun>();
-		--v0->getData<exFun>()->second.numberOfUsers;
-		v0->setData<exFun>(temp);
-		++temp->second.numberOfUsers;
+		const exFun* temp = v1->getData<exFun*>();
+		--v0->getData<const exFun*>()->function.numberOfUsers;
+		v0->setData<const exFun*>(temp);
+		++temp->function.numberOfUsers;
 	}
 }

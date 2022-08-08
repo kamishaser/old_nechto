@@ -1,9 +1,8 @@
 #pragma once
 #include "visualNode.h"
 #include "textOut.h"
-#include "baseValueTypes.h"
 #include "mathOperator.h"
-#include "tag.h"
+#include "text.h"
 #include "externalFunction.h"
 
 namespace nechto::ide
@@ -13,47 +12,30 @@ namespace nechto::ide
 		
 		switch (n1->getType())
 		{
-		case node::Error:
+		case node::Deleted:
 			vn1.nodeText = L"error\n" + to_string(n1);
 			break;
 		case node::Hub:
 			vn1.nodeText = L"hub";
 			break;
 		case node::Variable:
-			switch (n1->getSubtype())
-			{
-			case baseValueType::Error:
-				vn1.nodeText = L"error-type\nvariable";
-			case baseValueType::I64:
+			if (n1->getSubtype())
 				vn1.nodeText = std::to_wstring(n1->getData<i64>());
-				break;
-			case baseValueType::F64:
+			else
 				vn1.nodeText = std::to_wstring(n1->getData<f64>());
-				break;
-			default:
-				assert(false);
-				break;
-			}
-			break;
-		case node::TypeCastOperator:
-			vn1.nodeText = L"typeCast";
 			break;
 		case node::MathOperator:
 			vn1.nodeText = typeName::mathOperatorShortT[n1->getSubtype()];
 			break;
-		case node::Tag:
+		case node::Text:
 			vn1.nodeText = typeName::tagT[n1->getSubtype()] +
-				tag::getData(n1);
+				text::get(n1);
 			break;
 		case node::ConditionalBranching:
 			vn1.nodeText = L"if";
 			break;
 		case node::ExternalFunction:
-			if (n1->getData<externalFunction*>() == nullptr)
-				vn1.nodeText = L"error\nnullptr";
-			else
-				vn1.nodeText = n1->getData<externalFunction*>()->name;
-			break;
+			vn1.nodeText = n1->getData<externalFunction::exFun*>()->name;
 		/*case node::Pointer:
 			
 			break;*/
@@ -121,7 +103,6 @@ namespace nechto::ide
 				vn.nShape = rhombe();
 				break;
 			case node::MathOperator:
-			case node::TypeCastOperator:
 				vn.nShape = circle();
 				break;
 			case node::Variable:
@@ -143,25 +124,23 @@ namespace nechto::ide
 
 		void fill(visualNode& vNode)
 		{
-			externalConnection& exCon = vNode.exCon;
 			bool warng = false;
 			bool error = false;
 			bool mOver = false;
 			bool highl = false;
 
-			assert(exCon.getName() == L"nechto.ide.visualNode" ||
-				exCon.getName() == L"nechto.ide.visualConnection");
+			assert(vNode.getTypeName() == L"nechtoIde.visualNode");
 			color temp;
-			assert(exCon.getTag().exist());
-			if (exCon.getTag()->hasHub())
+			assert(vNode.get().exist());
+			if (vNode.get()->hasHub())
 			{
-				connectionIterator i(exCon.getTag());
+				connectionIterator i(vNode.get());
 				do
 				{
 					if (i.get().exist())
-						if (i.get()->getType() == node::Tag)
+						if (i.get()->getType() == node::Text)
 						{
-							std::wstring name = tag::getData(i.get());
+							std::wstring name = text::get(i.get());
 							if (name == L"nechto.ide.cursored")
 								mOver = true;
 							if (name == L"nechto.ide.error")
@@ -169,7 +148,7 @@ namespace nechto::ide
 							if (name == L"nechto.ide.warning")
 								warng = true;
 						}
-				} while (++i);
+				} while (i.stepForward());
 			}
 			color ew =
 				(error) ? errorColor :

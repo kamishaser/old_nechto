@@ -1,64 +1,114 @@
 #pragma once
-#include "tag.h"
 #include "nodeOperations.h"
-#include "uniqueNodePtr.h"
 
 namespace nechto
 {
+	//объект осуществл€ющий св€зь с nechto
 	class externalConnection
 	{
-	protected:
-		uniqueNodePtr exConTag;
 	public:
-		externalConnection(const nodePtr conNode, const std::wstring& name)
-			:exConTag(node::Tag, tag::ExternalConnection)
+		std::atomic<nodePtr> exCon;
+		std::wstring typeName;
+	
+		externalConnection(const externalConnection&) = delete;
+
+		externalConnection()
+		{}
+		externalConnection(const std::wstring& n, nodePtr conNode = nullNodePtr)
+			:typeName(n)
 		{
-			tag::setData(exConTag, name);
-			if(conNode.exist())
-				NumHubConnect(exConTag, conNode, 0);
+			connect(conNode);
 		}
-		externalConnection& operator=(const nodePtr conNode)
+		~externalConnection()
 		{
-			disconnect(exConTag, exConTag->connection[0]);
-			NumHubConnect(exConTag, conNode, 0);
+			disconnect();
+		}
+		void newExConNode()
+		{
+			connect(newNode(node::ExternalConnection));
+		}
+		void deleteExConNode()
+		{
+			nodePtr temp = exCon.exchange(nullNodePtr);
+			if (temp.exist())
+				deleteNode(temp);
+		}
+		const externalConnection& operator=(const externalConnection&) = delete;
+
+		const externalConnection& operator=(externalConnection&& ec1) noexcept
+		{
+			nodePtr temp = ec1.exCon;
+			ec1.disconnect();
+			connect(temp);
+			nodeStorage::lock(temp);
+			typeName = ec1.typeName;
+			nodeStorage::unlock(temp);
 			return *this;
 		}
-		bool exist() const{ return exConTag->hasConnection(0); }
-		auto operator <=> (const externalConnection& exCon) const 
+
+		const externalConnection& operator=(const nodePtr conNode)
 		{
-			return exConTag <=> exCon.exConTag;
+			connect(conNode);
+			return *this;
 		}
-		operator const nodePtr() const
+		bool exist() const{ return exCon.load().exist(); }
+		auto operator <=> (const externalConnection& ec) const 
 		{
-			return exConTag->connection[0];
+			return exCon.load() <=> ec.exCon.load();
 		}
 		nodePtr get()const
 		{
-			return exConTag->connection[0].load();
+			return exCon;
 		}
-		std::wstring getName() const
+		nodePtr getConnection(int number)const
 		{
-			return tag::getData(exConTag);
+			nodePtr temp = exCon.load();
+			if (!temp.exist())
+				return nullNodePtr;
+			return temp->connection[number];
 		}
-		node* operator->() const
+		const std::wstring getTypeName() const
 		{
-			return *exConTag->connection[0].load();
+			nodeStorage::lock(exCon);
+			std::wstring temp = typeName;
+			nodeStorage::unlock(exCon);
+			return temp;
 		}
-		const nodePtr getTag() const
+		void setTypeName(const std::wstring& n)
 		{
-			return exConTag;
+			nodeStorage::lock(exCon);
+			typeName = n;
+			nodeStorage::unlock(exCon);
+		}
+
+		static void intializeNode(nodePtr v1, externalConnection* exCon = nullptr)
+		{
+			if (exCon != nullptr)
+				exCon->connect(v1);
+			else
+				v1->setData<externalConnection*>(nullptr);
+		}
+		static void resetNode(nodePtr v1)
+		{
+			auto exCon = v1->getData<externalConnection*>();
+			if (exCon != nullptr)
+				exCon->disconnect();
 		}
 		///////////////////////////////////////////////////
 		
-		externalConnection(const externalConnection& exCon)
-			:externalConnection(exCon.getTag(), exCon.getName()) 
-		{}
-		externalConnection& operator= (const externalConnection& exCon)
+		void disconnect()
 		{
-			if(exCon.get().exist())
-				NumHubConnect(exConTag, exCon.get(), 0);
-			tag::setData(exConTag, exCon.getName());
-			return *this;
+			if (!exCon.load().exist())
+				return;
+			exCon.load()->setData<externalConnection*>(nullptr);
+			exCon = nullNodePtr;
+		}
+		void connect(nodePtr v1)
+		{
+			disconnect();
+			assert(typeCompare(v1, node::ExternalConnection));
+			exCon = v1;
+			exCon.load()->setData<externalConnection*>(this);
 		}
 	};
 }

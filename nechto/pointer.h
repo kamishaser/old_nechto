@@ -3,10 +3,6 @@
 
 namespace nechto
 {
-	void deleteNode(nodePtr v1);
-	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
-	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
-
 	namespace pointer
 	{
 		bool check(nodePtr v1)
@@ -34,6 +30,7 @@ namespace nechto
 			}
 			return true;
 		}
+		
 		
 
 		//что хранится в итераторе:
@@ -76,6 +73,12 @@ namespace nechto
 				return hub->connection[v1->getData<i64>() & 3ll];
 			}
 		}
+
+		void initializeEmpty(nodePtr v1)
+		{
+			v1->setData<char>(0);
+		}
+		
 	}
 
 }

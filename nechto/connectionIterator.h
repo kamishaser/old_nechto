@@ -1,19 +1,15 @@
 #pragma once
 #include "node.h"
+#include "hub.h"
 
 namespace nechto
 {
-	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
-	bool typeCompare(nodePtr v1, char type);
-
 	//не тестировал
-	class hubIterator //общий итератор цепочки хабов. Работает как массивами, так и с обычными цепочками
+	struct hubIterator //общий итератор цепочки хабов. Работает как массивами, так и с обычными цепочками
 	{
-	public:
-		static_assert(sizeof(iteratorData) <= 8);
 		nodePtr currentHub;
 		nodePtr mainNode;
-		char position;
+		char position = 0;
 
 		hubIterator() {}
 		hubIterator(nodePtr curHub, nodePtr base, char pos)
@@ -24,10 +20,14 @@ namespace nechto
 		//элемент, на который указывает итератор
 		nodePtr get() const
 		{
+			return currentHub->connection[pos()].load();
+		}
+		std::atomic<nodePtr>& getA()
+		{
 			return currentHub->connection[pos()];
 		}
 		//позиция итератора в хабе. Номер соединения от 0 до 3
-		char pos()
+		char pos() const
 		{
 			return position & static_cast<char>(3);
 		}
@@ -166,7 +166,7 @@ namespace nechto
 			hub::erase(currentHub, mainNode);
 			
 		}
-	}
+	};
 	class arrayIterator
 	{
 	public:
@@ -185,7 +185,7 @@ namespace nechto
 		nodePtr mainNode = nullNodePtr;
 		nodePtr currentHub = nullNodePtr;
 		i64 position;
-	
+
 		nodePtr firstHub()
 		{
 			return mainNode->connection[0];
@@ -212,7 +212,6 @@ namespace nechto
 			{//нельзя удалять последний хаб
 				mainNode->data.fetch_add(1);
 				return;
-				mainNode->data.load();
 			}
 			//перебирает все подключённые ноды в поисках итератора, указывающего на удаляемый хаб
 			connectionIterator conIter(mainNode);
@@ -232,5 +231,13 @@ namespace nechto
 			} while (conIter.stepForward());
 			hub::erase(currentHub, mainNode);
 		}
+	};
+	/*обменивает места подключения по одной стороне, 
+	возвращает true, если обмен удался*/
+	bool swap(hubIterator& i1, hubIterator& i2)
+	{
+		if (i1.mainNode != i2.mainNode)
+			return false;
+		i1.getA().exchange(i2.getA());
 	}
 }

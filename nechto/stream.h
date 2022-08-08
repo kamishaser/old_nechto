@@ -3,7 +3,7 @@
 #include "nodeTypeProperties.h"
 
 #include "externalFunction.h"
-#include "tag.h"
+#include "text.h"
 #include <functional>
 #include <map>
 #include <set>
@@ -79,7 +79,7 @@ namespace nechto
 
 		std::set<nodePtr> savedNodes;//список сохранённых нод
 		std::map<nodePtr, nodePtr> loadedNodes;//map загруженных нод
-		externalFunction::shmap exFunMap;
+		externalFunction::shEFS exFunSet;
 		//ноды сохраняются с теми адресами, которые занимали на момент сохранения
 		//соответственно и связи прописаны по ним
 		//однако при загрузке им выдают новые адреса, по которым и надо коннектиться
@@ -185,13 +185,14 @@ namespace nechto
 			if (hasStaticAdData(v1))
 			{
 				std::wstring adData;
-				if(v1->getType() == node::Tag)
-					adData = tag::getData(v1);
-				if(v1->getType() == node::ExternalFunction)
-					if (v1->getData<externalFunction*>() == nullptr)
+				if(v1->getType() == node::Text)
+					adData = text::get(v1);
+				if (v1->getType() == node::ExternalFunction)
+					/*if (v1->getData<externalFunction*>() == nullptr)
 						adData = L"error";
 					else
-						adData = v1->getData<externalFunction*>()->name;
+						adData = v1->getData<externalFunction*>()->name;*/
+					assert(false);
 				const uint32_t adDataSize = static_cast<uint32_t>(adData.size());
 				writeElement(&adDataSize);
 				for (uint32_t i = 0; i < adDataSize; i++)
@@ -249,18 +250,14 @@ namespace nechto
 			nodePtr oldAddress = readAddress();
 			if (!oldAddress.exist())
 				return nullNodePtr;
-			nodePtr vload = newNode();
+			nodePtr vload;
 			loadedNodes.emplace(oldAddress, vload);
 			read(reinterpret_cast<char*>(&typeBuffer), sizeof(typeBuffer));
 			if (hasSubType(vload))
-			{
 				read(reinterpret_cast<char*>(&subtypeBuffer), sizeof(subtypeBuffer));
-				setTypeAndSubtype(vload, typeBuffer, subtypeBuffer);
-			}
 			else
-			{
-				setTypeAndSubtype(vload, typeBuffer);
-			}
+				subtypeBuffer = 0;
+			vload = newNode(typeBuffer, subtypeBuffer);
 			if (hasStaticData(vload))
 			{
 				read(reinterpret_cast<char*>(&dataBuffer), sizeof(dataBuffer));
@@ -282,16 +279,17 @@ namespace nechto
 						adData[i] = temp;
 					}
 				}
-				if (vload->getType() == node::Tag)
-					tag::setData(vload, adData);
+				if (vload->getType() == node::Text)
+					text::set(vload, adData);
 				if (vload->getType() == node::ExternalFunction)
 				{
 					//если функции нет, создаётся затычка, которую потом можно заместить
-					if (!externalFunction::exist(adData))
+					/*if (!externalFunction::exist(adData))
 						externalFunction::add(
 							externalFunction(adData, externalFunction::Error.checkPtr, 
 								externalFunction::Error.FuncPtr));
-					vload->setData(externalFunction::get(adData));
+					vload->setData(externalFunction::get(adData));*/
+					assert(false);
 				}
 			}
 			for (int i = 0; i < 4; i++)
