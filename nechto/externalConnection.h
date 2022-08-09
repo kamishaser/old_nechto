@@ -9,7 +9,7 @@ namespace nechto
 	public:
 		std::atomic<nodePtr> exCon;
 		std::wstring typeName;
-	
+
 		externalConnection(const externalConnection&) = delete;
 
 		externalConnection()
@@ -19,7 +19,7 @@ namespace nechto
 		{
 			connect(conNode);
 		}
-		~externalConnection()
+		virtual ~externalConnection()
 		{
 			disconnect();
 		}
@@ -51,8 +51,8 @@ namespace nechto
 			connect(conNode);
 			return *this;
 		}
-		bool exist() const{ return exCon.load().exist(); }
-		auto operator <=> (const externalConnection& ec) const 
+		bool exist() const { return exCon.load().exist(); }
+		auto operator <=> (const externalConnection& ec) const
 		{
 			return exCon.load() <=> ec.exCon.load();
 		}
@@ -90,12 +90,12 @@ namespace nechto
 		}
 		static void resetNode(nodePtr v1)
 		{
-			auto exCon = v1->getData<externalConnection*>();
+			auto exCon = get(v1);
 			if (exCon != nullptr)
 				exCon->disconnect();
 		}
 		///////////////////////////////////////////////////
-		
+
 		void disconnect()
 		{
 			if (!exCon.load().exist())
@@ -110,5 +110,16 @@ namespace nechto
 			exCon = v1;
 			exCon.load()->setData<externalConnection*>(this);
 		}
+		///////////////////////////////////////////////////
+		static bool isExCon(nodePtr v1)
+		{
+			return (v1->getType() == node::ExternalConnection);
+		}
+		static externalConnection* get(nodePtr v1)
+		{
+			assert(isExCon(v1));
+			return v1->getData<externalConnection*>();
+		}
+
 	};
 }

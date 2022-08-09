@@ -27,21 +27,24 @@ namespace nechto::ide
 		{
 			NumHubConnect(exCon.load(), v1, 0);
 		}
-		visualNode(const visualNode& vn)
-			:visualNode()
-		{
-			nodePtr v1 = vn.getConnection(0);
-			if(v1.exist())
-				NumHubConnect(get(), v1, 0);
-		}
-		const visualNode& operator= (const visualNode& vn)
-		{
-			NumHubConnect(get(), (vn.getConnection(0)), 0);
-		}
 		~visualNode()
 		{
 			deleteExConNode();
 		}
+		//проверка: является ли аргуменn внешним подключением visualNode
+		static visualNode* getByPtr(nodePtr v1)
+		{
+			if (v1->getType() != node::ExternalConnection)
+				return nullptr;
+			auto exCon = v1->getData<externalConnection*>();
+			if (exCon == nullptr)
+				return nullptr;
+			if (exCon->typeName != vnTypeName)
+				return nullptr;
+			return dynamic_cast<visualNode*>(exCon);
+		}
 	};
 	const std::wstring visualNode::vnTypeName = L"nechtoIde.visualNode";
+
+	
 }

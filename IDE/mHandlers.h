@@ -80,6 +80,8 @@ namespace nechto::ide::handler
 		glm::vec2 centripet(visualNode& v1)
 		{
 			float distance = glm::length(v1.position-center);
+			if (distance < 1)
+				return glm::vec2(0, 0);
 			
 			glm::vec2 normal = glm::normalize(v1.position-center);
 			return glm::vec2
@@ -87,6 +89,7 @@ namespace nechto::ide::handler
 				-glm::sqrt(distance) * normal.x * speed,
 				-glm::sqrt(distance) * normal.y * speed
 			);
+			
 		}
 	public:
 		float speed;

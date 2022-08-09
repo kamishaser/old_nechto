@@ -26,7 +26,8 @@ namespace nechto
 			L"MathOperator",			//математический оператор
 			L"ConditionalBranching",	//if
 			L"ExternalFunction",		//функция, не являющаяся частью nechto
-			L"Tag",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
+			L"Text",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
+			L"ExternalConnection",
 			L"Pointer",
 			L"Array"
 		};
