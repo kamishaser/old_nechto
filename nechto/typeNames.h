@@ -29,7 +29,7 @@ namespace nechto
 			L"Text",					//строковый объект. ћожет использоватьс€ как метка, название, комментарий или переменна€
 			L"ExternalConnection",
 			L"Pointer",
-			L"Array"
+			L"Group"
 		};
 		
 		const std::vector<std::wstring> variableT
@@ -38,13 +38,20 @@ namespace nechto
 			L"I64",
 		};
 
-		const std::vector<std::wstring> tagT
+		const std::vector<std::wstring> textT
 		{
 			L"Comment",
 			L"Name",
-			L"ExternalConnection",
-			L"Attribute"
+			L"Other"
 		};
+
+		const std::vector<std::wstring> pointerT
+		{
+			L"Reference",//одиночна€ ссылка
+			L"ConIter",//итератор соединений
+			L"GroupIter"//итератор массива
+		};
+		
 		
 		const std::vector<std::wstring> mathOperatorT
 		{
@@ -110,7 +117,7 @@ namespace nechto
 			case node::MathOperator:
 				return find(mathOperatorT, subtypeName);
 			case node::Text:
-				return find(tagT, subtypeName);
+				return find(textT, subtypeName);
 			default:
 				return 0;
 			}

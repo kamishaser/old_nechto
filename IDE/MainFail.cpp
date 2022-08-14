@@ -2,16 +2,15 @@
 
 #include "client.h"
 #include "nodeBoard.h"
-#include "mHandlers.h"
-#include "autoExpandHandler.h"
 #include "creationInCode.h"
 using namespace nechto;
 using namespace nechto::ide;
 
 void cracalk(std::shared_ptr<graph> nGraph);
+
+
 int main()
 {
-	
 	setlocale(LC_ALL, "Rus");
 	std::shared_ptr<graph> nGraph = std::make_shared<graph>();
 	cracalk(nGraph);
@@ -36,15 +35,25 @@ void cracalk(std::shared_ptr<graph> nGraph)
 	nodePtr result = cic.createVariable(0);
 	nodePtr summator = cic.createMathOperator(mathOperator::Addition, result, r1, sl2);
 	step(summator);
-	connectionIterator pi1(summator);
-	nodePtr i1 = newNode(node::Pointer, pointer::ConIter);
-	do
-	{
-		pi1.push(i1);
-		pi1.pull(i1);
-		std::wcout << to_string(pi1.get()) << std::endl;
 
-	} while (pi1.stepForward());
+	nodePtr a1 = newNode(node::Group);
+	groupIterator ai1(a1);
+	IterHubConnect(ai1, sl1);
+	//std::wcout << to_string(ai1.currentHub) << to_string(ai1.get()) << std::endl;
+	/*ai1.stepForward();
+	IterHubConnect(ai1, sl2);
+	ai1.stepForward();
+	ai1.stepForward();
+	IterHubConnect(ai1, summator);
+	ai1.insertHub();
+	ai1.stepForward();
+	ai1.stepForward();
+	IterHubConnect(ai1, r1);
+	std::wcout << connectionsList(a1) << std::endl;
+
+	group::compress(a1);
+	std::wcout << connectionsList(a1) << std::endl;*/
+	
 	//nodePtr printer = createExternalFunction(L"consoleOut");
 	//nodePtr reader1 = createExternalFunction(L"consoleIn");
 	//nodePtr reader2 = createExternalFunction(L"consoleIn");

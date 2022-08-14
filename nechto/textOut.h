@@ -1,6 +1,7 @@
 #pragma once
 #include "typeNames.h"
 #include "text.h"
+#include "nodeTypeProperties.h"
 #include "connectionIterator.h"
 
 namespace nechto
@@ -20,18 +21,20 @@ namespace nechto
 		case node::Variable:
 			return typeName::variableT[address->getSubtype()];
 		case node::MathOperator:
-			return typeName::mathOperatorT[address->getSubtype()];
+			return typeName::mathOperatorShortT[address->getSubtype()];
 		case node::Text:
-			return typeName::tagT[address->getSubtype()];
+			return typeName::textT[address->getSubtype()];
+		case node::Pointer:
+			return typeName::pointerT[address->getSubtype()];
 		default:
-			return L"error";
+			return L"";
 		}
 	}
 	const std::wstring nodeData(nodePtr v1)
 	{
 		if (v1 == nullNodePtr)
 			return L"error";
-		size_t data = v1->getData<size_t>();
+		i64 data = v1->getData<i64>();
 		void* temptr = &data;
 		switch (v1->getType())
 		{
@@ -43,30 +46,46 @@ namespace nechto
 		case node::Text:
 			return text::get(v1);
 		case node::ExternalFunction:
-			/*if (v1->getData<externalFunction*>() == nullptr)
-				return L"nullptr Error";
-			else 
-				return v1->getData<externalFunction*>()->name;*/
-			assert(false);
+			return externalFunction::getName(v1);
+		case node::ExternalConnection:
+			if (v1->getData<externalConnection*>() != nullptr)
+				return v1->getData<externalConnection*>()->getTypeName();
 		}
-		return L"error";
+		return L"";
 	}
 
 	std::wstring nodeProperties(const nodePtr v1)
 	{
-		if (v1 == nullNodePtr)
+		if (!v1.exist())
 			return L"nullNodePtr";
 		return std::wstring(to_string(v1) + L' ' + nodeType(v1) + L' ' + nodeSubtype(v1) + L' ' + nodeData(v1));
 	}
-	std::wstring ConnectionsListText(const nodePtr v1)
+	std::wstring numConnectionsList(const nodePtr v1)
 	{
-		std::wstring temp;
+		assert(v1.exist());
+		std::wstring temp = nodeProperties(v1) + L"________________________________\n";
+		for (int i = 0; i < 4; ++i)
+			temp += L"   " + nodeProperties(v1->connection[i].load()) + L'\n';
+		return temp;
+	}
+	std::wstring connectionsList(const nodePtr v1)
+	{
+		std::wstring temp = nodeProperties(v1) + L'\n';
+		if (!v1.exist())
+			return temp;
+		if (typeCompare(v1, node::Group))
+		{
+			groupIterator gi(v1);
+			do
+			{
+				temp += numConnectionsList(gi.currentHub) + L"\n";
+			} while (gi.GoToNextHub());
+			temp += L"\n mainChain:\n";
+		}
 		connectionIterator i(v1);
 		do {
-			temp += to_string(i.get()) + L'\n';
-			if (i.position % 4 == 3)
-				temp += '\n';
-		} while (i.stepForward());
+			temp += numConnectionsList(i.currentHub) + L"\n";
+		} while (i.GoToNextHub());
 		return temp;
 	}
 }

@@ -34,7 +34,7 @@ namespace nechto::ide::handler
 	public:
 		userH(std::shared_ptr<ideDisplay> d)
 		:graph::handler(20ms, 25ms), display(d), lastCPos(d->getCursorPosition()),
-		cursored(L"nechtoIDE.cursoredNode", newNode(node::ExternalConnection)) {}
+		cursored(newNode(node::ExternalConnection)) {}
 
 		virtual ~userH() 
 		{

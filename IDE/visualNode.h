@@ -17,34 +17,39 @@ namespace nechto::ide
 		color lightColor = color(0, 0, 0);
 		geometricShape nShape;
 
-		const static std::wstring vnTypeName;
-		std::wstring nodeText = L"а кириллица тут работает?";
+		std::wstring nodeText;
 	
-		visualNode()
-			:externalConnection(vnTypeName, newNode(node::ExternalConnection)) {}
-		visualNode(nodePtr v1)
-			:visualNode()
+		visualNode(nodePtr v1  = nullNodePtr)
+			:externalConnection(newNode(node::ExternalConnection))
 		{
-			NumHubConnect(exCon.load(), v1, 0);
+			assert(getByPtr(v1) == nullptr);//vNode нельзя подключать к vNode
+			if(v1.exist())
+				NumHubConnect(exCon.load(), v1, 0);
 		}
-		~visualNode()
+		virtual ~visualNode()
 		{
 			deleteExConNode();
 		}
-		//проверка: является ли аргуменn внешним подключением visualNode
+		/*получение указателя на visualNode по объекту. 
+		Возвращает nullptr при несоответствии*/
 		static visualNode* getByPtr(nodePtr v1)
 		{
+			if (!v1.exist())
+				return nullptr;
 			if (v1->getType() != node::ExternalConnection)
 				return nullptr;
 			auto exCon = v1->getData<externalConnection*>();
 			if (exCon == nullptr)
 				return nullptr;
-			if (exCon->typeName != vnTypeName)
+			if (exCon->getTypeName() != typeName)
 				return nullptr;
 			return dynamic_cast<visualNode*>(exCon);
 		}
+		const static std::wstring typeName;
+		virtual const std::wstring& getTypeName() const override
+		{
+			return typeName;
+		}
 	};
-	const std::wstring visualNode::vnTypeName = L"nechtoIde.visualNode";
-
-	
+	const std::wstring visualNode::typeName = L"nechtoIde.visualNode";
 }

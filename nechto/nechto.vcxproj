@@ -138,7 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="array.h" />
+    <ClInclude Include="group.h" />
     <ClInclude Include="branching.h" />
     <ClInclude Include="checkAndStep.h" />
     <ClInclude Include="creationInCode.h" />
@@ -146,6 +146,7 @@
     <ClInclude Include="externalFunction.h" />
     <ClInclude Include="connectionIterator.h" />
     <ClInclude Include="hub.h" />
+    <ClInclude Include="namedExCon.h" />
     <ClInclude Include="nodeOperations.h" />
     <ClInclude Include="mathOperator.h" />
     <ClInclude Include="nodeTypeProperties.h" />

@@ -8,23 +8,22 @@ namespace nechto
 		switch (v1->getType())
 		{
 		case node::Hub:
+		case node::ConditionalBranching:
+		case node::ExternalFunction:
+		case node::ExternalConnection:
+		case node::Group:
 			return false;
 		case node::Variable:
-			return true;
 		case node::MathOperator:
-			return true;
-		case node::ConditionalBranching:
-			return false;
-		case node::ExternalFunction:
-			return false;
 		case node::Text:
+		case node::Pointer:
 			return true;
 		default:
 			assert(false);
 		}
 		return false;
 	}
-	bool hasStaticData(nodePtr v1)
+	bool hasData(nodePtr v1)
 	{
 		switch (v1->getType())
 		{

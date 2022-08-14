@@ -3,19 +3,16 @@
 
 namespace nechto
 {
+	static const std::wstring unknownTypeName = L"unknownType";
 	//объект осуществл€ющий св€зь с nechto
 	class externalConnection
 	{
 	public:
 		std::atomic<nodePtr> exCon;
-		std::wstring typeName;
 
 		externalConnection(const externalConnection&) = delete;
 
-		externalConnection()
-		{}
-		externalConnection(const std::wstring& n, nodePtr conNode = nullNodePtr)
-			:typeName(n)
+		externalConnection(nodePtr conNode = nullNodePtr)
 		{
 			connect(conNode);
 		}
@@ -40,9 +37,6 @@ namespace nechto
 			nodePtr temp = ec1.exCon;
 			ec1.disconnect();
 			connect(temp);
-			nodeStorage::lock(temp);
-			typeName = ec1.typeName;
-			nodeStorage::unlock(temp);
 			return *this;
 		}
 
@@ -67,18 +61,9 @@ namespace nechto
 				return nullNodePtr;
 			return temp->connection[number];
 		}
-		const std::wstring getTypeName() const
+		virtual const std::wstring& getTypeName() const
 		{
-			nodeStorage::lock(exCon);
-			std::wstring temp = typeName;
-			nodeStorage::unlock(exCon);
-			return temp;
-		}
-		void setTypeName(const std::wstring& n)
-		{
-			nodeStorage::lock(exCon);
-			typeName = n;
-			nodeStorage::unlock(exCon);
+			return unknownTypeName;
 		}
 
 		static void intializeNode(nodePtr v1, externalConnection* exCon = nullptr)
@@ -122,4 +107,5 @@ namespace nechto
 		}
 
 	};
+	//externalConnection::
 }

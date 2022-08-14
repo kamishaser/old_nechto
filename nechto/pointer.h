@@ -23,7 +23,7 @@ namespace nechto
 			}
 			else
 			{
-				if (mainNode->getType() != node::Array)
+				if (mainNode->getType() != node::Group)
 					return false;
 				if (currentHub->getType() != node::Hub)
 					return false;
@@ -70,7 +70,7 @@ namespace nechto
 				nodePtr hub = v1->connection[0];
 				if (!hub.exist())
 					return nullNodePtr;
-				return hub->connection[v1->getData<i64>() & 3ll];
+				return hub->connection[v1->getData<char>() & 3ll];
 			}
 		}
 

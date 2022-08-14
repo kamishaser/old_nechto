@@ -11,7 +11,7 @@
 #include "externalFunction.h"
 #include "connectionIterator.h"
 #include "externalConnection.h"
-#include "array.h"
+#include "group.h"
 #include "hub.h"
 
 namespace nechto
@@ -42,70 +42,62 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//проверка наличия соединения
-	bool isHubExist(nodePtr v1)
-	{
-		assert(v1.exist());
-		return v1->hubConnection.load().exist();
-	}
-	bool isNodeHasConnections(nodePtr v1)
-	{
-		assert(v1.exist());
-		nodePtr hubIterator = v1;
-		while (true)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (hubIterator->connection[i].load().exist())
-					return true;
-			}
-			if (!hubIterator->hasHub())
-				return false;
-			hubIterator = hubIterator->hubConnection;
-		}
-	}
-	//номер подключения v2 к v1 нод. -1, если соединение не найдено
-	i64 getConnectionNumber(nodePtr v1, nodePtr v2)
-	{
-		assert(v1.exist());
-		i64 number = 0;
-		nodePtr hubIterator = v1;
-		while (true)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (hubIterator->connection[i].load() == v2)
-					return number;
-				++number;
-			}
-			if (!hubIterator->hasHub())
-				return -1;
-			hubIterator = hubIterator->hubConnection;
-		}
-	}
 
-	std::vector<nodePtr> allNodeConnections(nodePtr v1)
+	bool hasConnections(nodePtr v1)
 	{
 		assert(v1.exist());
-		nodePtr hubIterator = v1;
-		std::vector<nodePtr> connections;
-		while (true)
+		if (v1->getType() == node::Group)
 		{
-			for (int i = 0; i < 4; i++)
+			assert(group::check(v1));
+			groupIterator i1(v1);
+			do
 			{
-				connections.push_back(hubIterator->connection[i].load());
-			}
-			if (!hubIterator->hasHub())
-				return connections;
-			hubIterator = hubIterator->hubConnection;
+				if (i1.get().exist())
+				{
+					return true;
+				}
+			} while (i1.stepForward());
 		}
+		connectionIterator i2(v1);
+		do
+		{
+			if (i2.get().exist())
+			{
+				return true;
+			}
+		} while (i2.stepForward());
+		return false;
+	}
+	bool hasConnection(nodePtr v1, nodePtr v2)
+	{
+		assert(v1.exist() && v2.exist());
+		if (v1->getType() == node::Group)
+		{
+			assert(group::check(v1));
+			groupIterator i1(v1);
+			do
+			{
+				if (i1.get() == v2)
+				{
+					return true;
+				}
+			} while (i1.stepForward());
+		}
+		connectionIterator i2(v1);
+		do
+		{
+			if (i2.get() == v2)
+			{
+				return true;
+			}
+		} while (i2.stepForward());
+		return false;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
-	const nodePtr newNode(char type, char subtype)
+	nodePtr newNode(char type, char subtype)
 	{
-		nodePtr v1;
-		nodePtr temp = nodeStorage::terminal.allocate();
-		v1 = temp;
+		nodePtr v1 = nodeStorage::terminal.allocate();
 		v1->type = type;
 		v1->subtype = subtype;
 
@@ -127,8 +119,8 @@ namespace nechto
 		case node::Pointer:				//указатель на объект
 			pointer::initializeEmpty(v1);
 			break;
-		case node::Array:
-			array::initializeEmpty(v1);
+		case node::Group:
+			group::initializeEmpty(v1);
 			break;
 		default:
 			break;
@@ -195,14 +187,14 @@ namespace nechto
 		HubConnect(v2, v1);
 	}
 
-	void IterHubConnect(hubIterator i1, nodePtr v2)
+	void IterHubConnect(hubIterator& i1, nodePtr v2)
 	{
 		nodePtr oldCon1 = i1.oneSideConnect(v2);
 		if (oldCon1.exist())
 			oneSideDisconnect(oldCon1, i1.mainNode);
 		HubConnect(v2, i1.mainNode);
 	}
-	void IterIterConnect(hubIterator i1, hubIterator i2)
+	void IterIterConnect(hubIterator& i1, hubIterator& i2)
 	{
 		nodePtr oldCon1 = i1.oneSideConnect(i2.mainNode);
 		nodePtr oldCon2 = i2.oneSideConnect(i1.mainNode);
@@ -219,12 +211,28 @@ namespace nechto
 	void oneSideDisconnect(nodePtr v1, nodePtr v2)
 	{
 		assert(v1.exist() && v2.exist());
-		connectionIterator i1(v1);
+		if (v1->getType() == node::Group)
+		{
+			assert(group::check(v1));
+			groupIterator i1(v1);
+			do
+			{
+				if (i1.get() == v2)
+				{
+					i1.oneSideDisconnect();
+					return;
+				}
+			} while (i1.stepForward());
+		}
+		connectionIterator i2(v1);
 		do
 		{
-			if (i1.get() == v2)
-				i1.oneSideConnect(nullNodePtr);
-		} while (i1.stepForward());
+			if (i2.get() == v2)
+			{
+				i2.oneSideDisconnect();
+				return;
+			}
+		} while (i2.stepForward());
 	}
 	void disconnect(nodePtr v1, nodePtr v2)
 	{
@@ -274,8 +282,8 @@ namespace nechto
 			break;
 		case node::Pointer:				//указатель на объект
 			break;
-		case node::Array:
-			array::reset(v1);
+		case node::Group:
+			group::reset(v1);
 			break;
 		default:
 			break;

@@ -24,7 +24,7 @@ namespace nechto
 	bool nodePtr::check() const
 	{
 		nodePtr temp = *this;
-		if (temp->correctnessÑhecked.load())
+		if(temp->correctnessÑhecked.load())
 			return true;
 		switch (temp->getType())
 		{

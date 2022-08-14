@@ -55,7 +55,7 @@
     <ClInclude Include="autoExpandHandler.h">
       <Filter>Исходные файлы\projection\graph</Filter>
     </ClInclude>
-    <ClInclude Include="mHandlers.h">
+    <ClInclude Include="spreadHandler.h">
       <Filter>Исходные файлы\projection\graph</Filter>
     </ClInclude>
     <ClInclude Include="userH.h">

@@ -154,7 +154,7 @@
     <ClInclude Include="visualConnection.h" />
     <ClInclude Include="nodeBoard.h" />
     <ClInclude Include="periodLimiter.h" />
-    <ClInclude Include="mHandlers.h" />
+    <ClInclude Include="spreadHandler.h" />
     <ClInclude Include="graph.h" />
     <ClInclude Include="ideDisplay.h" />
     <ClInclude Include="visualNode.h" />

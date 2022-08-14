@@ -16,8 +16,8 @@ namespace nechto::ide::handler
 		{
 			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
 			{
-				fillVNText(i1->first, i1->second);
-				vnShape::fill(i1->first, i1->second);
+				vnText::fill(i1->second);
+				vnShape::fill(i1->second);
 				vnLightColor::fill(i1->second);
 			}
 		}

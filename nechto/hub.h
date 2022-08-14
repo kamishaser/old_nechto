@@ -118,12 +118,34 @@ namespace nechto
 				
 			}
 		}
-
-		/*void fill(nodePtr v1, char subtype);
-		void reset(nodePtr v1);
-		void perform(nodePtr v1);
-		bool check(nodePtr v1);
-		void copy(nodePtr v1);*/
+		//void compress(nodePtr v1)
+		//{
+		//	assert(v1.exist());
+		//	assert(typeCompare(v1, node::Group));
+		//	connectionIterator pullIter(v1);
+		//	connectionIterator pushIter(v1);
+		//	if (!v1->hasHub())
+		//		return;
+		//	pullIter.GoToNextHub();
+		//	pushIter.GoToNextHub();
+		//	do
+		//	{
+		//		nodePtr temp = *pullIter;
+		//		*pullIter = nullNodePtr;//надо переделать для оптимизации
+		//		if (temp.exist())
+		//		{
+		//			*pushIter = temp;
+		//			pushIter.stepForward();
+		//		}
+		//	} while (pullIter.stepForward());
+		//	if (pushIter.pos() != 0)
+		//		pushIter.stepForward();
+		//	while (pushIter.currentHub != v1->connection[0])
+		//	{
+		//		assert(hub::empty(pushIter.currentHub));
+		//		pushIter.eraseHub();
+		//	}
+		//}
 
 	}
 }

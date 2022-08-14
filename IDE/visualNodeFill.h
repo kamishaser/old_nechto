@@ -7,40 +7,53 @@
 
 namespace nechto::ide
 {
-	void fillVNText(nodePtr n1, visualNode& vn1)
+	namespace vnText
 	{
-		
-		switch (n1->getType())
+		void fill(visualNode& vn1)
 		{
-		case node::Deleted:
-			vn1.nodeText = L"error\n" + to_string(n1);
-			break;
-		case node::Hub:
-			vn1.nodeText = L"hub";
-			break;
-		case node::Variable:
-			if (n1->getSubtype())
-				vn1.nodeText = std::to_wstring(n1->getData<i64>());
-			else
-				vn1.nodeText = std::to_wstring(n1->getData<f64>());
-			break;
-		case node::MathOperator:
-			vn1.nodeText = typeName::mathOperatorShortT[n1->getSubtype()];
-			break;
-		case node::Text:
-			vn1.nodeText = typeName::tagT[n1->getSubtype()] +
-				text::get(n1);
-			break;
-		case node::ConditionalBranching:
-			vn1.nodeText = L"if";
-			break;
-		case node::ExternalFunction:
-			vn1.nodeText = n1->getData<externalFunction::exFun*>()->name;
-		/*case node::Pointer:
-			
-			break;*/
-		default:
-			vn1.nodeText = L"недоделал";
+			nodePtr n1 = vn1.get()->connection[0];
+			assert(n1.exist());
+			char subtype = n1->getSubtype();
+			assert(n1.exist());
+			switch (n1->getType())
+			{
+			case node::Deleted:
+				vn1.nodeText = L"error:\ndeleted\n" + to_string(n1);
+				break;
+			case node::Hub:
+				vn1.nodeText = L"error:\nhub\n" + to_string(n1);
+				break;
+			case node::Variable:
+				if (subtype)
+					vn1.nodeText = std::to_wstring(n1->getData<i64>());
+				else
+					vn1.nodeText = std::to_wstring(n1->getData<f64>());
+				break;
+			case node::MathOperator:
+				vn1.nodeText = typeName::mathOperatorShortT[n1->getSubtype()];
+				break;
+			case node::Text:
+				vn1.nodeText = typeName::textT[n1->getSubtype()] +
+					text::get(n1);
+				break;
+			case node::ConditionalBranching:
+				vn1.nodeText = L"if";
+				break;
+			case node::ExternalFunction:
+				vn1.nodeText = n1->getData<externalFunction::exFun*>()->name;
+			case node::Pointer:
+				if(subtype == pointer::Reference)
+					
+				break;
+			case node::Group:
+
+				break;
+			case node::ExternalConnection:
+
+				break;
+			default:
+				vn1.nodeText = L"недоделал";
+			}
 		}
 	}
 	namespace vnShape
@@ -94,12 +107,13 @@ namespace nechto::ide
 			return temp;
 		}
 
-		void fill(nodePtr n1, visualNode& vn)
+		void fill(visualNode& vn)
 		{
+			nodePtr n1 = vn.get()->connection[0];
 			switch (n1->getType())
 			{
 			case node::ConditionalBranching:
-			case node::Array:
+			case node::Group:
 				vn.nShape = rhombe();
 				break;
 			case node::MathOperator:

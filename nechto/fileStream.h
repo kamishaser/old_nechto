@@ -5,7 +5,7 @@
 
 namespace nechto
 {
-	class fileStream
+	/*class fileStream
 	{
 		stream			nechtoStream;
 		std::fstream	fStream;
@@ -56,5 +56,5 @@ namespace nechto
 			assert(isOpen());
 			return nechtoStream.load();
 		}
-	};
+	};*/
 }

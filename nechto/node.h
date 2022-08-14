@@ -90,7 +90,7 @@ namespace nechto
 		std::atomic<ptr> hubConnection;
 	
 		static_assert(std::atomic<i64>::is_always_lock_free);
-		friend const ptr newNode(char, char);
+		friend ptr newNode(char, char);
 		friend class nodeStorage::Terminal;
 
 		template <class TCon>
@@ -139,7 +139,7 @@ namespace nechto
 		{
 			return subtype;
 		}
-		enum Type //список типов нод
+		enum Type :char//список типов нод
 		{
 			Deleted,
 			Hub,					//разветвитель
@@ -150,12 +150,12 @@ namespace nechto
 			Text,					//метка
 			ExternalConnection,		//внешнее подключение
 			Pointer,				//указатель на объект
-			Array
+			Group,
 		};
 	};
 	namespace variable
 	{
-		enum Type
+		enum Type :char
 		{
 			F64 = 0,//false
 			I64 = 1 //true
@@ -163,7 +163,7 @@ namespace nechto
 	}
 	namespace mathOperator
 	{
-		enum Type
+		enum Type :char
 		{
 			Assigment,		// =
 			UnaryMinus,		// 0-
@@ -190,28 +190,23 @@ namespace nechto
 			Decrement,		// --
 		};
 	}
-	namespace tag
+	namespace text
 	{
 
-		enum Type
+		enum Type :char
 		{
 			Comment, //стандартный текстовый комментарий
 			Name,
-
-			ExternalConnection, //внешнее подключение. Данная нода может использоваться извне.
-			//ноду имеющую внешнее подключение нельзя удалять.
-			//комонента связности, не имеющаа внешнего подключение считается утеренной и 
-			//может быть удалена сборщиком мусора, (когда он будет разработан)
-			Attribute
+			Other
 		};
 	}
 	namespace pointer
 	{
-		enum Type
+		enum Type :char
 		{
 			Reference = 0,//одиночная ссылка
 			ConIter,//итератор соединений
-			ArrayIter//итератор массива
+			GroupIter//итератор массива
 		};
 	}	
 
@@ -230,15 +225,12 @@ namespace nechto
 	bool subtypeCompare(nodePtr v1, char subtype);
 	bool typeSubtypeCompare(nodePtr v1, char type, char subtype);
 	//проверка наличия соединения
-	bool isHubExist(nodePtr v1);
-	bool isNodeHasConnections(nodePtr v1);
+	bool hasConnections(nodePtr v1);
 	bool hasConnection(nodePtr v1, nodePtr v2);
 	bool hasMultipleConnection(nodePtr v1);
 
-	i64 getConnectionNumber(nodePtr v1, nodePtr v2);
-	std::vector<nodePtr> allNodeConnections(nodePtr v1);
 	//создание
-	const nodePtr newNode(char type, char subtype = 0);
+	nodePtr newNode(char type, char subtype = 0);
 
 	//создание одностороннего соединения
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber);
@@ -248,8 +240,8 @@ namespace nechto
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
 
-	void IterHubConnect(hubIterator i1, nodePtr v2);
-	void IterIterConnect(hubIterator i1, hubIterator i2);
+	void IterHubConnect(hubIterator& i1, nodePtr v2);
+	void IterIterConnect(hubIterator& i1, hubIterator& i2);
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);

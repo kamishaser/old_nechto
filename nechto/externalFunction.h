@@ -46,10 +46,10 @@ namespace nechto::externalFunction
 	//указатель (реализован итератором) на функцию
 	struct exFun
 	{//блое имя	/ функция для хранения в set
-		mutable fn function;
+		mutable std::shared_ptr<fn> function;
 		std::wstring name;
 
-		exFun(const std::wstring& n, const fn& fun)
+		exFun(const std::wstring& n, std::shared_ptr<fn> fun)
 			:name(n), function(fun) {}
 
 		auto operator <=> (const exFun& exF) const
@@ -62,8 +62,7 @@ namespace nechto::externalFunction
 	//к жесточайшим костылям. Такую структуру ни в map, ни в set без костылей
 	//типа mutable не запихнёшь
 
-	fn Error =
-		fn
+	const std::shared_ptr<fn> Error = std::make_shared<fn>
 		(
 			[](nodePtr) {return false; },
 			[](nodePtr) {return false; },
@@ -91,7 +90,7 @@ namespace nechto::externalFunction
 			mblock.unlock();
 			return temp;
 		}
-		const exFun* insert(const std::wstring& name, const fn& fn) noexcept
+		const exFun* insert(const std::wstring& name, const std::shared_ptr<fn> fn) noexcept
 		{
 			mblock.lock();
 			const exFun* temp = &(*funset.emplace(exFun(name, fn)).first);
@@ -112,7 +111,7 @@ namespace nechto::externalFunction
 				return false;
 			
 			mblock.lock();
-			bool result = !funset.find(exFun(name, Error))->function.numberOfUsers;
+			bool result = !funset.find(exFun(name, Error))->function->numberOfUsers;
 			if(result)
 				funset.erase(exFun(name, Error));
 			mblock.unlock();
@@ -130,9 +129,9 @@ namespace nechto::externalFunction
 				name,
 				Error
 			);
-		--v1->getData<const exFun*>()->function.numberOfUsers;
+		--v1->getData<const exFun*>()->function->numberOfUsers;
 		v1->setData<const exFun*>(temp);
-		++temp->function.numberOfUsers;
+		++temp->function->numberOfUsers;
 
 	}
 	//заполняет ноду функции
@@ -150,29 +149,37 @@ namespace nechto::externalFunction
 				Error
 			);
 		v1->setData<const exFun*>(temp);
-		++temp->function.numberOfUsers;
+		++temp->function->numberOfUsers;
 	}
 	//сбрасывает функцию
 	void reset(nodePtr v1)
 	{
 		const exFun* temp = v1->getData<exFun*>();
 		if(temp != nullptr)
-			--temp->function.numberOfUsers;
+			--temp->function->numberOfUsers;
 	}
 	bool perform(nodePtr v1)
 	{
-		return v1->getData<exFun*>()->function.perform(v1);
+		return v1->getData<exFun*>()->function->perform(v1);
 	}
 	bool check(nodePtr v1)
 	{
-		return (v1->getData<exFun*>()->function.check(v1));
+		return (v1->getData<exFun*>()->function->check(v1));
 	}
 	//присваивание значения ноде того же типа
 	void assigment(nodePtr v0, nodePtr v1)
 	{
 		const exFun* temp = v1->getData<exFun*>();
-		--v0->getData<const exFun*>()->function.numberOfUsers;
+		--v0->getData<const exFun*>()->function->numberOfUsers;
 		v0->setData<const exFun*>(temp);
-		++temp->function.numberOfUsers;
+		++temp->function->numberOfUsers;
+	}
+	std::wstring getName(nodePtr v1)
+	{
+		if (!v1.exist())
+			return L"error";
+		if (!typeCompare(v1, node::ExternalFunction))
+			return L"error";
+		return v1->getData<const exFun*>()->name;
 	}
 }
