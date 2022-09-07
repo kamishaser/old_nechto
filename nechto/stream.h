@@ -2,7 +2,6 @@
 #include "node.h"
 #include "nodeTypeProperties.h"
 
-#include "externalFunction.h"
 #include "text.h"
 #include <functional>
 #include <map>
@@ -184,7 +183,7 @@ namespace nechto
 	//			std::wstring adData;
 	//			if(v1->getType() == node::Text)
 	//				adData = text::get(v1);
-	//			if (v1->getType() == node::ExternalFunction)
+	//			if (v1->getType() == node::Method)
 	//				/*if (v1->getData<externalFunction*>() == nullptr)
 	//					adData = L"error";
 	//				else
@@ -278,7 +277,7 @@ namespace nechto
 	//			}
 	//			if (vload->getType() == node::Text)
 	//				text::set(vload, adData);
-	//			if (vload->getType() == node::ExternalFunction)
+	//			if (vload->getType() == node::Method)
 	//			{
 	//				//если функции нет, создаётся затычка, которую потом можно заместить
 	//				/*if (!externalFunction::exist(adData))

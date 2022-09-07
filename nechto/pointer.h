@@ -1,5 +1,6 @@
 #pragma once
 #include "node.h"
+#include "hub.h"
 
 namespace nechto
 {
@@ -9,17 +10,24 @@ namespace nechto
 		{
 			assert(v1->getType() == node::Pointer);
 			char subtype = v1->getSubtype();
-			if (subtype == pointer::Reference)
+			if (subtype == pointer::Simple)
 				return true;
-			nodePtr currentHub = v1->connection[0];
-			nodePtr mainNode = v1->connection[1];
+			auto hpp = v1->getData<hubPosPair>();
+			nodePtr mainNode = v1->connection[0];
+			nodePtr currentHub = hpp.first;
 			if (!currentHub.exist() || !mainNode.exist())
 				return false;
 			if (currentHub->getData<std::pair<nodePtr, nodePtr>>().second != mainNode)
 				return false;
 			if (subtype == pointer::ConIter)
 			{
-				
+				if (currentHub != mainNode)//подключено к хабу
+				{
+					if (currentHub->getType() != node::Hub)
+						return false;
+					if (hub::getMain(currentHub) != mainNode)
+						return false;
+				}
 			}
 			else
 			{
@@ -27,16 +35,17 @@ namespace nechto
 					return false;
 				if (currentHub->getType() != node::Hub)
 					return false;
+				if (hub::getMain(currentHub) != mainNode)
+					return false;
 			}
 			return true;
 		}
 		
 		
-
+		
 		//что хранится в итераторе:
-		//в поле данных номер элемента
-		//к нулевому текущий хаб(внимание: односторонее соединение!!!)
-		//к первому соединению подключен массив(в случае coniter основная нода)
+		//в поле данных хранится пара из указателя на хаб и номера позиции в нём
+		//к нулевому соединению подключен массив(в случае coniter основная нода)
 		
 		//присваивание значения ноде того же типа
 		void assigment(nodePtr v0, const nodePtr v1)
@@ -53,32 +62,10 @@ namespace nechto
 			{
 				NumConnect(v0, v1->connection[0], 0);
 				NumHubConnect(v0, v1->connection[1], 1);
-				v0->setData<i64>(v1->getData<i64>());
+				v0->setData<hubPosPair>(v1->getData<hubPosPair>());
 			}
 		}
-		
-		nodePtr follow(const nodePtr v1)
-		{
-			assert(v1.exist());
-			assert(v1->getType() == node::Pointer);
-			if (!v1->getSubtype())//reference
-			{
-				return v1->connection[0].load();
-			}
-			else
-			{
-				nodePtr hub = v1->connection[0];
-				if (!hub.exist())
-					return nullNodePtr;
-				return hub->connection[v1->getData<char>() & 3ll];
-			}
-		}
-
-		void initializeEmpty(nodePtr v1)
-		{
-			v1->setData<char>(0);
-		}
-		
+		bool set(nodePtr pointer, nodePtr v1);//определено в connectionIterator.h
 	}
 
 }

@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="nodeOperations.h">
+    <ClInclude Include="graphOperations.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="node.h">
@@ -30,9 +30,6 @@
     <ClInclude Include="checkAndStep.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="externalFunction.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="text.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
@@ -43,9 +40,6 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="nodeTypeProperties.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="script.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="pointer.h">
@@ -66,10 +60,7 @@
     <ClInclude Include="branching.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="creationInCode.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="externalConnection.h">
+    <ClInclude Include="externalObject.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="textOut.h">
@@ -79,6 +70,18 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="namedExCon.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="connectionRule.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeOperator.h">
+      <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeOperationSet.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="method.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
   </ItemGroup>

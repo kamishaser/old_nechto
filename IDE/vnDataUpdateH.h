@@ -1,25 +1,29 @@
 #pragma once
-#include "graph.h"
 #include "visualNodeFill.h"
 
-namespace nechto::ide::handler
+namespace nechto::ide
 {
-	class vnDataUpdateH : public graph::handler
+	class vnDataUpdateH
 	{
 	public:
-		vnDataUpdateH()
-			:graph::handler(21ms, 25ms){}
-
-		virtual ~vnDataUpdateH() {}
-
-		virtual void update()
+		nodePtr nBoardNode;
+		vnDataUpdateH(nodePtr nbn)
+			:nBoardNode(nbn) {}
+		void update()
 		{
-			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
+			nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
+			assert(nBoard);
+			groupIterator i1(nBoard->vNodeGroup());
+			do
 			{
-				vnText::fill(i1->second);
-				vnShape::fill(i1->second);
-				vnLightColor::fill(i1->second);
-			}
+				visualNode* vNode = visualNode::getByNode(i1.get());
+				if (vNode && (i1.get()->connection[0].load().exist()))
+				{
+					vnText::fill(vNode);
+					vnShape::fill(vNode);
+					vnLightColor::fill(vNode);
+				}
+			} while (i1.stepForward());
 		}
 	};
 }

@@ -150,16 +150,13 @@
     <ClInclude Include="client.h" />
     <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />
-    <ClInclude Include="visualAttribute.h" />
     <ClInclude Include="visualConnection.h" />
     <ClInclude Include="nodeBoard.h" />
     <ClInclude Include="periodLimiter.h" />
     <ClInclude Include="spreadHandler.h" />
-    <ClInclude Include="graph.h" />
     <ClInclude Include="ideDisplay.h" />
     <ClInclude Include="visualNode.h" />
     <ClInclude Include="visualNodeFill.h" />
-    <ClInclude Include="visualWay.h" />
     <ClInclude Include="vnDataUpdateH.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -138,21 +138,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="connectionRule.h" />
+    <ClInclude Include="method.h" />
     <ClInclude Include="group.h" />
     <ClInclude Include="branching.h" />
     <ClInclude Include="checkAndStep.h" />
-    <ClInclude Include="creationInCode.h" />
-    <ClInclude Include="externalConnection.h" />
-    <ClInclude Include="externalFunction.h" />
+    <ClInclude Include="externalObject.h" />
     <ClInclude Include="connectionIterator.h" />
     <ClInclude Include="hub.h" />
     <ClInclude Include="namedExCon.h" />
-    <ClInclude Include="nodeOperations.h" />
+    <ClInclude Include="graphOperations.h" />
     <ClInclude Include="mathOperator.h" />
+    <ClInclude Include="nodeOperationSet.h" />
+    <ClInclude Include="nodeOperator.h" />
     <ClInclude Include="nodeTypeProperties.h" />
     <ClInclude Include="performer.h" />
     <ClInclude Include="pointer.h" />
-    <ClInclude Include="script.h" />
     <ClInclude Include="stream.h" />
     <ClInclude Include="fileStream.h" />
     <ClInclude Include="node.h" />

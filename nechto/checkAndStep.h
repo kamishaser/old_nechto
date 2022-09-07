@@ -2,8 +2,7 @@
 #include "node.h"
 #include "text.h"
 #include "mathOperator.h"
-#include "nodeOperations.h"
-#include "externalFunction.h"
+#include "method.h"
 #include "Pointer.h"
 #include "branching.h"
 
@@ -15,52 +14,48 @@ namespace nechto
 		{
 		case node::MathOperator:
 		case node::ConditionalBranching:
-		case node::ExternalFunction:
+		case node::Method:
 			return true;
 		default:
 			return false;
 		}
 	}
-	bool nodePtr::check() const
+	bool check(nodePtr v1)
 	{
-		nodePtr temp = *this;
-		if(temp->correctnessÑhecked.load())
-			return true;
-		switch (temp->getType())
+		switch (v1->getType())
 		{
 		case node::Deleted://åñëè ïðîâåðÿåìîé íîäû íå ñóùåñòâóåò - ÷òî-òî íå òàê
-			temp->correctnessÑhecked = false;
+			return false;
 			break;
 		case node::Hub://õàáû âîîáùå íå çäåñü ïðîâåðÿþòñÿ.
-			temp->correctnessÑhecked = false;
+			return false;
 			break;
 		case node::Variable://ïåðåìåííàÿ íå èìååò ñîáñòâåííûõ ïîäêëþ÷åíèé. 
-			temp->correctnessÑhecked = true;
+			return true;
 			break;
 		case node::MathOperator:
-			temp->correctnessÑhecked = mathOperator::check(*this);
+			return mathOperator::check(v1);
 			break;
 		case node::Text:
-			temp->correctnessÑhecked = text::check(*this);
+			return text::check(v1);
 			break;
 		case node::ConditionalBranching:
-			temp->correctnessÑhecked = branching::check(*this);
+			return branching::check(v1);
 			break;
-		case node::ExternalFunction:
-			temp->correctnessÑhecked = externalFunction::check(*this);
+		case node::Method:
+			return method::check(v1);
 			break;
 		case node::Pointer:
-			temp->correctnessÑhecked = pointer::check((*this));
+			return pointer::check((v1));
 			break;
 		default:
 			assert(false);
 		}
-		return temp->correctnessÑhecked;
 	}
 	
 	nodePtr step(nodePtr v1)
 	{
-		assert(v1.check());
+		assert(check(v1));
 		assert(isAction(v1));
 		nodePtr nextPosition;
 		char temp;
@@ -77,13 +72,14 @@ namespace nechto
 			assert(!temp);
 			nextPosition = v1->connection[temp];
 			return nextPosition;
-		case node::ExternalFunction:
-			assert(externalFunction::perform(v1));
+		case node::Method:
+			assert(method::operate(v1));
 			nextPosition = v1->connection[3].load();
 			if (!nextPosition.exist())
 				return nullNodePtr;
 			return nextPosition;
 		default: assert(false);
 		}
+		return nullNodePtr;
 	}
 }

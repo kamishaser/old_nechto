@@ -45,11 +45,11 @@ namespace nechto
 				return std::to_wstring(*static_cast<f64*>(temptr));
 		case node::Text:
 			return text::get(v1);
-		case node::ExternalFunction:
-			return externalFunction::getName(v1);
-		case node::ExternalConnection:
-			if (v1->getData<externalConnection*>() != nullptr)
-				return v1->getData<externalConnection*>()->getTypeName();
+		case node::Method:
+			return method::getMethodName(v1);
+		case node::ExternalObject:
+			if (v1->getData<externalObject*>())
+				return v1->getData<externalObject*>()->getTypeName();
 		}
 		return L"";
 	}

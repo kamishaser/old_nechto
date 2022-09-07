@@ -4,16 +4,18 @@
 
 namespace nechto
 {
-	//не тестировал
 	struct hubIterator //общий итератор цепочки хабов. Работает как массивами, так и с обычными цепочками
 	{
+	protected:
+		char position = 0;//внимание: считыть только через pos()
+	public:
 		nodePtr currentHub;
 		nodePtr mainNode;
-		char position = 0;//внимание: считыть только через pos()
-
 		hubIterator() {}
 		hubIterator(nodePtr curHub, nodePtr base, char pos)
 			:currentHub(curHub), mainNode(base), position(pos) {}
+		hubIterator(nodePtr mainNode, pointer::hubPosPair hpp)
+			:currentHub(hpp.first), mainNode(mainNode), position(hpp.second) {}
 		
 		//элемент, на который указывает итератор
 		/*const std::atomic<nodePtr>* operator->() const
@@ -24,40 +26,46 @@ namespace nechto
 		{
 			return currentHub->connection[pos()];
 		}*/
-		std::atomic<nodePtr>& operator->()
-		{
-			return currentHub->connection[pos()];
-		}
-		std::atomic<nodePtr>& operator*()
+		auto& operator*()
 		{
 			return currentHub->connection[pos()];
 		}
 		nodePtr get()const 
 		{
-			return currentHub->connection[pos()].load();
+			return currentHub->connection[pos()];
 		}
+		void set(nodePtr v1)
+		{
+			IterHubConnect(*this, v1);
+		}
+
 		//позиция итератора в хабе. Номер соединения от 0 до 3
 		char pos() const
 		{
 			return position & static_cast<char>(3);
 		}
 		//вытянуть данные из ноды итератора
-		void pull(nodePtr v1)
+		bool pull(nodePtr v1)
 		{
 			assert(typeCompare(v1, node::Pointer));
-			assert(!subtypeCompare(v1, pointer::Reference));
-			currentHub = v1->connection[0];
-			mainNode = v1->connection[1];
-			position = v1->getData<char>();
+			assert(!subtypeCompare(v1, pointer::Simple));
+			auto hpp = v1->getData<pointer::hubPosPair>();
+			currentHub = hpp.first;
+			if (!currentHub.exist())
+				return false;
+			mainNode = hub::getMain(currentHub);
+			position = hpp.second;
+			
+			return true;
 		}
 		//отправить данные в ноду итератор
 		void push(nodePtr v1) const
 		{
 			assert(typeCompare(v1, node::Pointer));
-			assert(!subtypeCompare(v1, pointer::Reference));
-			v1->connection[0] = currentHub;
-			v1->connection[1] = mainNode;
-			v1->setData<char>(position);
+			assert(!subtypeCompare(v1, pointer::Simple));
+			if (v1->connection[0] != mainNode)
+				NumHubConnect(v1, mainNode, 0);
+			v1->setData(pointer::hubPosPair(currentHub, position));
 		}
 		//односторонне подключается к v1. Возвращает старое соединение
 		nodePtr oneSideConnect(nodePtr v1)
@@ -69,6 +77,8 @@ namespace nechto
 		{
 			return oneSideConnect(nullNodePtr);
 		}
+		//двусторонне отключается. Возвращает старое соединение
+		void disconnect(); // определение в nodeOperations.h
 		bool operator==(const hubIterator& i2) const
 		{
 			return (mainNode == i2.mainNode && pos() == i2.pos() &&
@@ -94,8 +104,15 @@ namespace nechto
 	class connectionIterator : public hubIterator
 	{
 	public:
-		connectionIterator(nodePtr v1)
-			:hubIterator(v1, v1, 0) {}
+		connectionIterator(nodePtr v1, char pos = 0)
+			:hubIterator(v1, v1, pos) 
+		{
+			assert(pos < 4);
+		}
+		connectionIterator(nodePtr currentHub, nodePtr mainNode, char pos)
+			:hubIterator(currentHub, mainNode, pos){}
+		connectionIterator(nodePtr mainNode, pointer::hubPosPair hpp)
+			:hubIterator(hpp.first, mainNode, hpp.second) {}
 		bool GoToNextHub()
 		{
 			nodePtr nextNode = currentHub->hubConnection.load();
@@ -114,30 +131,27 @@ namespace nechto
 		}
 		bool GoToPreviousHub()
 		{
-			nodePtr previousNode =
-				currentHub->getData<std::pair<nodePtr, nodePtr>>().first;
-			//если  хаба не существует - переход в основную ноду
-			if (previousNode.exist())
+			if (typeCompare(currentHub, node::Hub))
 			{
-				currentHub = previousNode;
-				return true;
+				currentHub = hub::previous(currentHub);
 			}
 			else
 			{
-				nodePtr hubIterator = currentHub;
-				i64 pos = 3;
+				nodePtr hubIter = currentHub;
+				char pos = 3;
 				while (true)
 				{
-					nodePtr next = hubIterator->hubConnection;
+					nodePtr next = hubIter->hubConnection;
 					if (!next.exist())
 						break;
 					++pos;
-					hubIterator = next;
+					hubIter = next;
 				}
-				currentHub = hubIterator;
+				currentHub = hubIter;
 				position = pos;
 				return false;
 			}
+			return currentHub != mainNode->connection[0];
 		}
 
 		bool stepForward()
@@ -199,36 +213,49 @@ namespace nechto
 						}
 				}
 			} while (conIter.stepForward());
+			nodePtr next = hub::next(currentHub);
 			hub::erase(currentHub, mainNode);
-			
+			currentHub = next;
 		}
 	};
 	class groupIterator : public hubIterator
 	{
 	public:
-		groupIterator(nodePtr v1)
-			:hubIterator(v1->connection[0], v1, 0) 
+		groupIterator(nodePtr v1, char pos = 0)
+			:hubIterator(v1->getData<nodePtr>(), v1, pos)
 		{
+			assert(pos < 4);
 			assert(typeCompare(v1, node::Group));
 		}
+		groupIterator(nodePtr currentHub, nodePtr mainNode, char pos)
+			:hubIterator(currentHub, mainNode, pos) 
+		{
+			assert(pos < 4);
+			assert(typeCompare(mainNode, node::Group));
+		}
+		groupIterator(nodePtr mainNode, pointer::hubPosPair hpp)
+			:hubIterator(hpp.first, mainNode, hpp.second) {}
 
+		bool atFirstHub()
+		{
+			return currentHub == mainNode->getData<nodePtr>();
+		}
 		bool GoToNextHub()
 		{
-			currentHub = currentHub->hubConnection.load();
-			return (currentHub != mainNode->connection[0]);
+			currentHub = hub::next(currentHub);
+			return atFirstHub();
 		}
 		bool GoToPreviousHub()
 		{
-			bool result = currentHub != mainNode->connection[0];
-			currentHub = currentHub->getData<std::pair<nodePtr, nodePtr>>().first;
-			return result;
+			currentHub = hub::previous(currentHub);
+			return atFirstHub();
 		}
 		bool stepForward()
 		{
 			++position;
 			if (!(position & 3ll))//если позиция == 0, переход в следующий хаб
 			{
-				return GoToNextHub();
+				return !GoToNextHub();
 			}
 			else
 				return true;
@@ -236,16 +263,16 @@ namespace nechto
 		bool stepBack()
 		{
 			bool result;
-			if (!(position & 3ll))//если позиция равна 0, переход в предыдущий хаб
-				result = GoToPreviousHub();
-			else
+			if (position & 3ll)//если позиция равна 0, переход в предыдущий хаб
 				result = true;
+			else
+				result = !GoToPreviousHub();
 			--position;
 			return result;
 		}
 		nodePtr firstHub()
 		{
-			return mainNode->connection[0];
+			return mainNode->getData<nodePtr>();
 		}
 
 		bool atFirst()
@@ -253,13 +280,10 @@ namespace nechto
 			if (!(position & 3ll))
 				return false;
 			nodePtr begin = firstHub();
-			if (currentHub != begin->connection[0])
-				return false;
-			return true;
+			return atFirstHub();
 		}
 		void insertHub()
 		{
-			mainNode->data.fetch_add(1);
 			hub::insert(currentHub, mainNode);
 		}
 		void eraseHub()
@@ -286,9 +310,25 @@ namespace nechto
 						}
 				}
 			} while (conIter.stepForward());
-			if (mainNode->connection[0] = currentHub)
-				mainNode->connection[0] = hub::next(currentHub);
+			if (atFirstHub())
+				mainNode->setData<nodePtr>(hub::next(currentHub));
+			nodePtr next = hub::next(currentHub);
 			hub::erase(currentHub, mainNode);
+			currentHub = next;
 		}
 	};
+	bool pointer::set(nodePtr pointer, nodePtr v1)
+	{
+		if (pointer->getSubtype() == pointer::Simple)
+		{
+			NumHubConnect(pointer, v1, 0);
+		}
+		else
+		{
+			hubIterator i0(pointer->connection[0],
+				pointer->getData<pointer::hubPosPair>());
+			i0.set(v1);
+		}
+		return true;
+	}
 }

@@ -5,6 +5,7 @@ namespace nechto
 	//хаб каждый хаб обязательно содержит следующие данные:
 		//hubConnection: следующий хаб
 		//data: пара адресов: предыдущий хаб и основная нода.
+	class connectionIterator;
 	namespace hub
 	{
 		//создаёт новый хаб и вставляет в цепочку после текущего
@@ -23,7 +24,7 @@ namespace nechto
 			}
 			return hub;
 		}
-		inline nodePtr pushBack(nodePtr chainEnd, nodePtr mainNode)
+		inline nodePtr insertBack(nodePtr chainEnd, nodePtr mainNode)
 		{
 			assert(!chainEnd->hasHub());
 			nodePtr hub = newNode(node::Hub);
@@ -48,6 +49,7 @@ namespace nechto
 			}
 			return iter;
 		}
+		
 		//следующая нода в цепочке
 		nodePtr next(nodePtr v1)
 		{

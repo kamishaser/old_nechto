@@ -25,9 +25,9 @@ namespace nechto
 			L"Variable",				//объект-переменная базового типа, хнанящаяся внутри алгоритма (одинаков для всех исполнителей)
 			L"MathOperator",			//математический оператор
 			L"ConditionalBranching",	//if
-			L"ExternalFunction",		//функция, не являющаяся частью nechto
 			L"Text",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
-			L"ExternalConnection",
+			L"ExternalObject",
+			L"Method",
 			L"Pointer",
 			L"Group"
 		};

@@ -2,15 +2,17 @@
 #include "SFML/Window.hpp"
 #include "GLM/gtx/rotate_vector.hpp"
 #include "nodeBoard.h"
+#include "periodLimiter.h"
 
 namespace nechto::ide
 {
-	class ideDisplay
+	class ideDisplay : public externalObject
 	{
 	public:
 		sf::Font vnFont;
 		sf::RenderWindow window;
 		periodLimiter plim;
+		nodePtr nBoardNode;
 
 		struct settings
 		{
@@ -20,8 +22,9 @@ namespace nechto::ide
 		};
 		settings dSettings;
 
-		ideDisplay()
-			:window(sf::VideoMode(1000, 1000), "nechtoIDE"),
+		ideDisplay(nodePtr nbn)
+			:externalObject(newNode(node::ExternalObject, 1)),
+			nBoardNode(nbn), window(sf::VideoMode(1000, 1000), "nechtoIDE"),
 			plim(20ms, 100ms)
 		{
 			assert(vnFont.loadFromFile("Fonts/arial.ttf"));
@@ -35,7 +38,7 @@ namespace nechto::ide
 		{
 			return glm::vec2(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
 		}
-		virtual bool update(std::shared_ptr<graph> nGraph)
+		virtual bool update()
 		{
 			sf::Event event;
 			while (window.pollEvent(event))
@@ -48,51 +51,61 @@ namespace nechto::ide
 			}
 			if (plim.moreThanMin())
 			{
-				window.clear();
-				for (auto i1 = nGraph->connections.begin(); i1 != nGraph->connections.end(); ++i1)
-					draw(
-						nGraph->findNode(i1->first.first),
-						nGraph->findNode(i1->first.second), i1->second);
-				for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
-					draw(i1->second);
-				window.display();
 				plim.reset();
+				nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
+				assert(nBoard);
+				window.clear();
+				groupIterator i1(nBoard->vConnectionGroup());
+				do
+				{
+					visualConnection* vscon = visualConnection::getByNode(i1.get());
+					if (vscon)
+						draw(vscon);
+				} while (i1.stepForward());
+				groupIterator i2(nBoard->vNodeGroup());
+				do
+				{
+					visualNode* vNode = visualNode::getByNode(i2.get());
+					if (vNode)
+						draw(vNode);
+				} while (i2.stepForward());
+				window.display();
 			}
+			return true;
 		}
 
-		void draw(visualNode& vNode)
+		void draw(visualNode* vNode)
 		{
 			//////////////////////////////////////////////////////////////////
 			sf::Text text;
 			
 			text.setFont(vnFont);
-			text.setString(vNode.nodeText);
+			text.setString(vNode->nodeText);
 			text.setCharacterSize(dSettings.characterSize);
 			text.setStyle(1);
 			//////////////////////////////////////////////////////////////////
 			sf::FloatRect bounds = text.getLocalBounds();
 			glm::vec2 size(bounds.width, bounds.height);
-			vNode.size = size + glm::vec2(dSettings.characterSize, dSettings.characterSize);
+			vNode->size = size + glm::vec2(dSettings.characterSize, dSettings.characterSize);
 			text.setPosition(sf::Vector2f(
-				vNode.position.x - bounds.width / 2.0f,
-				vNode.position.y - bounds.height / 2.0f - dSettings.characterSize/4));
-
+				vNode->position.x - bounds.width / 2.0f,
+				vNode->position.y - bounds.height / 2.0f - dSettings.characterSize/4));
 			//////////////////////////////////////////////////////////////////
 
 
-			if (vNode.nShape.empty())
-				vNode.nShape = std::vector<glm::vec2>{
+			if (vNode->nShape.empty())
+				vNode->nShape = std::vector<glm::vec2>{
 					glm::vec2(-0.5,-0.5),
 					glm::vec2(0.5 ,-0.5),
 					glm::vec2(0.5 , 0.5),
 					glm::vec2(-0.5, 0.5) };
-			sf::ConvexShape nShape(vNode.nShape.size());
+			sf::ConvexShape nShape(vNode->nShape.size());
 			nShape.setPosition(0, 0);
-			for (int i = 0; i < vNode.nShape.size(); ++i)
+			for (int i = 0; i < vNode->nShape.size(); ++i)
 			{
-				float x = vNode.nShape[i].x * vNode.size.x;
-				float y = vNode.nShape[i].y * vNode.size.y;
-				glm::vec2 pointPosition(glm::vec2(x, y) + vNode.position);
+				float x = vNode->nShape[i].x * vNode->size.x;
+				float y = vNode->nShape[i].y * vNode->size.y;
+				glm::vec2 pointPosition(glm::vec2(x, y) + vNode->position);
 				nShape.setPoint(i, GLM_SFML(pointPosition));
 			}
 			//////////////////////////////////////////////////////////////////
@@ -102,9 +115,9 @@ namespace nechto::ide
 			int b = (shc.b > 64) ? 32 : 223;
 			text.setFillColor(sf::Color(r, g, b));
 			//////////////////////////////////////////////////////////////////
-			if (vNode.lightColor != sf::Color(0, 0, 0))
+			if (vNode->lightColor != sf::Color(0, 0, 0))
 			{
-				nShape.setOutlineColor(vNode.lightColor);
+				nShape.setOutlineColor(vNode->lightColor);
 				nShape.setOutlineThickness(dSettings.baseLineThickness);
 			}
 			//////////////////////////////////////////////////////////////////
@@ -114,11 +127,14 @@ namespace nechto::ide
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////
-		void draw(visualNode& first, visualNode& second, visualConnectionData& vCon)
+		void draw(visualConnection* vCon)
 		{
+			visualNode* first = visualNode::getByNode(vCon->get()->connection[0]);
+			visualNode* second = visualNode::getByNode(vCon->get()->connection[1]);
+			assert(first && second);
 			////////////////////////////////////////////////////////////////////////
-			glm::vec2 fpos = first.position;
-			glm::vec2 spos = second.position;
+			glm::vec2 fpos = first->position;
+			glm::vec2 spos = second->position;
 			////////////////////////////////////////////////////////////////////////
 			sf::ConvexShape line(4);
 			glm::vec2 temp = spos - fpos;
@@ -136,5 +152,24 @@ namespace nechto::ide
 			////////////////////////////////////////////////////////////////////////
 			window.draw(line);
 		}
+		static ideDisplay* getByNode(nodePtr v1)
+		{
+			if (!v1.exist())
+				return nullptr;
+			if (v1->getType() != node::ExternalObject)
+				return nullptr;
+			auto exObj = v1->getData<externalObject*>();
+			if (exObj == nullptr)
+				return nullptr;
+			if (exObj->getTypeName() != typeName)
+				return nullptr;
+			return dynamic_cast<ideDisplay*>(exObj);
+		}
+		const static std::wstring typeName;
+		virtual const std::wstring& getTypeName() const override
+		{
+			return typeName;
+		}
 	};
+	const std::wstring ideDisplay::typeName = L"nechtoIde.ideDisplay";
 }

@@ -56,13 +56,27 @@ namespace nechto
 			{
 				return exist();
 			}
-			bool check() const;
-			
-			node* operator-> ();
-			node* operator* ();
+		private:
+			node* get();
+			const node* cget() const;
+		public:
+			node* operator-> ()
+			{
+				return get();
+			};
+			node* operator* ()
+			{
+				return get();
+			}
 
-			const node* operator-> () const;
-			const node* operator* () const;
+			const node* operator-> () const
+			{
+				return cget();
+			}
+			const node* operator* () const
+			{
+				return cget();
+			}
 
 			/*bool operator<(const ptr& v2)const
 			{
@@ -83,7 +97,6 @@ namespace nechto
 	private:
 		std::atomic<char> type;//тип ноды
 		std::atomic<char> subtype;//подтип ноды
-		std::atomic<bool> correctnessСhecked = false;
 	public:
 		std::atomic<i64> data = 0;//данные ноды
 		std::atomic<ptr> connection[4];
@@ -117,10 +130,6 @@ namespace nechto
 		{
 			return (hubConnection.load());
 		}
-		void correctnessHasNotBeenChecked()
-		{
-			correctnessСhecked = false;
-		}
 		int connectionType(int number) const //получение типа ноды подключённой по номеру
 		{
 			if (!hasConnection(number)) return 0;
@@ -146,13 +155,17 @@ namespace nechto
 			Variable,				//объект-переменная базового типа, хранящаяся внутри алгоритма (одинаков для всех исполнителей)
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
-			ExternalFunction,		//функция, не являющаяся частью nechto
 			Text,					//метка
-			ExternalConnection,		//внешнее подключение
+			ExternalObject,			//внешнее подключение
+			Method,					//операция с externalObject
 			Pointer,				//указатель на объект
-			Group,
+			Group,					//группа объектов
+			NodeOperator			//узловой оператор
 		};
 	};
+	using nodePtr = node::ptr;
+	using nodeEvent = std::function<bool(nodePtr)>;
+	const nodePtr nullNodePtr = nodePtr(); //аналог nullptr
 	namespace variable
 	{
 		enum Type :char
@@ -204,22 +217,42 @@ namespace nechto
 	{
 		enum Type :char
 		{
-			Reference = 0,//одиночная ссылка
+			Simple = 0,//одиночная ссылка
 			ConIter,//итератор соединений
 			GroupIter//итератор массива
 		};
-	}	
+		using hubPosPair = std::pair<nodePtr, int>;
 
-	using nodePtr = node::ptr;
-	using nodeEvent = std::function<void(nodePtr)>;
-	using nodeConnectionEvent = std::function<void(nodePtr, nodePtr)>;
-	const nodePtr nullNodePtr = nodePtr(); //аналог nullptr
+		nodePtr follow(nodePtr v1)
+		{
+			assert(v1->getType() == node::Pointer);
+			if (!v1->getSubtype())//reference
+			{
+				return v1->connection[0].load();
+			}
+			else
+			{
+				auto hpp = v1->getData<hubPosPair>();
+				if (!hpp.first.exist())
+					return nullNodePtr;
+				return hpp.first->connection[hpp.second & 3].load();
+			}
+		}
+	}	
+	/*
+	в external connection подтип 
+	0 - не является единственным владельцем, 1 - unique_ptr
+	*/
+	
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 	// объявления из nodeOperations
 	struct hubIterator; //определено в connectionIterator.h
-	
+	//проверка и шаг
+	bool isAction(nodePtr v1);
+	bool check(nodePtr v1);
+	nodePtr step(nodePtr v1);
 	//сравнение типов
 	bool typeCompare(nodePtr v1, char type);
 	bool subtypeCompare(nodePtr v1, char subtype);
@@ -240,8 +273,8 @@ namespace nechto
 	void NumHubConnect(nodePtr v1, nodePtr v2, ushort number1);
 	void HubHubConnect(nodePtr v1, nodePtr v2);
 
-	void IterHubConnect(hubIterator& i1, nodePtr v2);
-	void IterIterConnect(hubIterator& i1, hubIterator& i2);
+	void IterHubConnect(hubIterator i1, nodePtr v2);
+	void IterIterConnect(hubIterator i1, hubIterator i2);
 	//разрыв соединения
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
@@ -250,6 +283,7 @@ namespace nechto
 	void reset(nodePtr v1);
 	//удаление
 	void deleteNode(nodePtr v);
+
 
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
@@ -449,7 +483,7 @@ namespace nechto
 			}
 			const nodePtr allocate()
 			{
-				assert(currentAllocator != nullptr);
+				assert(currentAllocator);
 				if (currentAllocator->freeSpace() <= static_cast<ushort>(256))
 					changeCurrentAllocator();
 				nodePtr id;
@@ -459,7 +493,7 @@ namespace nechto
 			}
 			void deallocate(nodePtr id)
 			{
-				assert(getAllocator(id.first) != nullptr);
+				assert(getAllocator(id.first));
 				id->type = node::Deleted;
 				getAllocator(id.first)->deallocate(id.second);
 			}
@@ -471,23 +505,12 @@ namespace nechto
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 
-	node* node::ptr::operator-> ()
+	node* node::ptr::get()
 	{
 		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);
 	}
-	node* node::ptr::operator* ()
-	{
-		assert(exist());
-		return nodeStorage::getAllocator(first)->get(second);
-	}
-
-	const node* node::ptr::operator-> () const
-	{
-		assert(exist());
-		return nodeStorage::getAllocator(first)->get(second);
-	}
-	const node* node::ptr::operator* () const
+	const node* node::ptr::cget() const
 	{
 		assert(exist());
 		return nodeStorage::getAllocator(first)->get(second);

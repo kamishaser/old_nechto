@@ -1,9 +1,8 @@
 #pragma once
 #include "ideDisplay.h"
 #include "textOut.h"
-#include "graph.h"
 
-namespace nechto::ide::handler
+namespace nechto::ide
 {
 	bool vNodeContainsPoint(glm::vec2 position, glm::vec2 size, glm::vec2 point)
 	{
@@ -19,29 +18,27 @@ namespace nechto::ide::handler
 		return ((point.x > left && point.x < right) &&
 			(point.y > top && point.y < bottom));
 	}
-	class userH : public graph::handler
+	class userH
 	{
-		std::shared_ptr<ideDisplay> display;
+	public:
+		nodePtr ideDisplayNode;
+		nodePtr nBoardNode;
 
-		externalConnection cursored;
+		namedExCon cursored;
 		glm::vec2 lastCPos;
 
 
-		//externalConnection moveCursored =
-		//	externalConnection(createVariable(0ll), L"moveCursored");
-		glm::vec2 offset;
+		//externalObject moveCursored =
+		//	externalObject(createVariable(0ll), L"moveCursored");
+		//glm::vec2 offset;
 		bool last = false;
-	public:
-		userH(std::shared_ptr<ideDisplay> d)
-		:graph::handler(20ms, 25ms), display(d), lastCPos(d->getCursorPosition()),
-		cursored(newNode(node::ExternalConnection)) {}
+	
+		userH(nodePtr nbn, nodePtr idn)
+		:nBoardNode(nbn), ideDisplayNode(idn),
+			cursored(L"#nechtoIde.cursored"),
+			lastCPos(ideDisplay::getByNode(ideDisplayNode)->getCursorPosition()){}
 
-		virtual ~userH() 
-		{
-			cursored.deleteExConNode();
-		}
-
-		virtual void update()
+		void update()
 		{
 			updateCursored();
 		}
@@ -51,21 +48,28 @@ namespace nechto::ide::handler
 			nodePtr last = cursored.getConnection(0);
 			if (last.exist())
 				numDisconnect(cursored.get(), 0);
-			for (auto i1 = nGraph->nodes.begin(); i1 != nGraph->nodes.end(); ++i1)
+			nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
+			ideDisplay* display = ideDisplay::getByNode(ideDisplayNode);
+
+			groupIterator i1(nBoard->vNodeGroup());
+			do
 			{
-				if (vNodeContainsPoint(i1->second.position,
-					i1->second.size, display->getCursorPosition()))
+				auto* vNode = visualNode::getByNode(i1.get());
+				if (!vNode)
+					continue;
+				if (vNodeContainsPoint(vNode->position,
+					vNode->size, display->getCursorPosition()))
 				{
-					if (i1->second.get().exist())
+					if (vNode->get().exist())
 					{
-						if (i1->second.get() != last)
+						if (vNode->get() != last)
 						{
-							std::wcout << L"cursored: " << nodeProperties(i1->first) << std::endl;
+							std::wcout << L"cursored: " << nodeProperties(vNode->getConnection(0)) << std::endl;
 						}
-						NumHubConnect(cursored.get(), i1->second.get(), 0);
+						NumHubConnect(cursored.get(), vNode->get(), 0);
 					}
 				}
-			}
+			} while (i1.stepForward());
 		}
 	};
 }

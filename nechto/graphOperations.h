@@ -8,9 +8,8 @@
 #include "mathOperator.h"
 #include "text.h"
 #include "pointer.h"
-#include "externalFunction.h"
+#include "method.h"
 #include "connectionIterator.h"
-#include "externalConnection.h"
 #include "group.h"
 #include "hub.h"
 
@@ -101,23 +100,19 @@ namespace nechto
 		v1->type = type;
 		v1->subtype = subtype;
 
+		//внимание! итераторы не могут быть пустыми!!!
 		switch (v1->getType())
 		{
 		case node::Variable:
 		case node::MathOperator:			//математический оператор
 		case node::ConditionalBranching:	//if
-			break;
-		case node::ExternalFunction:		//функци€, не €вл€юща€с€ частью nechto
-			externalFunction::initializeEmpty(v1);
+		case node::Method:
 			break;
 		case node::Text:					//метка
 			text::initialize(v1);
 			break;
-		case node::ExternalConnection:		//внешнее подключение
-			externalConnection::intializeNode(v1);
-			break;
-		case node::Pointer:				//указатель на объект
-			pointer::initializeEmpty(v1);
+		case node::ExternalObject:		//внешнее подключение
+			externalObject::intializeNode(v1);
 			break;
 		case node::Group:
 			group::initializeEmpty(v1);
@@ -136,31 +131,36 @@ namespace nechto
 	void NumConnect(nodePtr v1, nodePtr v2, ushort conNumber)
 	{//безопасное добавление односторонней св€зи
 		//осуществл€етс€ прив€зка v2 к v1 по номеру conNumber
-		nodePtr temp = nullNodePtr;
-		if (v1->connection[conNumber].compare_exchange_strong(temp, v2))
+		nodePtr temp = v1->connection[conNumber].exchange(v2);
+		if (!temp.exist())
 			return;
-		v1->connection[conNumber] = v2;
 		oneSideDisconnect(temp, v1);
 	}//возвращает true, если св€зь добавить удалось и false в противном случае
 
+	namespace hub//костыль размещени€. ќтрефакторить при разделении файлов на h и cpp
+	{
+		//первый свободый порт в цепочке
+		connectionIterator firstEmptyPort(nodePtr v1)
+		{
+			if (!v1->hasHub())
+				hub::insertBack(v1, v1);
+			nodePtr hubIter = v1->hubConnection;
+			while (true)
+			{
+				for (int i = 0; i < 4; ++i)
+					if (!hubIter->hasConnection(i))
+					{
+						return connectionIterator(hubIter, v1, i);
+					}
+				nodePtr next = hubIter->hubConnection;
+				hubIter = (next.exist()) ? next : hub::insertBack(hubIter, v1);
+			}
+		}
+	}
 	void HubConnect(nodePtr v1, nodePtr v2)
 	{//добавление св€зи в первое попавшеес€ свободное место в хабе
 		assert(v1.exist() && v2.exist());
-
-		if (!v1->hubConnection.load().exist())
-			hub::pushBack(v1, v1);
-		nodePtr hubIterator = v1->hubConnection;
-		while (true)
-		{
-			for (int i = 0; i < 4; ++i)
-				if (!hubIterator->hasConnection(i))
-				{
-					hubIterator->connection[i] = v2;
-					return;
-				}
-			nodePtr next = hubIterator->hubConnection;
-			hubIterator = (next.exist()) ? next : hub::pushBack(hubIterator, v1);
-		}
+		hub::firstEmptyPort(v1).oneSideConnect(v2);
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание двухстороннего соединени€
@@ -187,14 +187,14 @@ namespace nechto
 		HubConnect(v2, v1);
 	}
 
-	void IterHubConnect(hubIterator& i1, nodePtr v2)
+	void IterHubConnect(hubIterator i1, nodePtr v2)
 	{
 		nodePtr oldCon1 = i1.oneSideConnect(v2);
 		if (oldCon1.exist())
 			oneSideDisconnect(oldCon1, i1.mainNode);
 		HubConnect(v2, i1.mainNode);
 	}
-	void IterIterConnect(hubIterator& i1, hubIterator& i2)
+	void IterIterConnect(hubIterator i1, hubIterator i2)
 	{
 		nodePtr oldCon1 = i1.oneSideConnect(i2.mainNode);
 		nodePtr oldCon2 = i2.oneSideConnect(i1.mainNode);
@@ -241,19 +241,17 @@ namespace nechto
 		oneSideDisconnect(v1, v2);
 		oneSideDisconnect(v2, v1);
 	}
-	void numDisconnect(nodePtr v1, i64 conNum)
+	void hubIterator::disconnect()
+	{
+		nechto::oneSideDisconnect(get(), mainNode);
+	}
+	void numDisconnect(nodePtr v1, i64 number)
 	{
 		assert(v1.exist());
-		i64 hubNumber = conNum >> 2;
-
-		nodePtr hubIterator = v1;
-		for (i64 i = 0; i < (conNum >> 2); ++i)
-		{
-			if (!v1->hasHub())
-				return;
-			hubIterator = hubIterator->hubConnection;
-		}
-		oneSideDisconnect(hubIterator->connection[conNum & 3ll].exchange(nullNodePtr), v1);
+		nodePtr old = v1->connection[number];
+		if (old.exist())
+			oneSideDisconnect(old, v1);
+		v1->connection[number] = nullNodePtr;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,6 +259,7 @@ namespace nechto
 	void deleteNode(nodePtr v1)
 	{
 		assert(v1.exist());
+		assert(!typeCompare(v1, node::Deleted));//нельз€ удал€ть дважды
 		nodePtr vTemp = v1;
 		switch (v1->getType())
 		{
@@ -271,14 +270,11 @@ namespace nechto
 		case node::MathOperator:			//математический оператор
 		case node::ConditionalBranching:	//if
 			break;
-		case node::ExternalFunction:		//функци€, не €вл€юща€с€ частью nechto
-			externalFunction::reset(v1);
-			break;
 		case node::Text:					//метка
 			text::reset(v1);
 			break;
-		case node::ExternalConnection:		//внешнее подключение
-			externalConnection::resetNode(v1);
+		case node::ExternalObject:		//внешнее подключение
+			externalObject::resetNode(v1);
 			break;
 		case node::Pointer:				//указатель на объект
 			break;

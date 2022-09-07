@@ -43,15 +43,6 @@
     <ClInclude Include="visual.h">
       <Filter>Исходные файлы\projection\visual</Filter>
     </ClInclude>
-    <ClInclude Include="visualAttribute.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="visualWay.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="graph.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
-    </ClInclude>
     <ClInclude Include="autoExpandHandler.h">
       <Filter>Исходные файлы\projection\graph</Filter>
     </ClInclude>

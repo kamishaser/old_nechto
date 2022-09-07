@@ -1,7 +1,6 @@
 #pragma once
 #include "node.h"
 #include "mathOperator.h"
-#include "pointer.h"
 #include "connectionIterator.h"
 
 namespace nechto

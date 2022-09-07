@@ -1,41 +1,47 @@
 #pragma once
-#include "externalConnection.h"
+#include "externalObject.h"
 
 namespace nechto
 {
-	class namedExCon : public externalConnection
+	class namedExCon : public externalObject
 	{
+	public:
 		std::wstring name;
 
 		namedExCon(nodePtr v1, const std::wstring& n)
-			:externalConnection(v1), name(n)
+			:externalObject(v1), name(n)
 		{
+			assert(n[0] == L'#');
 			assert(v1.exist());
-			assert(typeCompare(v1, node::ExternalConnection));
+			assert(typeCompare(v1, node::ExternalObject));
 		}
 		namedExCon(const std::wstring& n)
-			:externalConnection(newNode(node::ExternalConnection)),
-			name(n) {}
-		static namedExCon* getByPtr(nodePtr v1)
+			:externalObject(newNode(node::ExternalObject)),
+			name(n) {assert(n[0] == L'#');}
+		static namedExCon* getByNode(nodePtr v1)
 		{
 			if (!v1.exist())
 				return nullptr;
-			if (v1->getType() != node::ExternalConnection)
+			if (v1->getType() != node::ExternalObject)
 				return nullptr;
-			auto exCon = v1->getData<externalConnection*>();
-			if (exCon == nullptr)
+			auto exObj = v1->getData<externalObject*>();
+			if (exObj == nullptr)
 				return nullptr;
-			wchar_t border(L"\'");
-			const std::wstring& temp = exCon->getTypeName();
+			const std::wstring& temp = exObj->getTypeName();
 			if (temp.size() < 1)
 				return nullptr;
-			if (temp.begin() != L"#")
+			if (temp[0] != L'#')
 				return nullptr;
-			return dynamic_cast<namedExCon*>(exCon);
+			
+			return dynamic_cast<namedExCon*>(exObj);
 		}
 		virtual const std::wstring& getTypeName() const override
 		{
-			return std::wstring() + name;
+			return name;
+		}
+		auto operator <=> (const namedExCon& exc) const
+		{
+			return name <=> exc.name;
 		}
 	};
 }

@@ -7,9 +7,6 @@ namespace nechto
 {
 	namespace group
 	{
-		//к основной ноде массива подключена замкнутая цепочка хабов [0]
-		//в data хранится размер массива
-
 		void initializeEmpty(nodePtr v1)
 		{
 			//первый хаб массива. (замкнут сам на себя)
@@ -17,12 +14,11 @@ namespace nechto
 			hub->hubConnection = hub;
 			hub->setData(std::pair<nodePtr, nodePtr>(hub, v1));
 
-			v1->setData<i64>(1);
-			v1->connection[0] = hub;
+			v1->setData<nodePtr>(hub);
 		}
 		void reset(nodePtr v1)
 		{
-			nodePtr hubIter = v1->connection[0];
+			nodePtr hubIter = v1->getData<nodePtr>();
 			for (i64 i = 0; i < v1->data; ++i)
 			{
 				hub::deleteAllConnectionsInHub(hubIter, v1);
@@ -32,6 +28,7 @@ namespace nechto
 			}
 			hubIter->connection[0] = nullNodePtr;
 		}
+		
 		bool check(nodePtr v1)
 		{
 			assert(v1->getType() == node::Group);
@@ -42,14 +39,11 @@ namespace nechto
 			//if (!v1->getType())
 			return true;
 		}
-		//void copy(nodePtr v1);
-		void compress(nodePtr v1)
+		
+		void compress(const groupIterator& begin)
 		{
-			assert(v1.exist());
-			assert(typeCompare(v1, node::Group));
-			groupIterator pullIter(v1);
-			groupIterator pushIter(v1);
-
+			groupIterator pullIter = begin;
+			groupIterator pushIter = begin;
 			do
 			{
 				nodePtr temp = *pullIter;
@@ -62,11 +56,45 @@ namespace nechto
 			} while (pullIter.stepForward());
 			if (pushIter.pos() != 0)
 				pushIter.stepForward();
-			while (pushIter.currentHub != v1->connection[0])
+			while (pushIter.currentHub != pushIter.mainNode->connection[0])
 			{
 				assert(hub::empty(pushIter.currentHub));
 				pushIter.eraseHub();
 			}
+		}
+		void compress(nodePtr v1)
+		{
+			assert(v1.exist());
+			assert(typeCompare(v1, node::Group));
+			compress(groupIterator(v1));			
+		}
+		groupIterator lastConnectedPort(nodePtr group)
+		{
+			assert(group.exist());
+			assert(typeCompare(group, node::Group));
+			groupIterator i1(group);
+			do
+			{
+				i1.stepBack();
+				if (i1.get().exist())
+					return i1;
+			} while (i1.stepBack());
+			return i1;//если пустых элементов нет, возвращает итератор на первый элемент
+		}
+		groupIterator firstEmptyPort(nodePtr group)
+		{
+			assert(group.exist());
+			assert(typeCompare(group, node::Group));
+			groupIterator i1(group);
+			do
+			{
+				if (!i1.get().exist())
+					return i1;
+			} while (i1.stepForward());
+			i1.stepBack();//костыль. Переделать когда отрефакторю вставку хабов в группу
+			i1.insertHub();
+			i1.stepForward();
+			return i1;
 		}
 	}
 }

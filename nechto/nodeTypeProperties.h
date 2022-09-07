@@ -9,12 +9,12 @@ namespace nechto
 		{
 		case node::Hub:
 		case node::ConditionalBranching:
-		case node::ExternalFunction:
-		case node::ExternalConnection:
+		case node::Method:
 		case node::Group:
 			return false;
-		case node::Variable:
+		case node::Variable://0 - double, 1 - int64
 		case node::MathOperator:
+		case node::ExternalObject://0 - не является единственным владельцем, 1 - unique_ptr
 		case node::Text:
 		case node::Pointer:
 			return true;
@@ -35,7 +35,7 @@ namespace nechto
 			return false;
 		case node::ConditionalBranching:
 			return false;
-		case node::ExternalFunction:
+		case node::Method:
 			return false;
 		case node::Text:
 			return true;
@@ -56,7 +56,7 @@ namespace nechto
 			return false;
 		case node::ConditionalBranching:
 			return false;
-		case node::ExternalFunction:
+		case node::Method:
 			return true;
 		case node::Text:
 			return true;
@@ -79,7 +79,7 @@ namespace nechto
 			return;
 		case node::ConditionalBranching:
 			return;
-		case node::ExternalFunction:
+		case node::Method:
 			return;
 		case node::Text:
 			return;
