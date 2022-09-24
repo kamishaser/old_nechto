@@ -8,11 +8,12 @@ using namespace nechto;
 using namespace nechto::ide;
 
 
-
+void test()
+{
+	
+}
 int main()
 {
-	std::cout << sizeof(connectionRule) << std::endl;
-	setlocale(LC_ALL, "Rus");
 	client c;
 
 	while (c.update())

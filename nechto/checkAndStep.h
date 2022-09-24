@@ -2,9 +2,11 @@
 #include "node.h"
 #include "text.h"
 #include "mathOperator.h"
+#include "nodeOperator.h"
 #include "method.h"
 #include "Pointer.h"
 #include "branching.h"
+#include "group.h"
 
 namespace nechto
 {
@@ -48,6 +50,11 @@ namespace nechto
 		case node::Pointer:
 			return pointer::check((v1));
 			break;
+		case node::Group:
+			return group::check(v1);
+			break;
+		case node::NodeOperator:
+			return checkNodeOperator(v1);
 		default:
 			assert(false);
 		}
@@ -57,26 +64,24 @@ namespace nechto
 	{
 		assert(check(v1));
 		assert(isAction(v1));
-		nodePtr nextPosition;
+		nodePtr nextPosition = v1->connection[3].load();
 		char temp;
 		switch (v1->getType())
 		{
 		case node::MathOperator:
 			assert(mathOperator::perform(v1));
-			nextPosition = v1->connection[3].load();
-			if (!nextPosition.exist())
-				return nullNodePtr;
 			return nextPosition;
 		case node::ConditionalBranching:
 			temp = branching::perform(v1);
-			assert(!temp);
+			assert(temp != 0);
 			nextPosition = v1->connection[temp];
 			return nextPosition;
 		case node::Method:
 			assert(method::operate(v1));
-			nextPosition = v1->connection[3].load();
-			if (!nextPosition.exist())
-				return nullNodePtr;
+			return nextPosition;
+		case node::NodeOperator:
+			if (!operateNodeOperator(v1))
+				assert(false);
 			return nextPosition;
 		default: assert(false);
 		}

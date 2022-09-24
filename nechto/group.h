@@ -18,15 +18,67 @@ namespace nechto
 		}
 		void reset(nodePtr v1)
 		{
-			nodePtr hubIter = v1->getData<nodePtr>();
-			for (i64 i = 0; i < v1->data; ++i)
+			groupIterator i1(v1);
+			while (true)
 			{
-				hub::deleteAllConnectionsInHub(hubIter, v1);
-				nodePtr next = hubIter->hubConnection;
-				deleteNode(hubIter);
-				hubIter = next;
+				nodePtr connection = i1.oneSideDisconnect();
+				if (connection.exist())
+				{
+					//при удалении ноды надо удалить все существующие соединения
+					if (typeSubtypeCompare(
+						connection, node::Pointer, pointer::GroupIter) &&
+						(connection->connection[0] == v1))
+					{
+						connection->connection[0] = nullNodePtr;
+						connection->setData<pointer::hubPosPair>(
+							pointer::hubPosPair(nullNodePtr, 0));
+
+					}
+					else
+						oneSideDisconnect(connection, v1);
+					if (i1.pos() == 3)
+					{
+						nodePtr vTemp = i1.currentHub;
+						bool end = !i1.GoToNextHub();
+						nodeStorage::terminal.deallocate(vTemp);
+						i1.setLocalPos(0);
+						if (end)
+						{
+							assert(typeCompare(i1.currentHub, node::Deleted));
+							return;
+						}
+					}
+					else
+						i1.stepForward();
+				}
 			}
-			hubIter->connection[0] = nullNodePtr;
+		}
+		i64 numberOfMembers(nodePtr group)
+		{
+			i64 counter = 0;
+			groupIterator i(group);
+			do
+			{
+				if (i.get().exist())
+					++counter;
+			} while (i.stepForward());
+			return counter;
+		}
+		bool empty(nodePtr group)
+		{
+			groupIterator i(group);
+			do
+			{
+				if (i.get().exist())
+					return false;
+			} while (i.stepForward());
+			return true;
+		}
+
+		void clear(nodePtr v1)
+		{
+			reset(v1);
+			initializeEmpty(v1);
 		}
 		
 		bool check(nodePtr v1)
@@ -95,6 +147,10 @@ namespace nechto
 			i1.insertHub();
 			i1.stepForward();
 			return i1;
+		}
+		nodePtr getFirstHub(nodePtr group)
+		{
+			return group->getData<nodePtr>();
 		}
 	}
 }

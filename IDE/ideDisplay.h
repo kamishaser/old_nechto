@@ -12,7 +12,7 @@ namespace nechto::ide
 		sf::Font vnFont;
 		sf::RenderWindow window;
 		periodLimiter plim;
-		nodePtr nBoardNode;
+		nodeBoard* nBoard;
 
 		struct settings
 		{
@@ -22,9 +22,9 @@ namespace nechto::ide
 		};
 		settings dSettings;
 
-		ideDisplay(nodePtr nbn)
+		ideDisplay(nodeBoard* nbn)
 			:externalObject(newNode(node::ExternalObject, 1)),
-			nBoardNode(nbn), window(sf::VideoMode(1000, 1000), "nechtoIDE"),
+			nBoard(nbn), window(sf::VideoMode(1000, 1000), "nechtoIDE"),
 			plim(20ms, 100ms)
 		{
 			assert(vnFont.loadFromFile("Fonts/arial.ttf"));
@@ -52,7 +52,6 @@ namespace nechto::ide
 			if (plim.moreThanMin())
 			{
 				plim.reset();
-				nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
 				assert(nBoard);
 				window.clear();
 				groupIterator i1(nBoard->vConnectionGroup());
@@ -80,32 +79,33 @@ namespace nechto::ide
 			sf::Text text;
 			
 			text.setFont(vnFont);
-			text.setString(vNode->nodeText);
 			text.setCharacterSize(dSettings.characterSize);
 			text.setStyle(1);
+			text.setString(vNode->nodeText);
+			text.setPosition(0, 0);
 			//////////////////////////////////////////////////////////////////
-			sf::FloatRect bounds = text.getLocalBounds();
+			sf::FloatRect bounds = text.getGlobalBounds();
 			glm::vec2 size(bounds.width, bounds.height);
-			vNode->size = size + glm::vec2(dSettings.characterSize, dSettings.characterSize);
+			size.x += dSettings.characterSize / 2;
+			size.y += dSettings.characterSize / 2;
+			//size += size + glm::vec2(dSettings.characterSize/2, dSettings.characterSize/2);
+			if (vNode->frame.size.x < size.x)
+				vNode->frame.size.x = size.x;
+			if (vNode->frame.size.y < size.y)
+				vNode->frame.size.y = size.y;
 			text.setPosition(sf::Vector2f(
-				vNode->position.x - bounds.width / 2.0f,
-				vNode->position.y - bounds.height / 2.0f - dSettings.characterSize/4));
+				vNode->frame.position.x + dSettings.characterSize / 4,
+				vNode->frame.position.y + dSettings.characterSize / 6));
 			//////////////////////////////////////////////////////////////////
-
 
 			if (vNode->nShape.empty())
-				vNode->nShape = std::vector<glm::vec2>{
-					glm::vec2(-0.5,-0.5),
-					glm::vec2(0.5 ,-0.5),
-					glm::vec2(0.5 , 0.5),
-					glm::vec2(-0.5, 0.5) };
+				vNode->nShape = vnShape::rectangle();
 			sf::ConvexShape nShape(vNode->nShape.size());
-			nShape.setPosition(0, 0);
 			for (int i = 0; i < vNode->nShape.size(); ++i)
 			{
-				float x = vNode->nShape[i].x * vNode->size.x;
-				float y = vNode->nShape[i].y * vNode->size.y;
-				glm::vec2 pointPosition(glm::vec2(x, y) + vNode->position);
+				float x = vNode->nShape[i].x * vNode->frame.size.x;
+				float y = vNode->nShape[i].y * vNode->frame.size.y;
+				glm::vec2 pointPosition(glm::vec2(x, y) + vNode->frame.center());
 				nShape.setPoint(i, GLM_SFML(pointPosition));
 			}
 			//////////////////////////////////////////////////////////////////
@@ -133,8 +133,8 @@ namespace nechto::ide
 			visualNode* second = visualNode::getByNode(vCon->get()->connection[1]);
 			assert(first && second);
 			////////////////////////////////////////////////////////////////////////
-			glm::vec2 fpos = first->position;
-			glm::vec2 spos = second->position;
+			glm::vec2 fpos = first->frame.position;
+			glm::vec2 spos = second->frame.position;
 			////////////////////////////////////////////////////////////////////////
 			sf::ConvexShape line(4);
 			glm::vec2 temp = spos - fpos;
@@ -158,12 +158,7 @@ namespace nechto::ide
 				return nullptr;
 			if (v1->getType() != node::ExternalObject)
 				return nullptr;
-			auto exObj = v1->getData<externalObject*>();
-			if (exObj == nullptr)
-				return nullptr;
-			if (exObj->getTypeName() != typeName)
-				return nullptr;
-			return dynamic_cast<ideDisplay*>(exObj);
+			return dynamic_cast<ideDisplay*>(v1->getData<externalObject*>());
 		}
 		const static std::wstring typeName;
 		virtual const std::wstring& getTypeName() const override

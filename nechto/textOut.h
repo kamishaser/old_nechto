@@ -8,7 +8,9 @@ namespace nechto
 {
 	const std::wstring to_string(nodePtr address)
 	{
-		return static_cast<std::wstring>(L"[") + std::to_wstring((int)address.getFirst()) + L' ' + std::to_wstring((int)address.getSecond()) + L']';
+		return static_cast<std::wstring>(L"[") + 
+			std::to_wstring((int)address.getFirst()) + L' ' + 
+			std::to_wstring((int)address.getSecond()) + L']';
 	}
 	const std::wstring nodeType(nodePtr address)
 	{
@@ -78,6 +80,7 @@ namespace nechto
 			groupIterator gi(v1);
 			do
 			{
+				std::wcout << numConnectionsList(gi.currentHub) << std::endl;
 				temp += numConnectionsList(gi.currentHub) + L"\n";
 			} while (gi.GoToNextHub());
 			temp += L"\n mainChain:\n";

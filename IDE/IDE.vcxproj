@@ -148,6 +148,9 @@
   <ItemGroup>
     <ClInclude Include="autoExpandHandler.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="consistentGroup.h" />
+    <ClInclude Include="rect.h" />
+    <ClInclude Include="placementHandler.h" />
     <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />
     <ClInclude Include="visualConnection.h" />
@@ -155,6 +158,7 @@
     <ClInclude Include="periodLimiter.h" />
     <ClInclude Include="spreadHandler.h" />
     <ClInclude Include="ideDisplay.h" />
+    <ClInclude Include="visualGroup.h" />
     <ClInclude Include="visualNode.h" />
     <ClInclude Include="visualNodeFill.h" />
     <ClInclude Include="vnDataUpdateH.h" />

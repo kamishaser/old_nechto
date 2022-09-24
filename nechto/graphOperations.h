@@ -6,6 +6,7 @@
 #include <set>
 
 #include "mathOperator.h"
+#include "nodeOperator.h"
 #include "text.h"
 #include "pointer.h"
 #include "method.h"
@@ -139,7 +140,7 @@ namespace nechto
 
 	namespace hub//костыль размещения. Отрефакторить при разделении файлов на h и cpp
 	{
-		//первый свободый порт в цепочке
+		//первый свободый порт в цепочке хабов
 		connectionIterator firstEmptyPort(nodePtr v1)
 		{
 			if (!v1->hasHub())
@@ -244,6 +245,7 @@ namespace nechto
 	void hubIterator::disconnect()
 	{
 		nechto::oneSideDisconnect(get(), mainNode);
+		currentHub->connection[pos()] = nullNodePtr;
 	}
 	void numDisconnect(nodePtr v1, i64 number)
 	{
@@ -258,9 +260,10 @@ namespace nechto
 	// удаление
 	void deleteNode(nodePtr v1)
 	{
+		std::cout << "|||||||||||||||||||||DELETE||||||||||||||||||" << std::endl;
 		assert(v1.exist());
 		assert(!typeCompare(v1, node::Deleted));//нельзя удалять дважды
-		nodePtr vTemp = v1;
+
 		switch (v1->getType())
 		{
 		case node::Hub:					//разветвитель
@@ -284,22 +287,44 @@ namespace nechto
 		default:
 			break;
 		}
+		
+		/*цикл удаления узла со всеми хабами 
+		и со всеми указывающими на него итераторами*/
+		connectionIterator i1(v1);
 		while (true)
-		{//цикл удаления узла со всеми хабами
-			vTemp->setData<void*>(nullptr);
-			for (int i = 0; i < 4; i++)//разрыв соединения
-				if (vTemp->connection[i].load().exist())
+		{
+			nodePtr connection = i1.oneSideDisconnect();
+			if (connection.exist())
+			{
+				//при удалении ноды надо удалить все существующие соединения
+				if (typeSubtypeCompare(connection, 
+					node::Pointer, pointer::ConIter) &&
+					(connection->getSubtype() == pointer::ConIter) &&
+					(connection->connection[0] == v1))
 				{
-					oneSideDisconnect(vTemp->connection[i], v1);
-					vTemp->connection[i] = nullNodePtr;
+					connection->connection[0] = nullNodePtr;
+					connection->setData<pointer::hubPosPair>(
+						pointer::hubPosPair(nullNodePtr, 0));
+					
 				}
-			if (!vTemp->hubConnection.load().exist())
-				break;
-
-			nodePtr vHub = vTemp->hubConnection;
-			nodeStorage::terminal.deallocate(vTemp);
-			vTemp = vHub;
-		}
+				else
+					oneSideDisconnect(connection, v1);
+			}
+			if (i1.pos() == 3)
+			{
+				nodePtr vTemp = i1.currentHub;
+				bool end = !i1.GoToNextHub();
+				nodeStorage::terminal.deallocate(vTemp);
+				i1.setLocalPos(0);
+				if (end)
+				{
+					assert(typeCompare(i1.currentHub, node::Deleted));
+					return;
+				}
+			}
+			else
+				i1.setLocalPos(i1.pos() + 1);
+		} 
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////

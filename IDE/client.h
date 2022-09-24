@@ -7,49 +7,79 @@
 #include "userH.h"
 #include "vnDataUpdateH.h"
 #include "checkAndStep.h"
+#include "placementHandler.h"
+#include "consistentGroup.h"
 
 
 namespace nechto::ide
 {
+	//при удалении ноды надо удалить все итераторы
+	//при группы надо удалить все итераторы
+	//хабы должны удаляться не в deleteNode
+	//оптимизация eraseHub в итераторе или нормальное удаление всех итераторов
 	class client
 	{
 	public:
-		nodePtr nBoardNode;
-		nodePtr ideDisplayNode;
-		spreadHandler sph;
+		nodeBoard* nBoard;
+		ideDisplay* display;
+		placementHandler plh;
 		vnDataUpdateH vduh;
+		autoExpandHandler aeh;
+		consistentGroup mainGroup;
 		userH uh;
 
 		client(/*externalFunction::shEFS exFunSet*/)
-			:nBoardNode((new nodeBoard)->get()), 
-			ideDisplayNode((new ideDisplay(nBoardNode))->get()),
-			sph(nBoardNode, glm::vec2(500, 500), 4, 4, 0.02),
-			uh(nBoardNode, ideDisplayNode),
-			vduh(nBoardNode)
+			:nBoard(new nodeBoard),
+			display(new ideDisplay(nBoard)),
+			mainGroup(newExObjNode(), nBoard, glm::vec2{500, 500}, consistentGroup::arrangeMode()),
+			plh(nBoard),
+			vduh(nBoard),
+			uh(nBoard, display),
+			aeh(nBoard)			
 		{
-			nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
 			IterIterConnect(group::firstEmptyPort(nBoard->taggedGroup()),
 				connectionIterator(uh.cursored.get(), 1));
 
-			auto* vn1 = nBoard->addNode(nBoard->vNodeGroup());
-			nBoard->addNode(nBoardNode);
-
-			nodePtr v = newNode(node::Variable, 1);
-			v->setData<i64>(124);
-			auto* vn2 = nBoard->addNode(v);
-			nBoard->addConnection(vn1, vn2);
-			nodePtr test = groupIterator(nBoard->vNodeGroup()).get();
-			assert(visualNode::getByNode(test));
+			nBoard->addNode(newNode(node::ExternalObject, 1), example());
+			NumHubConnect(mainGroup.get(), nBoard->vNodeGroup(), 0);
 		}
-
+		int i = 0;
 		bool update()
 		{
-			sph.update();
+			aeh.update();
 			vduh.update();
 			uh.update();
-			auto* display = ideDisplay::getByNode(ideDisplayNode);
-			assert(display);
+			std::this_thread::sleep_for(2000ms);
+			mainGroup.mode.horisontal = false;// i & 1;
+			mainGroup.mode.rightAlignment = true;// i & 1 << 1;
+			mainGroup.mode.reverseDirection = false;// i & 1 << 2;
+			mainGroup.mode.table4 = true;// i & 1 << 3;
+			mainGroup.arrange(10);
+			++i;
 			return display->update();
+
+		}
+
+		nodePtr example()
+		{
+			nodePtr descriptionText = newNode(node::Text);
+			text::set(descriptionText, std::wstring(L"Простейший алгоритм\n") +
+				L"для разработки и тестирования" +
+				L"системы базового отображения nechto");
+			
+			nodePtr vFirst= nullNodePtr;
+			nodePtr vLast = nullNodePtr;
+			for (int i = 0; i < 16; ++i)
+			{
+				nodePtr v1 = newNode(node::Variable, true);
+				v1->setData<i64>(i);
+				if (vLast.exist())
+					HubHubConnect(v1, vLast);
+				else
+					vFirst = v1;
+				vLast = v1;
+			}
+			return vFirst;
 		}
 	};
 

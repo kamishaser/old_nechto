@@ -2,6 +2,8 @@
 #include "visualNode.h"
 #include "textOut.h"
 #include "mathOperator.h"
+#include "nodeOperator.h"
+#include "externalObject.h"
 #include "text.h"
 #include "method.h"
 
@@ -30,11 +32,11 @@ namespace nechto::ide
 					vn1->nodeText = std::to_wstring(n1->getData<f64>());
 				break;
 			case node::MathOperator:
-				vn1->nodeText = typeName::mathOperatorShortT[n1->getSubtype()];
+				vn1->nodeText = 
+					typeName::mathOperatorShortT[n1->getSubtype()];
 				break;
 			case node::Text:
-				vn1->nodeText = typeName::textT[n1->getSubtype()] +
-					text::get(n1);
+				vn1->nodeText = text::get(n1);
 				break;
 			case node::ConditionalBranching:
 				vn1->nodeText = L"if";
@@ -43,14 +45,26 @@ namespace nechto::ide
 				vn1->nodeText = method::getMethodName(n1);
 			case node::Pointer:
 				if(subtype == pointer::Simple)
-					
+					vn1->nodeText = L"*s";
+				else if (subtype == pointer::ConIter)
+					vn1->nodeText = L"*c";
+				else
+					vn1->nodeText = L"*g";
 				break;
 			case node::Group:
-
+				vn1->nodeText = L"group";
 				break;
 			case node::ExternalObject:
-
+				if (n1->getData<externalObject*>() == nullptr)
+					vn1->nodeText = nullptr;
+				else
+					vn1->nodeText =
+					n1->getData<externalObject*>()->getTypeName();
+				
 				break;
+			case node::NodeOperator:
+				vn1->nodeText =
+					nodeOperator.getName(subtype);
 			default:
 				vn1->nodeText = L"недоделал";
 			}
@@ -68,6 +82,7 @@ namespace nechto::ide
 				vn->nShape = rhombe();
 				break;
 			case node::MathOperator:
+			case node::NodeOperator:
 				vn->nShape = circle();
 				break;
 			case node::Variable:

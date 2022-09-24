@@ -6,12 +6,11 @@ namespace nechto::ide
 	class vnDataUpdateH
 	{
 	public:
-		nodePtr nBoardNode;
-		vnDataUpdateH(nodePtr nbn)
-			:nBoardNode(nbn) {}
+		nodeBoard* nBoard;
+		vnDataUpdateH(nodeBoard* nbn)
+			:nBoard(nbn) {}
 		void update()
 		{
-			nodeBoard* nBoard = nodeBoard::getByNode(nBoardNode);
 			assert(nBoard);
 			groupIterator i1(nBoard->vNodeGroup());
 			do

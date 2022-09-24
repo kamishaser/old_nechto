@@ -1,6 +1,10 @@
 #pragma once
 #include "GLM/glm.hpp"
 #include "SFML/Graphics.hpp"
+#include "connectionRule.h"
+#include "nodeOperationSet.h"
+#include "connectionIterator.h"
+#include "graphOperations.h"
 
 namespace nechto::ide
 {
@@ -11,6 +15,12 @@ namespace nechto::ide
 	glm::vec2 SFML_GLM(sf::Vector2f v)
 	{
 		return glm::vec2(v.x, v.y);
+	}
+	std::wstring to_string(glm::vec2 vec)
+	{
+		return static_cast<std::wstring>(L"[") +
+			std::to_wstring(vec.x) + L' ' +
+			std::to_wstring(vec.y) + L']';
 	}
 	using color = sf::Color;
 	using geometricShape = std::vector<glm::vec2>;

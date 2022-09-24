@@ -91,6 +91,7 @@ namespace nechto
 		{
 			assert(v1->getType() == node::Hub);
 			deleteAllConnectionsInHub(v1, mainNode);
+			nodeStorage::terminal.deallocate(v1);
 		}
 		//исключает хаб из цепочки. При наличии соединений в хабе 2-сторонних соединений отключает
 		void erase(nodePtr v1, nodePtr mainNode)

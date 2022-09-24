@@ -32,9 +32,9 @@ namespace nechto
 			In_Output
 		};
 		
-		std::array<conType, 3> cType;
-		std::array<useType, 3> uType;
-		std::array<nodeEvent, 3> additionCheck;
+		std::array<conType, 4> cType;
+		std::array<useType, 4> uType;
+		std::array<nodeEvent, 4> additionCheck;
 
 		static const connectionRule NoneCR;//отсутствие правил подключения
 
@@ -46,8 +46,11 @@ namespace nechto
 		connectionRule(
 			conType ct0 = Any, useType ut0 = None, nodeEvent ach0 = nullptr,
 			conType ct1 = Any, useType ut1 = None, nodeEvent ach1 = nullptr,
-			conType ct2 = Any, useType ut2 = None, nodeEvent ach2 = nullptr)
-			:cType(ct0, ct1, ct2), uType(ut0, ut1, ut2), additionCheck(ach0, ach1, ach2) {}
+			conType ct2 = Any, useType ut2 = None, nodeEvent ach2 = nullptr,
+			conType ct3 = Any, useType ut3 = None, nodeEvent ach3 = nullptr)
+			:cType(ct0, ct1, ct2, ct3), 
+			uType(ut0, ut1, ut2, ut3), 
+			additionCheck(ach0, ach1, ach2, ach3) {}
 
 		nodePtr getConnection(nodePtr v1, int number)const
 		{
@@ -133,7 +136,7 @@ namespace nechto
 		}
 		bool check(nodePtr v1) const
 		{
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < 4; ++i)
 				if (!getConnection(v1, i).exist() && cType[i] != conType::Any)
 					return false;
 			return true;

@@ -38,6 +38,10 @@ namespace nechto
 		{
 			IterHubConnect(*this, v1);
 		}
+		void setLocalPos(char npos)
+		{
+			position = npos;
+		}
 
 		//позици€ итератора в хабе. Ќомер соединени€ от 0 до 3
 		char pos() const
@@ -125,50 +129,16 @@ namespace nechto
 			else
 			{
 				currentHub = mainNode;
-				position = 0;
 				return false;
 			}
 		}
-		bool GoToPreviousHub()
-		{
-			if (typeCompare(currentHub, node::Hub))
-			{
-				currentHub = hub::previous(currentHub);
-			}
-			else
-			{
-				nodePtr hubIter = currentHub;
-				char pos = 3;
-				while (true)
-				{
-					nodePtr next = hubIter->hubConnection;
-					if (!next.exist())
-						break;
-					++pos;
-					hubIter = next;
-				}
-				currentHub = hubIter;
-				position = pos;
-				return false;
-			}
-			return currentHub != mainNode->connection[0];
-		}
-
 		bool stepForward()
 		{
 			++position;
-			if (!(position & 3ll))
+			if (position & 3ll)
 				return true;
 			else
 				return GoToNextHub();
-		}
-		bool stepBack()
-		{
-			--position;
-			if ((position & 3ll) != 3)
-				return true;//если перемещение происходит в границах одного хаба - всЄ норм
-			else
-				return GoToPreviousHub();
 		}
 		//итератор на первом элементе
 		bool atFirst()
@@ -189,9 +159,9 @@ namespace nechto
 			return true;
 		}
 		//вставить хаб после текущего
-		void insertHub()
+		nodePtr insertHub()
 		{
-			hub::insert(currentHub, mainNode);
+			return hub::insert(currentHub, mainNode);
 		}
 		//удалить текущий хаб. ѕеревести все указывающие на него итераторы на следующий
 		void eraseHub()
@@ -243,32 +213,30 @@ namespace nechto
 		bool GoToNextHub()
 		{
 			currentHub = hub::next(currentHub);
-			return atFirstHub();
+			return !atFirstHub();
 		}
 		bool GoToPreviousHub()
 		{
+			bool result = currentHub != firstHub();
 			currentHub = hub::previous(currentHub);
-			return atFirstHub();
+			return result;
 		}
 		bool stepForward()
 		{
 			++position;
-			if (!(position & 3ll))//если позици€ == 0, переход в следующий хаб
-			{
-				return !GoToNextHub();
-			}
-			else
+			if (position & 3ll)//если позици€ == 0, переход в следующий хаб
 				return true;
+			else
+				return GoToNextHub();
+				
 		}
 		bool stepBack()
 		{
-			bool result;
-			if (position & 3ll)//если позици€ равна 0, переход в предыдущий хаб
-				result = true;
-			else
-				result = !GoToPreviousHub();
 			--position;
-			return result;
+			if ((position & 3ll) != 3)
+				return true;//если перемещение происходит в границах одного хаба - всЄ норм
+			else
+				return GoToPreviousHub();
 		}
 		nodePtr firstHub()
 		{
@@ -282,9 +250,9 @@ namespace nechto
 			nodePtr begin = firstHub();
 			return atFirstHub();
 		}
-		void insertHub()
+		nodePtr insertHub()
 		{
-			hub::insert(currentHub, mainNode);
+			return hub::insert(currentHub, mainNode);
 		}
 		void eraseHub()
 		{
@@ -316,18 +284,63 @@ namespace nechto
 			hub::erase(currentHub, mainNode);
 			currentHub = next;
 		}
+		/*вставл€ет элемент. 
+		ѕри необходимости сдвигает следующие элементы вперЄд на 1 хаб*/
+		bool insert(hubIterator backConnection)
+		{
+			bool newHub = false;
+			if (get().exist())
+			{
+				insertHub();
+				newHub = true;
+				nodePtr nextHub = hub::next(currentHub);
+				for (int i = pos(); i < 4; ++i)
+				{
+					nextHub->connection[i] = currentHub->connection[i].load();
+					currentHub->connection[i] = nullNodePtr;
+				}
+				IterIterConnect(*this, backConnection);
+				stepForward();
+			}
+			else
+			{
+				IterIterConnect(*this, backConnection);
+				if (pos() != 3)
+					++position;
+				else
+				{
+					nodePtr next = hub::next(currentHub);
+					if (next == firstHub())
+					{
+						next = insertHub();
+						newHub = true;
+					}
+					currentHub = next;
+
+					setLocalPos(0);
+					////////////////////////////////////////////////////////////недоделал
+				}
+			}
+			return newHub;
+		}
 	};
 	bool pointer::set(nodePtr pointer, nodePtr v1)
 	{
 		if (pointer->getSubtype() == pointer::Simple)
 		{
-			NumHubConnect(pointer, v1, 0);
+			if (v1.exist())
+				NumHubConnect(pointer, v1, 0);
+			else
+				numDisconnect(pointer, 0);
 		}
 		else
 		{
 			hubIterator i0(pointer->connection[0],
 				pointer->getData<pointer::hubPosPair>());
-			i0.set(v1);
+			if (v1.exist())
+				i0.set(v1);
+			else
+				i0.oneSideDisconnect();
 		}
 		return true;
 	}

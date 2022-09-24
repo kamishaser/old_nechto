@@ -18,6 +18,9 @@
     <Filter Include="Исходные файлы\projection\graph">
       <UniqueIdentifier>{f86be5bd-c31e-473d-a12e-7ff3d9945879}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\projection\visual\visualGroup">
+      <UniqueIdentifier>{4054cb26-9f04-43dc-a581-7ba2a48b784a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
@@ -60,6 +63,18 @@
     </ClInclude>
     <ClInclude Include="vnDataUpdateH.h">
       <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="placementHandler.h">
+      <Filter>Исходные файлы\projection\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="visualGroup.h">
+      <Filter>Исходные файлы\projection\visual\visualGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.h">
+      <Filter>Исходные файлы\projection\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="consistentGroup.h">
+      <Filter>Исходные файлы\projection\visual\visualGroup</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

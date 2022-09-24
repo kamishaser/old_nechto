@@ -279,8 +279,6 @@ namespace nechto
 	void oneSideDisconnect(nodePtr v1, nodePtr v2);
 	void disconnect(nodePtr v1, nodePtr v2);
 	void numDisconnect(nodePtr v1, i64 conNum);
-	//смена типа
-	void reset(nodePtr v1);
 	//удаление
 	void deleteNode(nodePtr v);
 

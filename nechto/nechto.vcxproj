@@ -152,7 +152,6 @@
     <ClInclude Include="nodeOperationSet.h" />
     <ClInclude Include="nodeOperator.h" />
     <ClInclude Include="nodeTypeProperties.h" />
-    <ClInclude Include="performer.h" />
     <ClInclude Include="pointer.h" />
     <ClInclude Include="stream.h" />
     <ClInclude Include="fileStream.h" />
@@ -163,6 +162,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="список задач.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
