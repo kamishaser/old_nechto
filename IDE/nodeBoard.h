@@ -1,6 +1,7 @@
 #pragma once
 #include "visualNode.h"
 #include "visualConnection.h"
+#include "visualGroup.h"
 namespace nechto::ide
 {
 	glm::vec2 randomPos(glm::vec2 border)
@@ -21,44 +22,46 @@ namespace nechto::ide
 	}
 	struct nodeBoard : public externalObject
 	{
-		nodeBoard()//!!!только в куче, только через new!!!
-			:externalObject(newNode(node::ExternalObject, 1))
+		nodeBoard()
+			:externalObject(newNode(node::ExternalObject, 0))
 		{
 			NumNumConnect(get(), newNode(node::Group), 0, 0);
 			NumNumConnect(get(), newNode(node::Group), 1, 0);
 			NumNumConnect(get(), newNode(node::Group), 2, 0);
+			NumNumConnect(get(), newNode(node::Group), 3, 0);
 		}
-		nodePtr vNodeGroup()
+		nodePtr vNodeGroup() const
 		{
 			return exObj->connection[0];
 		}
-		nodePtr vConnectionGroup()
+		nodePtr vConnectionGroup() const
 		{
 			return exObj->connection[1];
 		}
+		nodePtr vGroupGroup() const
+		{
+			return getConnection(3);
+		}
 		//група различным образом помеченных нод и соединений
-		nodePtr taggedGroup()
+		nodePtr taggedGroup() const 
 		{
 			return exObj->connection[2];
 		}
 		
-		visualNode* addNode(
-			nodePtr emptyExternalObject, nodePtr v1 = nullNodePtr)
+		void addNode(visualNode* vNode)
 		{
-			std::cout << "addNode" << std::endl;
-			visualNode* vn = new visualNode(
-				emptyExternalObject, vNodeGroup(), v1);
-			vn->frame.position += randomOffset(200) + glm::vec2(200.f, 400.f);
-			return vn;
+			IterIterConnect(connectionIterator(vNode->get(), 3), 
+				group::firstEmptyPort(vNodeGroup()));
 		}
-		visualConnection* addConnection(nodePtr emptyExternalObject,
-			visualNode* vn1, visualNode* vn2)
+		void addConnection(visualConnection* vConnection)
 		{
-			std::cout << "addConnection" << std::endl;
-			visualConnection* vc = 
-				new visualConnection(
-					emptyExternalObject, vConnectionGroup(), vn1, vn2);
-			return vc;
+			IterIterConnect(connectionIterator(vConnection->get(), 3),
+				group::firstEmptyPort(vConnectionGroup()));
+		}
+		void addGroup(visualGroup* vGroup)
+		{
+			IterIterConnect(connectionIterator(vGroup->get(), 3),
+				group::firstEmptyPort(vGroupGroup()));
 		}
 		bool onThisBoard(visualNode* vNode)
 		{

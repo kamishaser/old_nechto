@@ -34,27 +34,96 @@ namespace nechto::ide
 			//номер оси длины
 			int lenght() const
 			{
-				return horisontal;
+				return !horisontal;
 			}
 			//номер оси ширины
 			int width() const
 			{
-				return !horisontal;
+				return horisontal;
 			}
 		};
 		
 		arrangeMode mode;
+		float distance = 5;
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(nodePtr emptyExternalObject, nodeBoard* nBoard, glm::vec2 startPoint, arrangeMode Mode)
-			:visualGroup(emptyExternalObject, nBoard, startPoint), mode(Mode)
+		consistentGroup(nodePtr emptyExternalObject, glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
+			:visualGroup(emptyExternalObject, startPoint), mode(Mode)
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
 		{}
-		
+		void setPositionByStartPoint(glm::vec2 pos)
+		{
+			frame.position.x = (mode.xSizeOffset()) ? pos.x - frame.size.x : pos.x;
+			frame.position.y = (mode.ySizeOffset()) ? pos.y - frame.size.y : pos.y;
+		}
+		void resizeVithSaveStartPoint(glm::vec2 size)
+		{
+			if (mode.xSizeOffset())
+				frame.position.x -= size.x - frame.size.x;
+			if (mode.ySizeOffset())
+				frame.position.y -= size.y - frame.size.y;
+			frame.size = size;
+		}
+		//расставить ноды в группе согласно mode на расстоянии distance друг от друга
+		virtual void update()
+		{
+			groupIterator gi(vNodeGroup());
+			glm::vec2 startPos = mode.startPoint(frame);//точка установки первой ноды
+			frame.size = glm::vec2{ 0, 0 };
+			float lenghtPos{ startPos[mode.lenght()]};//точка установки
+			if (!mode.table4)//с табличным отображением отдельная история
+			{
+				if (mode.reverseDirection)//реверс идёт с последней к первой
+					gi.stepBack();
+				do
+				{
+					glm::vec2 pos;//позиция установки ноды
+					pos[mode.lenght()] = lenghtPos;
+					pos[mode.width()] = startPos[mode.width()];
+					glm::vec2 size = arrangeOne(gi, pos);
+					lenghtPos += size[mode.lenght()] + distance;
+					if (size[mode.width()] > frame.size[mode.width()])
+					{
+						if (mode.rightAlignment)
+							frame.position[mode.width()] -=
+							size[mode.width()] - frame.size[mode.width()];
+						frame.size[mode.width()] = size[mode.width()];
+					}
+
+				} while ((mode.reverseDirection) ? gi.stepBack() : gi.stepForward());
+			}
+			else
+			{
+				std::array<float, 4> rPos =
+					rowPos(startPos[mode.width()], distance);
+				if (mode.reverseDirection)//реверс идёт с последней к первой
+					gi.GoToPreviousHub();
+				do
+				{
+					glm::vec2 size = arrangeRow(gi, rPos, lenghtPos);
+					lenghtPos += size[mode.lenght()] + distance;
+					if (size[mode.width()] > frame.size[mode.width()])
+					{
+						if (mode.rightAlignment)
+							frame.position[mode.width()] -=
+							size[mode.width()] - frame.size[mode.width()];
+						frame.size[mode.width()] = size[mode.width()];
+					}
+				} while ((mode.reverseDirection) ? gi.GoToPreviousHub() : gi.GoToNextHub());
+			}
+			lenghtPos -= distance;
+			if (lenghtPos > frame.size[mode.lenght()])
+			{
+				if (mode.rightAlignment)
+					frame.position[mode.lenght()] -=
+					lenghtPos - frame.size[mode.lenght()];
+				frame.size[mode.lenght()] = lenghtPos;
+			}
+		}
 	protected:
 		void replaceRect(rect* r1, glm::vec2 pos) const
 		{
 			r1->position.x = (mode.xSizeOffset()) ? (pos.x - r1->size.x) : pos.x;
-			r1->position.y = (mode.xSizeOffset()) ? (pos.y - r1->size.y) : pos.y;
+			r1->position.y = (mode.ySizeOffset()) ? (pos.y - r1->size.y) : pos.y;
 		}
 		glm::vec2 arrangeOne(groupIterator gi, glm::vec2 pos) const
 		{
@@ -124,62 +193,7 @@ namespace nechto::ide
 			return rowPos;
 		}
 	public:
-		void arrange(float distance)
-		{
-			groupIterator gi(vNodeGroup());
-			glm::vec2 startPos = mode.startPoint(frame);
-			float lenghtPos{ (mode.horisontal) ? startPos.x : startPos.y };//точка установки
-			if (!mode.table4)//с табличным отображением отдельная история
-			{
-				if (mode.reverseDirection)//реверс идёт с последней к первой
-					gi.stepBack();
-				do
-				{
-					//size отностельно направления группы. Поправка на horisontal не требуется
-					glm::vec2 pos;
-					pos[mode.lenght()] = lenghtPos;
-					pos[mode.width()] = startPos[mode.width()];
-					glm::vec2 size = arrangeOne(gi, pos);
-					lenghtPos += size[mode.lenght()] + distance;
-					if (size[mode.width()] > frame.size[mode.width()])
-					{
-						if (mode.rightAlignment)
-							frame.position[mode.width()] -=
-							size[mode.width()] - frame.size[mode.width()];
-						frame.size[mode.width()] = size[mode.width()];
-					}
-						
-				} while ((mode.reverseDirection) ? gi.stepBack() : gi.stepForward());
-			}
-			else
-			{
-				std::array<float, 4> rPos = 
-					rowPos(startPos[mode.width()], distance);
-				if (mode.reverseDirection)//реверс идёт с последней к первой
-					gi.GoToPreviousHub();
-				do
-				{
-					//size отностельно направления группы. Поправка на horisontal не требуется
-					glm::vec2 size = arrangeRow(gi, rPos, lenghtPos);
-					lenghtPos += size[mode.lenght()] + distance;
-					if (size[mode.width()] > frame.size[mode.width()])
-					{
-						if (mode.rightAlignment)
-							frame.position[mode.width()] -=
-							size[mode.width()] - frame.size[mode.width()];
-						frame.size[mode.width()] = size[mode.width()];
-					}
-				} while ((mode.reverseDirection) ? gi.GoToPreviousHub() : gi.GoToNextHub());
-			}
-			lenghtPos -= distance;
-			if (lenghtPos > frame.size[mode.lenght()])
-			{
-				if (mode.rightAlignment)
-					frame.position[mode.lenght()] -=
-					lenghtPos - frame.size[mode.lenght()];
-				frame.size[mode.lenght()] = lenghtPos;
-			}
-		}
+		
 		
 		/*получение указателя на consistentGroup по объекту.
 		Возвращает nullptr при несоответствии*/

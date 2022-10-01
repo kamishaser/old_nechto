@@ -3,45 +3,51 @@
 
 namespace nechto
 {
-	class namedExCon : public externalObject
+	struct namedExCon :public externalObject
 	{
-	public:
 		std::wstring name;
-
-		namedExCon(nodePtr v1, const std::wstring& n)
-			:externalObject(v1), name(n)
-		{
-			assert(n[0] == L'#');
-			assert(v1.exist());
-			assert(typeCompare(v1, node::ExternalObject));
-		}
 		namedExCon(const std::wstring& n)
-			:externalObject(newNode(node::ExternalObject)),
-			name(n) {assert(n[0] == L'#');}
+			:externalObject(newExObjNode(0)), name(n)
+			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
+		{}
+		virtual ~namedExCon()
+		{
+		}
+		/*получение указателя на namedExCon по объекту.
+		Возвращает nullptr при несоответствии*/
 		static namedExCon* getByNode(nodePtr v1)
 		{
 			if (!v1.exist())
 				return nullptr;
 			if (v1->getType() != node::ExternalObject)
 				return nullptr;
-			auto exObj = v1->getData<externalObject*>();
-			if (exObj == nullptr)
-				return nullptr;
-			const std::wstring& temp = exObj->getTypeName();
-			if (temp.size() < 1)
-				return nullptr;
-			if (temp[0] != L'#')
-				return nullptr;
-			
-			return dynamic_cast<namedExCon*>(exObj);
+			return dynamic_cast<namedExCon*>(v1->getData<externalObject*>());
 		}
+		const static std::wstring typeName;
+		const static staticNodeOperationSet methodSet;
+		const static connectionRule cRule;
 		virtual const std::wstring& getTypeName() const override
 		{
-			return name;
+			return typeName;
 		}
-		auto operator <=> (const namedExCon& exc) const
+		virtual const operation& getMethod(char number)const override
 		{
-			return name <=> exc.name;
+			return methodSet.getOperation(number);
 		}
+		virtual const conRule& getConnectionRule()const override
+		{
+			return cRule;
+		}
+	};
+	const std::wstring namedExCon::typeName = L"nechtoIde.namedExCon";
+	const connectionRule namedExCon::cRule = connectionRule{};
+	const staticNodeOperationSet namedExCon::methodSet
+	{
+		/*namedOperation(L"", operation{
+				connectionRule(conRule::ExternalObject, conRule::Input, nullptr,),
+				[](nodePtr v0, nodePtr v1, nodePtr v2)
+			{
+				return true;
+			}}),*/
 	};
 }

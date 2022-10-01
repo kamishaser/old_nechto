@@ -10,19 +10,15 @@ namespace nechto::ide
 	//к третьему подключается vCon из nodeBoard
 	struct visualConnection :public externalObject
 	{
-		color lineColor{ 255, 255, 255 };
 		std::wstring text;
 
-		visualConnection(nodePtr emptyExternalObject,
-			nodePtr vConnectionGroup, visualNode* vn1, visualNode* vn2)
+		visualConnection(nodePtr emptyExternalObject, visualNode* vn1, visualNode* vn2)
 			:externalObject(emptyExternalObject)
 			//при удалении ноды, удалится и сей объект. 
 			//!!!только выделять через new!!!
 		{
-			assert(vConnectionGroup.exist());
-			assert(typeCompare(vConnectionGroup, node::Group));
-			IterIterConnect(group::firstEmptyPort(vConnectionGroup),
-				hubIterator(get(), get(), 3));
+			/*IterIterConnect(group::firstEmptyPort(vConnectionGroup),
+				hubIterator(get(), get(), 3));*/
 			nodePtr v1 = vn1->exObj;
 			nodePtr v2 = vn2->exObj;
 			NumHubConnect(exObj, v1, 0);

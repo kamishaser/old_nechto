@@ -1,43 +1,47 @@
 #pragma once
 #include "externalObject.h"
 #include "visualNode.h"
-#include "nodeBoard.h"
 #include "rect.h"
 namespace nechto::ide
 {
 	
 	//соединение 0 - подконтрольная группа нод (обр номер 0)
-	//cоединение 3 - nodeBoard (обратный - хаб)
+	//cоединение 3 - vGroupGroup от nodeBoard
+	//набор правил и действий (что делать, если допустим на ноду нажал пользователь)
+	//группа visualNode
 	struct visualGroup :public externalObject
 	{
-		
 		rect frame;
-
-		visualGroup(nodePtr emptyExternalObject, nodeBoard* nBoard, glm::vec2 startPoint)
+		visualGroup(nodePtr emptyExternalObject, glm::vec2 startPoint = glm::vec2{0,0})
 			:externalObject(emptyExternalObject), frame(startPoint, glm::vec2{1.f, 1.f})
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
 		{
 			NumNumConnect(get(), newNode(node::Group), 0, 0);
-			NumHubConnect(get(), nBoard->get(), 3);
 		}
 		nodePtr vNodeGroup() const
 		{
 			return getConnection(0);
 		}
-		nodeBoard* nBoard() const
+		nodePtr getNodeBoard() const
 		{
-			return nodeBoard::getByNode(getConnection(3));
+			nodePtr temp = getConnection(3);
+			if (!temp.exist())
+				return nullNodePtr;
+			return temp->connection[0];
 		}
 		bool contains(visualNode* vNode) const
 		{
 			return (vNodeGroup() == vNode->getConnection(0));
 		}
+		//обновить группу
+		virtual void update() {}
 		//добавляет ноду в первый свободный порт
 		void addNode(visualNode* vNode) const
 		{
-			assert(vNode->getNodeBoard() == nBoard()->get());
-			IterIterConnect(group::firstEmptyPort(vNodeGroup()), connectionIterator(get())),
-				connectionIterator(vNode->get(), 1);
+			//vNodeGroup может содержать ноды только из одного nodeBoard
+			assert(vNode->getNodeBoard() == getNodeBoard());
+			IterIterConnect(connectionIterator(vNode->get(), 1),
+				group::firstEmptyPort(vNodeGroup()));
 		}
 		i64 numberOfVNodes() const
 		{
@@ -45,7 +49,7 @@ namespace nechto::ide
 		}
 		bool allNodeOnOneNodeBoard() const
 		{
-			nodePtr nBoardNode = nBoard()->get();
+			nodePtr nBoardNode = getNodeBoard();
 			groupIterator gi(vNodeGroup());
 			do
 			{

@@ -8,11 +8,13 @@
 
 namespace nechto::ide
 {
-	sf::Vector2f GLM_SFML(glm::vec2 v)
+	template<class T = float>
+	sf::Vector2<T> GLM_SFML(glm::vec2 v)
 	{
-		return sf::Vector2f(v.x, v.y);
+		return sf::Vector2<T>(v.x, v.y);
 	}
-	glm::vec2 SFML_GLM(sf::Vector2f v)
+	template<class T>
+	glm::vec2 SFML_GLM(sf::Vector2<T> v)
 	{
 		return glm::vec2(v.x, v.y);
 	}
@@ -24,6 +26,34 @@ namespace nechto::ide
 	}
 	using color = sf::Color;
 	using geometricShape = std::vector<glm::vec2>;
+
+	namespace col
+	{
+		color cursor = color(0xFFFFFFFF);
+		color sel0 = color(0x8BB9DCFF);
+		color sel1 = color(0x4D9EDCFF);
+		color sel2 = color(0x004F8BFF);
+		color sel3 = color(0x20415AFF);
+		color selOther = color(0x002846FF);
+
+		color background = color(0x3E6500FF);
+		color vGroupBackground = color(0x61812EFF);
+		color tip0 = color(0x7CC800FF);
+		color tip1 = color(0xB3EF53FF);
+		color tip3 = color(0xCDEF96FF);
+		
+		color vNodeG0 = color(0xF3CD99FF);
+		color vNodeG1 = color(0xF3B055FF);
+		color vNodeG2 = color(0xD97C00FF);
+		color vNodeG3 = color(0x8C6531FF);
+		color vNodeG4 = color(0x6D3F00FF);
+
+		color error = color(0xB30058FF);
+		color strongReadOnly = color(0x5B002CFF);
+		color strong = color(0x74294EFF);
+		color weak = color(0xE892BDFF);
+		color weakReadOnly = color(0xE8519BFF);
+	}
 
 	namespace vnShape
 	{

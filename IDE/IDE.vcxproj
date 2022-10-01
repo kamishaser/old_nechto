@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -147,17 +147,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="autoExpandHandler.h" />
-    <ClInclude Include="client.h" />
+    <ClInclude Include="button.h" />
+    <ClInclude Include="keyboardHandler.h" />
+    <ClInclude Include="MainFail.h" />
+    <ClInclude Include="mouseHandler.h" />
+    <ClInclude Include="nechtoIde.h" />
     <ClInclude Include="consistentGroup.h" />
+    <ClInclude Include="display.h" />
     <ClInclude Include="rect.h" />
-    <ClInclude Include="placementHandler.h" />
+    <ClInclude Include="selectHandler.h" />
+    <ClInclude Include="textInputBox.h" />
     <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />
     <ClInclude Include="visualConnection.h" />
     <ClInclude Include="nodeBoard.h" />
     <ClInclude Include="periodLimiter.h" />
     <ClInclude Include="spreadHandler.h" />
-    <ClInclude Include="ideDisplay.h" />
     <ClInclude Include="visualGroup.h" />
     <ClInclude Include="visualNode.h" />
     <ClInclude Include="visualNodeFill.h" />

@@ -1,105 +1,152 @@
 #pragma once
-#include "ideDisplay.h"
 #include "nodeBoard.h"
 #include "namedExCon.h"
 #include "textOut.h"
+#include "display.h"
+#include "mouseHandler.h"
+#include "keyboardHandler.h"
+#include "selectHandler.h"
 
 namespace nechto::ide
 {
+	//обработчик пользовательских действий
 	class userH
 	{
 	public:
-		ideDisplay* display;
-		nodeBoard* nBoard;
+		display& dp;
+		keyboardHandler keyboard;
+		selectHandler selectH;
+		mouseHandler mouse;
+		
+		
+		
+		userH(display& dplay)
+		:dp(dplay), selectH(dplay), mouse(dplay, keyboard, selectH){}
 
-		namedExCon cursored;
-		glm::vec2 lastCPos;
+		
 
+		/*enum Stage
+		{
+			base,
 
-		//externalObject moveCursored =
-		//	externalObject(createVariable(0ll), L"moveCursored");
-		//glm::vec2 offset;
-		bool last = false;
-	
-		userH(nodeBoard* nbn, ideDisplay* idn)
-		:nBoard(nbn), display(idn),
-			cursored(L"#nechtoIde.cursored"),
-			lastCPos(display->getCursorPosition()){}
-
+		};*/
 		void update()
 		{
-			updateCursored();
-			updateHighlighted();
-			updateMoved();
+			mouse.update();
+			keyboard.update();
+			if (!dp.textBox.hasFocus())
+			{
+				if (mouse.rightButton.bClickEvent())
+				{
+					auto vNode1 =
+						visualNode::getByNode(mouse.rightButton.content());
+					if (vNode1)
+						editText(vNode1);
+					else
+						dp.textBox.reset();
+				}
+				if (mouse.middleButton.bClickEvent())
+					editText(addTextNodeAndHubHubConnectToSelected());
+				if (keyboard[sf::Keyboard::Delete].bClickEvent())
+					deleteAllSelected();
+				if (keyboard[sf::Keyboard::C].bClickEvent())
+					HHconnectSelected();
+				if (keyboard[sf::Keyboard::D].bClickEvent())
+					disconnectSelected();
+				if (keyboard[sf::Keyboard::Escape].bClickEvent())
+					dp.textBox.reset();
+			}
 		}
-	private:
-		void updateCursored()
+		void editText(visualNode* vNode1)
 		{
-			nodePtr last = cursored.getConnection(0);
-			if (last.exist())
-				numDisconnect(cursored.get(), 0);
-			groupIterator i1(nBoard->vNodeGroup());
+			nodePtr v1 = vNode1->getConnection(0);
+			if (v1.exist() && typeCompare(v1, node::Text))
+			{
+				NumHubConnect(dp.textBox.get(), vNode1->get(), 1);
+				dp.textBox.iText = text::get(v1);
+				dp.textBox.focus();
+			}
+		}
+		visualNode* addTextNodeAndHubHubConnectToSelected()
+		{
+			nodePtr v1 = newNode(node::Text);
+			auto vNode1 = new visualNode(newExObjNode(), v1);
+			vNode1->frame.setPositionByCenter(mouse.cursorPosition());
+			dp.workBoard.addNode(vNode1);
+			groupIterator gi(selectH.selectedGroup());
 			do
 			{
-				auto* vNode = visualNode::getByNode(i1.get());
-				if (!vNode)
-					continue;
-				if (vNode->frame.contains(display->getCursorPosition()))
+				auto vNode2 = visualNode::getByNode(gi.get());
+				if (vNode2)
 				{
-					if (vNode->get().exist())
+					dp.workBoard.addConnection(new visualConnection(
+						newExObjNode(), vNode1, vNode2));
+					nodePtr v2 = vNode2->getConnection(0);
+					if (v2.exist())
+						HubHubConnect(v1, v2);
+				}
+
+			} while (gi.stepForward());
+			return vNode1;
+		}
+		void deleteAllSelected()
+		{
+			groupIterator gi(selectH.selectedGroup());
+			do
+			{
+				if (gi.get().exist())
+				{
+					if (gi.get()->connection[0].load().exist())
+						deleteNode(gi.get()->connection[0]);
+					deleteNode(gi.get());
+				}
+			} while (gi.stepForward());
+		}
+		
+		void HHconnectSelected()
+		{
+			auto vNode1 = visualNode::getByNode(selectH.lastSelected());
+			if (vNode1 == nullptr)
+				return;			
+			groupIterator gi(selectH.selectedGroup());
+			do
+			{
+				auto vNode2 = visualNode::getByNode(gi.get());
+				if (vNode2)
+				{
+					nodePtr v1 = vNode1->getConnection(0);
+					nodePtr v2 = vNode2->getConnection(0);
+					if (v1 != v2)
 					{
-						if (vNode->get() != last)
+						if (v1.exist() && v2.exist() && !hasConnection(v1, v2))
 						{
-							std::wcout << L"cursored: " << nodeProperties(vNode->getConnection(0)) << std::endl;
+							HubHubConnect(v1, v2);
 						}
-						NumHubConnect(cursored.get(), vNode->get(), 0);
+						if (!dp.workBoard.connected(vNode1, vNode2))
+						{
+							auto vConnection = new visualConnection(
+								newExObjNode(), vNode1, vNode2);
+							dp.workBoard.addConnection(vConnection);
+						}
 					}
 				}
-			} while (i1.stepForward());
+			} while (gi.stepForward());
 		}
-		bool leftButtonWasPressed = false;
-		milliseconds clickStartTime = 0ms;
-		const milliseconds moveTrigger = 200ms;
-		void updateHighlighted()
+		void disconnectSelected()
 		{
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			if (!selectH.lastSelected().exist())
+				return;
+			groupIterator gi(selectH.selectedGroup());
+			do
 			{
-				if (!leftButtonWasPressed &&
-					cursored.getConnection(0).exist() &&
-					cursored.getConnection(0)->connection[0].load().exist())
+				if (gi.get().exist() && gi.get() != selectH.lastSelected())
 				{
-					clickStartTime = currentTime();
-					nodePtr cursoredNode = 
-						cursored.getConnection(0)->connection[0];
-					std::wcout << connectionsList(cursoredNode) << std::endl;
+					nodePtr v1 = gi.get()->connection[0];
+					nodePtr v2 = selectH.lastSelected()->connection[0];
+					if (v1.exist() && v2.exist())
+						disconnect(v1, v2);
 				}
-				leftButtonWasPressed = true;
-				if (!movingNode && cursored.getConnection(0).exist() &&
-					(currentTime() - clickStartTime > moveTrigger))
-				{
-					movingNode = visualNode::getByNode(
-						cursored.getConnection(0));
-					mouseMovingNodeOffset = 
-						display->getCursorPosition() - 
-						movingNode->frame.position;
-				}
-			}
-			else
-			{
-				movingNode = nullptr;
-				leftButtonWasPressed = false;
-			}
-		}
-		visualNode* movingNode= nullptr;
-		glm::vec2 mouseMovingNodeOffset;
-		
-		void updateMoved()
-		{
-			if (movingNode)
-			{
-				movingNode->target =
-					display->getCursorPosition() - mouseMovingNodeOffset;
-			}
+			} while (gi.stepForward());
 		}
 	};
 }

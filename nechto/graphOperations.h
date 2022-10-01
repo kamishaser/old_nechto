@@ -260,7 +260,6 @@ namespace nechto
 	// удаление
 	void deleteNode(nodePtr v1)
 	{
-		std::cout << "|||||||||||||||||||||DELETE||||||||||||||||||" << std::endl;
 		assert(v1.exist());
 		assert(!typeCompare(v1, node::Deleted));//нельзя удалять дважды
 

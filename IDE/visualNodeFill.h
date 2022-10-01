@@ -97,17 +97,17 @@ namespace nechto::ide
 	}
 	namespace vnLightColor
 	{
-		static color errorColor = sf::Color::Red;
-		static color warningColor = sf::Color::Yellow;
-		static color highlightedColor = sf::Color::Blue;
-		static color mOverColor = sf::Color(100, 200, 255);
+		static const color errorColor = sf::Color::Red;
+		static const color warningColor = sf::Color::Yellow;
+		static const color selectedColor = sf::Color(0, 0, 255);
+		static const color mOverColor = sf::Color(100, 200, 255);
 
 		void fill(visualNode* vNode)
 		{
 			bool warng = false;
 			bool error = false;
 			bool mOver = false;
-			bool highl = false;
+			bool selec = false;
 
 			assert(vNode->getTypeName() == L"nechtoIde.visualNode");
 			color temp;
@@ -117,30 +117,30 @@ namespace nechto::ide
 				connectionIterator i(vNode->get());
 				do
 				{
-
-					namedExCon* attribute = namedExCon::getByNode(i.get());
+					nodePtr temp = i.get();
+					if (typeCompare(temp, node::Group))
+						temp = temp->connection[0];
+					namedExCon* attribute = namedExCon::getByNode(temp);
 					if (attribute)
 					{
 						
-						if (attribute->name == L"#nechtoIde.cursored")
+						if (attribute->name == L"mouseCursor")
 							mOver = true;
-						if (attribute->name == L"#nechtoIde.error")
+						if (attribute->name == L"nechtoIde.error")
 							error = true;
-						if (attribute->name == L"#nechtoIde.warning")
+						if (attribute->name == L"nechtoIde.warning")
 							warng = true;
+						if (attribute->name == L"groupOfSelected")
+							selec = true;
 					}
 				} while (i.stepForward());
 			}
-			color ew =
-				(error) ? errorColor :
-				(warng) ? warningColor :
-				sf::Color(0, 0, 0);
-			color mh =
-				(mOver) ? mOverColor :
-				(highl) ? highlightedColor :
-				sf::Color(0, 0, 0);
-
-			vNode->lightColor = ew + mh;
+			color mh = sf::Color(0, 0, 0);
+			if (mOver)
+				mh = col::cursor;
+			else if (selec)
+				mh = col::selOther;
+			vNode->lightColor = mh;
 		}
 	}
 }

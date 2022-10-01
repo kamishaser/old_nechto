@@ -9,17 +9,20 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\projection">
-      <UniqueIdentifier>{057edadb-9bb6-4f69-a25d-3f821de840a3}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\handler">
+      <UniqueIdentifier>{c84072d8-1b7a-442c-930f-99a408158049}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\projection\visual">
-      <UniqueIdentifier>{2a9005a1-2161-48b2-9ceb-7a539c902a77}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\handler\userH">
+      <UniqueIdentifier>{40bb2083-c990-4e59-a66d-915ef86d407e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\projection\graph">
-      <UniqueIdentifier>{f86be5bd-c31e-473d-a12e-7ff3d9945879}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\display">
+      <UniqueIdentifier>{f4cf8127-21a0-4577-b5ea-66475f647fd0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\projection\visual\visualGroup">
-      <UniqueIdentifier>{4054cb26-9f04-43dc-a581-7ba2a48b784a}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\visual">
+      <UniqueIdentifier>{9a51527a-4e89-4276-9bef-85b485417525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\visual\visualGroup">
+      <UniqueIdentifier>{9e21a627-55ca-4d1f-9840-8b9bd169ec6b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,53 +31,66 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h">
+    <ClInclude Include="nechtoIde.h">
       <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeBoard.h">
-      <Filter>Исходные файлы\projection</Filter>
-    </ClInclude>
-    <ClInclude Include="visualConnection.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="visualNode.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
     </ClInclude>
     <ClInclude Include="periodLimiter.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="visual.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="autoExpandHandler.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
-    </ClInclude>
-    <ClInclude Include="spreadHandler.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
-    </ClInclude>
-    <ClInclude Include="userH.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
-    </ClInclude>
-    <ClInclude Include="ideDisplay.h">
+    <ClInclude Include="rect.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="visualNodeFill.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeBoard.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFail.h" />
+    <ClInclude Include="autoExpandHandler.h">
+      <Filter>Исходные файлы\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="spreadHandler.h">
+      <Filter>Исходные файлы\handler</Filter>
     </ClInclude>
     <ClInclude Include="vnDataUpdateH.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
+      <Filter>Исходные файлы\handler</Filter>
     </ClInclude>
-    <ClInclude Include="placementHandler.h">
-      <Filter>Исходные файлы\projection\graph</Filter>
+    <ClInclude Include="userH.h">
+      <Filter>Исходные файлы\handler\userH</Filter>
     </ClInclude>
-    <ClInclude Include="visualGroup.h">
-      <Filter>Исходные файлы\projection\visual\visualGroup</Filter>
+    <ClInclude Include="mouseHandler.h">
+      <Filter>Исходные файлы\handler\userH</Filter>
     </ClInclude>
-    <ClInclude Include="rect.h">
-      <Filter>Исходные файлы\projection\visual</Filter>
+    <ClInclude Include="keyboardHandler.h">
+      <Filter>Исходные файлы\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="selectHandler.h">
+      <Filter>Исходные файлы\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="display.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="textInputBox.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
+    <ClInclude Include="visualConnection.h">
+      <Filter>Исходные файлы\visual</Filter>
     </ClInclude>
     <ClInclude Include="consistentGroup.h">
-      <Filter>Исходные файлы\projection\visual\visualGroup</Filter>
+      <Filter>Исходные файлы\visual\visualGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="visual.h">
+      <Filter>Исходные файлы\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNode.h">
+      <Filter>Исходные файлы\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualGroup.h">
+      <Filter>Исходные файлы\visual\visualGroup</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -30,6 +30,12 @@ namespace nechto
 		{
 			return currentHub->connection[pos()];
 		}
+		bool exist()const
+		{
+			return currentHub != nullNodePtr;
+		}
+		operator bool()const
+		{return exist(); }
 		nodePtr get()const 
 		{
 			return currentHub->connection[pos()];

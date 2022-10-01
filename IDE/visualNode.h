@@ -7,7 +7,9 @@
 
 namespace nechto::ide
 {
-	//к порту 0 подключается отображаемая нода, коли таковая имеется
+	//к порту 0 подключается 
+	//	отображаемая нода, если visualNode используется для отображения,
+	//	выполняемые действия, если visualNode используется как кнопка
 	//к потру 1 подключается группа vNode управляющая этой нодой
 	//к порту 3 подлкючается группа всех vNode в nodeBoard
 
@@ -16,22 +18,18 @@ namespace nechto::ide
 		//позиция состоит из текущего и целеввого значений.
 		//это нужно для стабильных и плавных перемещений
 		rect frame;//текущая рамка
-		glm::vec2 target;//цель
 
 		color shapeColor = color::White;
 		color lightColor = color(0, 0, 0);
 		geometricShape nShape;
 		std::wstring nodeText;
 	
-		visualNode(nodePtr emptyExternalObject, 
-			nodePtr vNodeGroup, nodePtr v1  = nullNodePtr)
+		visualNode(nodePtr emptyExternalObject, nodePtr v1  = nullNodePtr)
 			:externalObject(emptyExternalObject), frame(glm::vec2{0.f, 0.f}, glm::vec2{1.f, 1.f})
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
 		{
 			assert(getByNode(v1) == nullptr);//vNode нельзя подключать к vNode
-			assert(vNodeGroup.exist());
-			assert(typeCompare(vNodeGroup, node::Group));
-			IterIterConnect(group::firstEmptyPort(vNodeGroup), hubIterator(get(), get(), 3));
+			//IterIterConnect(group::firstEmptyPort(vNodeGroup), hubIterator(get(), get(), 3));
 			if(v1.exist())
 				NumHubConnect(exObj, v1, 0);
 		}

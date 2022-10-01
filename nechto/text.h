@@ -7,6 +7,7 @@ namespace nechto
 {
 	namespace text
 	{
+		static_assert(sizeof(wchar_t) == 2);
 		bool isConnectedToNumber(nodePtr v1)
 		{
 			nodePtr vtemp = v1;

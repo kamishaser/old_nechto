@@ -36,21 +36,21 @@ namespace nechto
 					}
 					else
 						oneSideDisconnect(connection, v1);
-					if (i1.pos() == 3)
-					{
-						nodePtr vTemp = i1.currentHub;
-						bool end = !i1.GoToNextHub();
-						nodeStorage::terminal.deallocate(vTemp);
-						i1.setLocalPos(0);
-						if (end)
-						{
-							assert(typeCompare(i1.currentHub, node::Deleted));
-							return;
-						}
-					}
-					else
-						i1.stepForward();
 				}
+				if (i1.pos() == 3)
+				{
+					nodePtr vTemp = i1.currentHub;
+					bool end = !i1.GoToNextHub();
+					nodeStorage::terminal.deallocate(vTemp);
+					i1.setLocalPos(0);
+					if (end)
+					{
+						assert(typeCompare(i1.currentHub, node::Deleted));
+						return;
+					}
+				}
+				else
+					i1.stepForward();
 			}
 		}
 		i64 numberOfMembers(nodePtr group)
@@ -80,7 +80,26 @@ namespace nechto
 			reset(v1);
 			initializeEmpty(v1);
 		}
-		
+		bool contains(nodePtr group, nodePtr v1)
+		{
+			groupIterator gi(group);
+			do
+			{
+				if (gi.get() == v1)
+					return true;
+			} while (gi.stepForward());
+			return false;
+		}
+		groupIterator getIteratorToConnection(nodePtr group, nodePtr v1)
+		{
+			groupIterator gi(group);
+			do
+			{
+				if (gi.get() == v1)
+					return gi;
+			} while (gi.stepForward());
+			return groupIterator(nullNodePtr, pointer::hubPosPair(nullNodePtr, 0));
+		}
 		bool check(nodePtr v1)
 		{
 			assert(v1->getType() == node::Group);

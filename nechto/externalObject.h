@@ -74,10 +74,9 @@ namespace nechto
 		}
 		nodePtr getConnection(int number)const
 		{
-			nodePtr temp = exObj;
-			if (!temp.exist())
+			if (!exObj.exist())
 				return nullNodePtr;
-			return temp->connection[number];
+			return exObj->connection[number];
 		}
 		static void intializeNode(nodePtr v1, externalObject* exObj = nullptr)
 		{
