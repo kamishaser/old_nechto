@@ -74,21 +74,22 @@ namespace nechto::ide
 			groupIterator gi(dp.workBoard.vConnectionGroup());
 			do
 			{
-				if (!gi.get().exist())
-					continue;
 				auto vConnection = visualConnection::getByNode(gi.get());
-				auto vNode0 = visualNode::getByNode(gi.get()->connection[0]);
-				auto vNode1 = visualNode::getByNode(gi.get()->connection[1]);
-				if (!(vConnection && vNode0 && vNode1))
+				if (!vConnection)
+					continue;
+				auto vNode0 = visualNode::getByNode(vConnection->getConnection(0));
+				auto vNode1 = visualNode::getByNode(vConnection->getConnection(1));
+				if (vNode0 == nullptr || vNode1 == nullptr)
 				{
 					deleteNode(gi.get());
-					return;
 				}
-				nodePtr v0 = vNode0->getConnection(0);
-				nodePtr v1 = vNode1->getConnection(0);
-				if (!(v0.exist() && v1.exist() &&
-					(vConnection != nullptr) && hasConnection(v0, v1)))
-					deleteNode(gi.get());
+				else
+				{
+					nodePtr v0 = vNode0->getConnection(0);
+					nodePtr v1 = vNode1->getConnection(0);
+					if (v0.exist() && v1.exist() && !hasConnection(v0, v1))
+						deleteNode(gi.get());
+				}
 			} while (gi.stepForward());
 		}
 		void expand()

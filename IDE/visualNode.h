@@ -43,7 +43,7 @@ namespace nechto::ide
 		}
 		virtual ~visualNode()
 		{
-			std::cout << "vNode deleted" << std::endl;
+			print(L"vNode deleted");
 		}
 		/*получение указателя на visualNode по объекту. 
 		Возвращает nullptr при несоответствии*/

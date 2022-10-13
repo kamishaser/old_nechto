@@ -4,6 +4,7 @@
 #include "autoExpandHandler.h"
 #include "userH.h"
 #include "vnDataUpdateH.h"
+#include "fileSerializer.h"
 
 namespace nechto::ide
 {
@@ -31,6 +32,11 @@ namespace nechto::ide
 				connectionIterator(uh.mouse.cursor.get(), 1));
 			IterIterConnect(group::firstEmptyPort(dp.interfaceBoard.taggedGroup()),
 				connectionIterator(uh.mouse.cursor.get(), 1));
+			dp.load(L"autosave.nechto");
+		}
+		~nechtoIDE()
+		{
+			dp.save(L"autosave.nechto");
 		}
 		bool update()
 		{
@@ -41,7 +47,7 @@ namespace nechto::ide
 			return dp.update();
 
 		}
-
+	private:
 		nodePtr example()
 		{
 			nodePtr descriptionText = newNode(node::Text);
@@ -63,6 +69,7 @@ namespace nechto::ide
 			}
 			return vFirst;
 		}
+		
 	};
 
 }

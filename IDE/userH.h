@@ -1,7 +1,6 @@
 #pragma once
 #include "nodeBoard.h"
 #include "namedExCon.h"
-#include "textOut.h"
 #include "display.h"
 #include "mouseHandler.h"
 #include "keyboardHandler.h"
@@ -25,40 +24,91 @@ namespace nechto::ide
 
 		
 
-		/*enum Stage
+		enum ActiveAction
 		{
-			base,
+			None,
+			Save,//ввод сохранения
+			Load,
 
-		};*/
+		};
+		ActiveAction aAction = None;
+		std::wstring aString;
 		void update()
 		{
 			mouse.update();
-			keyboard.update();
-			if (!dp.textBox.hasFocus())
+			if (mouse.rightButton.bClickEvent())
 			{
-				if (mouse.rightButton.bClickEvent())
-				{
-					auto vNode1 =
-						visualNode::getByNode(mouse.rightButton.content());
-					if (vNode1)
-						editText(vNode1);
-					else
-						dp.textBox.reset();
-				}
-				if (mouse.middleButton.bClickEvent())
-					editText(addTextNodeAndHubHubConnectToSelected());
-				if (keyboard[sf::Keyboard::Delete].bClickEvent())
-					deleteAllSelected();
-				if (keyboard[sf::Keyboard::C].bClickEvent())
-					HHconnectSelected();
-				if (keyboard[sf::Keyboard::D].bClickEvent())
-					disconnectSelected();
-				if (keyboard[sf::Keyboard::Escape].bClickEvent())
+				auto vNode1 =
+					visualNode::getByNode(mouse.rightButton.content());
+				if (vNode1)
+					editText(vNode1);
+				else
 					dp.textBox.reset();
 			}
+			if (mouse.middleButton.bClickEvent())
+				editText(addTextNodeAndHubHubConnectToSelected());
+			if (!dp.textBox.hasFocus())
+			{
+				keyboard.update();
+				if (keyboard[sf::Keyboard::N].bClickEvent())//создание
+					editText(addTextNodeAndHubHubConnectToSelected());
+				if (keyboard[sf::Keyboard::Delete].bClickEvent())//удаление
+					deleteAllSelected();
+				if (keyboard[sf::Keyboard::C].bClickEvent())//подключение
+					HHconnectSelected();
+				if (keyboard[sf::Keyboard::D].bClickEvent())//отключение
+					disconnectSelected();
+				if (keyboard[sf::Keyboard::S].bClickEvent())//сохранение
+				{
+					aAction = Save;
+					dp.textBox.focus(&aString);
+				}
+				if (keyboard[sf::Keyboard::L].bClickEvent())//загрузка
+				{
+					aAction = Load;
+					dp.textBox.focus(&aString);
+				}
+				if (keyboard[sf::Keyboard::A].bClickEvent())//выделение всех
+					selectH.selectGroup(dp.workBoard.vNodeGroup());
+				if (keyboard[sf::Keyboard::R].bClickEvent())//рандомное смещение всех
+					randomOfsetSelected();
+				if (keyboard[sf::Keyboard::Tab].isPressed())//рандомное смещение всех
+					dp.cursoredParametrs.nodeText =
+					connectionsList(mouse.cursored());
+				else
+					dp.cursoredParametrs.nodeText.clear();
+				if (!aString.empty())
+				{
+					switch (aAction)
+					{
+					case nechto::ide::userH::None:
+						break;
+					case nechto::ide::userH::Save:
+						dp.save(aString);
+						break;
+					case nechto::ide::userH::Load:
+						dp.load(aString);
+						break;
+					default:
+						break;
+					}
+					aAction = None;
+					aString.clear();
+				}
+				
+			}
+			else
+			{
+				for (auto& i : keyboard.keyBoardKeys)
+					i.bClickEvent();
+				mouse.rightButton.bClickEvent();
+				mouse.middleButton.bClickEvent();
+			}
 		}
+		
 		void editText(visualNode* vNode1)
 		{
+			dp.textBox.reset();
 			nodePtr v1 = vNode1->getConnection(0);
 			if (v1.exist() && typeCompare(v1, node::Text))
 			{
@@ -146,6 +196,16 @@ namespace nechto::ide
 					if (v1.exist() && v2.exist())
 						disconnect(v1, v2);
 				}
+			} while (gi.stepForward());
+		}
+		void randomOfsetSelected()
+		{
+			groupIterator gi(selectH.selectedGroup());
+			do
+			{
+				auto vNode = visualNode::getByNode(gi.get());
+				if (vNode)
+					vNode->frame.position += randomOffset(100);
 			} while (gi.stepForward());
 		}
 	};

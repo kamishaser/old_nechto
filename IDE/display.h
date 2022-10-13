@@ -3,7 +3,9 @@
 #include "consistentGroup.h"
 #include "nodeBoard.h"
 #include "textInputBox.h"
+#include "textOut.h"
 
+#include "fileSerializer.h"
 #include "SFML/Window.hpp"
 #include "GLM/gtx/rotate_vector.hpp"
 #include "periodLimiter.h"
@@ -36,7 +38,7 @@ namespace nechto::ide
 		visualNode cursoredParametrs{ newExObjNode(0) };
 		visualNode cursoredConnections{ newExObjNode(0) };
 		visualNode textBoxNode{ newExObjNode(0) };
-
+		visualNode consoleOut{ newExObjNode(0) };
 		textInputBox  textBox;
 		
 
@@ -63,10 +65,13 @@ namespace nechto::ide
 			interfaceBoard.addNode(&cursoredParametrs);
 			interfaceBoard.addNode(&cursoredConnections);
 			interfaceBoard.addNode(&textBoxNode);
+			interfaceBoard.addNode(&consoleOut);
 
 			bottomGroup.addNode(&cursoredParametrs);
 			bottomGroup.addNode(&cursoredConnections);
 			bottomGroup.addNode(&textBoxNode);
+			bottomGroup.addNode(&consoleOut);
+			consoleText = &consoleOut.nodeText;
 
 			cursoredParametrs.nodeText = L"наведи на ноду для получения данных";
 
@@ -97,13 +102,21 @@ namespace nechto::ide
 				}
 				else if (event.type == sf::Event::Resized)
 				{
-					std::cout << "resize" << std::endl;
 					rect winRect = windowRect();
 					window.setView(sf::View(GLM_SFML(winRect.center()), 
 						GLM_SFML(winRect.size)));
 					setChainsPosition();
 				} else if (event.type == sf::Event::TextEntered)
 					textBox.update(event.text.unicode);
+				/*else if (event.type == sf::Event::MouseWheelMoved)
+				{
+					static int mScrollData = event.mouseWheelScroll.x;
+					sf::View View = window.getView();
+					std::cout << event.mouseWheelScroll.x << std::endl;
+					View.zoom((event.mouseWheel.delta > 0) ? 0.9f : 1.1f);
+					mScrollData = event.mouseWheelScroll.x;
+					window.setView(View);
+				}*/
 			}
 			
 			setChainsPosition();
@@ -178,7 +191,7 @@ namespace nechto::ide
 				vNode->nShape = vnShape::rectangle();
 			sf::ConvexShape nShape(vNode->nShape.size());
 			nShape.setFillColor(col::vNodeG1);
-			text.setFillColor(col::sel2);
+			text.setFillColor(col::sel[2]);
 			for (int i = 0; i < vNode->nShape.size(); ++i)
 			{
 				float x = vNode->nShape[i].x * vNode->frame.size.x;
@@ -225,6 +238,37 @@ namespace nechto::ide
 			line.setFillColor(col::strong);
 			////////////////////////////////////////////////////////////////////////
 			window.draw(line);
+		}
+
+		bool load(std::filesystem::path path)
+		{
+			fileDeserializer ds;
+			ds.open(path);
+			if (!ds.isOpen())
+				return false;
+			nodePtr temp = ds.deserialize();
+			while (temp.exist())
+			{
+				auto vNode = new visualNode(newExObjNode(), temp);
+				workBoard.addNode(vNode);
+				temp = ds.deserialize();
+			}
+			ds.close();
+		}
+		bool save(std::filesystem::path path)
+		{
+			fileSerializer fs;
+			fs.open(path);
+			if (!fs.isOpen())
+				return false;
+			groupIterator gi(workBoard.vNodeGroup());
+			do
+			{
+				auto vNode = visualNode::getByNode(gi.get());
+				if (vNode && vNode->getConnection(0).exist())
+					fs.serialize(vNode->getConnection(0));
+			} while (gi.stepForward());
+			fs.close();
 		}
 	};
 }

@@ -6,7 +6,6 @@
 #include <mutex>
 #include <thread>
 #include <cassert>
-#include <iostream>
 #include <string>
 #include <functional>
 #include <compare>
@@ -155,17 +154,37 @@ namespace nechto
 			Variable,				//объект-переменная базового типа, хранящаяся внутри алгоритма (одинаков для всех исполнителей)
 			MathOperator,			//математический оператор
 			ConditionalBranching,	//if
-			Text,					//метка
 			ExternalObject,			//внешнее подключение
 			Method,					//операция с externalObject
 			Pointer,				//указатель на объект
 			Group,					//группа объектов
-			NodeOperator			//узловой оператор
+			Text,					//текст
+			NodeOperator,			//узловой оператор
 		};
 	};
 	using nodePtr = node::ptr;
 	using nodeEvent = std::function<bool(nodePtr)>;
 	const nodePtr nullNodePtr = nodePtr(); //аналог nullptr
+
+	//временная замена консоли
+	std::wstring* consoleText;
+	std::wstring console[3];
+	void print(const std::wstring& text)
+	{
+		if (consoleText)
+		{
+			console[0] = std::move(console[1]);
+			console[1] = std::move(console[2]);
+			console[2] = text;
+			consoleText->clear();
+			if (!console[0].empty())
+				*consoleText = console[0] + L"\n";
+			if (!console[1].empty())
+				*consoleText += console[1] + L"\n";
+			if (!console[2].empty())
+				*consoleText += console[2];
+		}
+	}
 	namespace variable
 	{
 		enum Type :char

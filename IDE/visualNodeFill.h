@@ -56,7 +56,7 @@ namespace nechto::ide
 				break;
 			case node::ExternalObject:
 				if (n1->getData<externalObject*>() == nullptr)
-					vn1->nodeText = nullptr;
+					vn1->nodeText = L"nullptr";
 				else
 					vn1->nodeText =
 					n1->getData<externalObject*>()->getTypeName();
@@ -104,43 +104,42 @@ namespace nechto::ide
 
 		void fill(visualNode* vNode)
 		{
-			bool warng = false;
-			bool error = false;
-			bool mOver = false;
-			bool selec = false;
+
+			int selStatus = -2;
 
 			assert(vNode->getTypeName() == L"nechtoIde.visualNode");
-			color temp;
 			assert(vNode->get().exist());
 			if (vNode->get()->hasHub())
 			{
-				connectionIterator i(vNode->get());
+				connectionIterator ci(vNode->get());
 				do
 				{
-					nodePtr temp = i.get();
+					nodePtr temp = ci.get();
 					if (typeCompare(temp, node::Group))
 						temp = temp->connection[0];
 					namedExCon* attribute = namedExCon::getByNode(temp);
 					if (attribute)
 					{
-						
+
 						if (attribute->name == L"mouseCursor")
-							mOver = true;
-						if (attribute->name == L"nechtoIde.error")
-							error = true;
-						if (attribute->name == L"nechtoIde.warning")
-							warng = true;
+							selStatus = 4;
 						if (attribute->name == L"groupOfSelected")
-							selec = true;
+							if (selStatus < -1)
+								selStatus = -1;
+						if (attribute->name == L"lastSelected" && selStatus < 4)
+							for (int i = 0; i < 4; ++i)
+								if (attribute->getConnection(i) == vNode->get())
+								{
+									if (selStatus < i)
+										selStatus = i;
+									break;
+								}
 					}
-				} while (i.stepForward());
+				} while (ci.stepForward());
 			}
-			color mh = sf::Color(0, 0, 0);
-			if (mOver)
-				mh = col::cursor;
-			else if (selec)
-				mh = col::selOther;
-			vNode->lightColor = mh;
+			if (selStatus >-2)
+				vNode->lightColor = col::sel[selStatus+1];
+			else vNode->lightColor = sf::Color(0, 0, 0);
 		}
 	}
 }

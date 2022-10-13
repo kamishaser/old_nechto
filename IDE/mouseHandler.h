@@ -74,9 +74,7 @@ namespace nechto::ide
 				updateCursored(&dp.interfaceBoard, cursorPosition());
 				if (!cursored().exist())
 					updateCursored(&dp.workBoard, cursorPosition());
-
 				return updateLeftButton();
-				
 			}
 		}
 		
@@ -96,11 +94,6 @@ namespace nechto::ide
 				{
 					if (vNode->get().exist())
 					{
-						if (vNode->get() != last)
-						{
-							/*dp.cursoredParametrs.nodeText = 
-								connectionsList(vNode->getConnection(0));*/
-						}
 						NumHubConnect(cursor.get(), vNode->get(), 0);
 					}
 				}
@@ -108,7 +101,7 @@ namespace nechto::ide
 		}
 
 		glm::vec2 lastCursorPosition = cursorPosition();//позиция курсора при предыдущем обновлении
-		const milliseconds pressTrigger = 170ms;
+		const milliseconds pressTrigger = 175ms;
 
 		void select(visualNode* vNode)
 		{
@@ -120,25 +113,36 @@ namespace nechto::ide
 			else
 				sh.deselect(vNode);
 		}
+		//обработка действий левой кнопкой мыши (в основном)
 		visualNode* updateLeftButton()
 		{
 			auto vNode = visualNode::getByNode(leftButton.content());
-			if (vNode == nullptr || vNode->getNodeBoard() != dp.workBoard.get())
+			if (vNode == nullptr)
 			{
+				if (leftButton.bClickEvent() &&
+					!(keyboard.control() || keyboard.shift()))
+					sh.deselectAll();
 				return nullptr;
+			}
+			if(vNode->getNodeBoard() != dp.workBoard.get())
+			{
+				leftButton.bClickEvent();
+				return vNode;
 			}
 
 			if (leftButton.bClickEvent())
+			{
 				if (!sh.select(vNode))
 					sh.deselect(vNode);
-				else;
+				dp.textBox.reset();
+			}
 			else if (leftButton.pressTime() > pressTrigger)
 			{
 				if (leftButton.isPressed())
 				{
 					glm::vec2 offset = cursorPosition() - lastCursorPosition;
 					if (!sh.contains(vNode))
-						sh.moveAllSelected(offset);
+						moveAllSelected(offset);
 					vNode->frame.position += offset;
 				}
 				else if (leftButton.eClickEvent())
@@ -156,7 +160,19 @@ namespace nechto::ide
 					sh.select(vNode);
 			}
 			lastCursorPosition = cursorPosition();
-			return vNode;
+			return nullptr;
+		}
+		void moveAllSelected(glm::vec2 offset)
+		{
+			groupIterator gi(sh.selectedGroup());
+			do
+			{
+				auto vNode = visualNode::getByNode(gi.get());
+				if (vNode)
+				{
+					vNode->frame.position += offset;
+				}
+			} while (gi.stepForward());
 		}
 	};
 }

@@ -41,7 +41,7 @@ namespace nechto::ide
 		}
 		virtual ~visualConnection()
 		{
-			std::cout << "visualConnectionDeleted" << std::endl;
+			print(L"visualConnectionDeleted");
 		}
 		/*получение указателя на visualConnection по объекту.
 		Возвращает nullptr при несоответствии*/

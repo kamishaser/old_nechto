@@ -33,10 +33,7 @@
     <ClInclude Include="text.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="stream.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="fileStream.h">
+    <ClInclude Include="serializer.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="nodeTypeProperties.h">
@@ -80,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="method.h">
       <Filter>Исходные файлы\node</Filter>
+    </ClInclude>
+    <ClInclude Include="fileSerializer.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -25,24 +25,18 @@ namespace nechto
 			L"Variable",				//объект-переменная базового типа, хнанящаяся внутри алгоритма (одинаков для всех исполнителей)
 			L"MathOperator",			//математический оператор
 			L"ConditionalBranching",	//if
-			L"Text",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
 			L"ExternalObject",
 			L"Method",
 			L"Pointer",
-			L"Group"
+			L"Group",
+			L"Text",					//строковый объект. Может использоваться как метка, название, комментарий или переменная
+			L"NodeOperator"
 		};
 		
 		const std::vector<std::wstring> variableT
 		{
 			L"F64",
 			L"I64",
-		};
-
-		const std::vector<std::wstring> textT
-		{
-			L"Comment",
-			L"Name",
-			L"Other"
 		};
 
 		const std::vector<std::wstring> pointerT
@@ -116,8 +110,6 @@ namespace nechto
 				return find(variableT, subtypeName);
 			case node::MathOperator:
 				return find(mathOperatorT, subtypeName);
-			case node::Text:
-				return find(textT, subtypeName);
 			default:
 				return 0;
 			}

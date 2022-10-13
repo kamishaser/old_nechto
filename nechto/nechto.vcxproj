@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="connectionRule.h" />
+    <ClInclude Include="fileSerializer.h" />
     <ClInclude Include="method.h" />
     <ClInclude Include="group.h" />
     <ClInclude Include="branching.h" />
@@ -153,8 +154,7 @@
     <ClInclude Include="nodeOperator.h" />
     <ClInclude Include="nodeTypeProperties.h" />
     <ClInclude Include="pointer.h" />
-    <ClInclude Include="stream.h" />
-    <ClInclude Include="fileStream.h" />
+    <ClInclude Include="serializer.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="textOut.h" />

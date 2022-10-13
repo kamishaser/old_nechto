@@ -29,12 +29,15 @@ namespace nechto::ide
 
 	namespace col
 	{
-		color cursor = color(0xFFFFFFFF);
-		color sel0 = color(0x8BB9DCFF);
-		color sel1 = color(0x4D9EDCFF);
-		color sel2 = color(0x004F8BFF);
-		color sel3 = color(0x20415AFF);
-		color selOther = color(0x002846FF);
+		color sel[]
+		{
+			color(0x002846FF),
+			color(0x20415AFF),
+			color(0x004F8BFF),
+			color(0x4D9EDCFF),
+			color(0x8BB9DCFF),
+			color(0xFFFFFFFF)
+		};
 
 		color background = color(0x3E6500FF);
 		color vGroupBackground = color(0x61812EFF);

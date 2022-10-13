@@ -12,6 +12,7 @@ namespace nechto::ide
 		const int controlV = 22;
 		bool Focus = false;
 	public:
+		std::wstring* stringAim = nullptr;
 		
 		i64 limit = 1000;
 		std::wstring header = L"ввод текста";
@@ -54,9 +55,10 @@ namespace nechto::ide
 			updateBox();
 			updateAim();
 		}
-		void focus()
+		void focus(std::wstring* s = nullptr)
 		{
 			Focus = true;
+			stringAim = s;
 		}
 		bool hasFocus()
 		{
@@ -64,9 +66,21 @@ namespace nechto::ide
 		}
 		void reset()
 		{
-			Focus = false;
-			aim()->frame.size = glm::vec2(0, 0);
-			aim()->nodeText = iText;
+			if (hasFocus())
+			{
+				Focus = false;
+				
+				if (stringAim != nullptr)
+				{
+					*stringAim = iText;
+					stringAim = nullptr;
+				}
+				else if (aim())
+				{
+					aim()->frame.size = glm::vec2(0, 0);
+					aim()->nodeText = iText;
+				}
+			}
 		}
 	private:
 		void updateBox()
@@ -92,66 +106,3 @@ namespace nechto::ide
 		}
 	};
 }
-/*
-Сие есть первая версия ide
-в которой есть возможность
-не использую консоль
-
-вводить текст
-
-редактировать граф
-
-к сожалению пока что
-возможность сильно ограничены.
-Например:
-
-можно работать только
-с текстовыми нодами
-
-нельзя перемещать камеру
-
-
-В ближайшее время я планирую добавить
-
-добавление и редактирования
-нод разных типов
-
-полноценное
-отображение
-соединений
-
-перемещение камеры
-
-несколько рабочих окон
-
-файловое сохранений
-(уже делал, надо
-только доработать)
-
-
-А потом всё опять сломаю.
-И похоже надолго.
-
-Надо:
-
-1) много чего переделать
-
-2) отрефакторить говонокод
-
-3) перераспихать 
-код по файлам
-
-4) возможно перевести
-на модули с хэдэров
-
-5) писать тесты
-
-6) и много чего по мелочи
-
-
-А затем займусь полноценной
-разработкой редактора nechto
-с помощью nechto
-
-В общем будет весело
-*/

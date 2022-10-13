@@ -24,8 +24,6 @@ namespace nechto
 			return typeName::variableT[address->getSubtype()];
 		case node::MathOperator:
 			return typeName::mathOperatorShortT[address->getSubtype()];
-		case node::Text:
-			return typeName::textT[address->getSubtype()];
 		case node::Pointer:
 			return typeName::pointerT[address->getSubtype()];
 		default:
@@ -80,7 +78,7 @@ namespace nechto
 			groupIterator gi(v1);
 			do
 			{
-				std::wcout << numConnectionsList(gi.currentHub) << std::endl;
+				print(numConnectionsList(gi.currentHub));
 				temp += numConnectionsList(gi.currentHub) + L"\n";
 			} while (gi.GoToNextHub());
 			temp += L"\n mainChain:\n";

@@ -14,5 +14,4 @@ int main()
 	nechtoIDE c;
 	while (c.update())
 		std::this_thread::sleep_for(10ms);
-	std::cout << "end" << std::endl;
 }
