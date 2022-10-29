@@ -150,6 +150,7 @@
     <ClInclude Include="namedExCon.h" />
     <ClInclude Include="graphOperations.h" />
     <ClInclude Include="mathOperator.h" />
+    <ClInclude Include="namedExConGroup.h" />
     <ClInclude Include="nodeOperationSet.h" />
     <ClInclude Include="nodeOperator.h" />
     <ClInclude Include="nodeTypeProperties.h" />

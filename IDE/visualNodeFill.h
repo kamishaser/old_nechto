@@ -6,6 +6,7 @@
 #include "externalObject.h"
 #include "text.h"
 #include "method.h"
+#include "buttonList.h"
 
 namespace nechto::ide
 {
@@ -101,45 +102,69 @@ namespace nechto::ide
 		static const color warningColor = sf::Color::Yellow;
 		static const color selectedColor = sf::Color(0, 0, 255);
 		static const color mOverColor = sf::Color(100, 200, 255);
-
+		int setByAttribute(visualNode* vNode);
+		int setByButtonState(sharedButton* button);
 		void fill(visualNode* vNode)
 		{
 
-			int selStatus = -2;
+			int aColor = -2;
+			int bColor = -2;
 
 			assert(vNode->getTypeName() == L"nechtoIde.visualNode");
 			assert(vNode->get().exist());
+			auto button = sharedButton::getByNode(vNode->getConnection(0));
+			if (button)
+				bColor = setByButtonState(button);
 			if (vNode->get()->hasHub())
-			{
-				connectionIterator ci(vNode->get());
-				do
-				{
-					nodePtr temp = ci.get();
-					if (typeCompare(temp, node::Group))
-						temp = temp->connection[0];
-					namedExCon* attribute = namedExCon::getByNode(temp);
-					if (attribute)
-					{
-
-						if (attribute->name == L"mouseCursor")
-							selStatus = 4;
-						if (attribute->name == L"groupOfSelected")
-							if (selStatus < -1)
-								selStatus = -1;
-						if (attribute->name == L"lastSelected" && selStatus < 4)
-							for (int i = 0; i < 4; ++i)
-								if (attribute->getConnection(i) == vNode->get())
-								{
-									if (selStatus < i)
-										selStatus = i;
-									break;
-								}
-					}
-				} while (ci.stepForward());
-			}
-			if (selStatus >-2)
-				vNode->lightColor = col::sel[selStatus+1];
+				aColor = setByAttribute(vNode);
+			int color = (aColor > bColor) ? aColor : bColor;
+			if (color >-2)
+				vNode->lightColor = col::sel[color+1];
 			else vNode->lightColor = sf::Color(0, 0, 0);
+		}
+		int setByAttribute(visualNode* vNode)
+		{
+			int color = -2;
+			connectionIterator ci(vNode->get());
+			do
+			{
+				nodePtr temp = ci.get();
+				if (typeCompare(temp, node::Group))
+					temp = temp->connection[0];
+				namedExCon* attribute = namedExCon::getByNode(temp);
+				if (attribute)
+				{
+					//выделение
+					if (attribute->name == L"mouseCursor")
+						color = 4;
+					else if (attribute->name == L"groupOfSelected" &&
+						color < -1)
+						color = -1;
+					else if (attribute->name == L"lastSelected" &&
+						color < 4)
+					{
+						for (int i = 0; i < 4; ++i)
+							if (attribute->getConnection(i) == vNode->get())
+							{
+								if (color < i)
+									color = i;
+								break;
+							}
+					}
+					//нажатия кнопок
+					else if (attribute->name == L"pressedButton")
+						color = 3;
+				}
+			} while (ci.stepForward());
+			return color;
+		}
+		int setByButtonState(sharedButton* button)
+		{
+			const int baseColor = -2;
+			auto bList = buttonList::getByNode(button->getList());
+			if(bList && bList->isLClicked(button))
+				return 2;
+			return baseColor;
 		}
 	}
 }

@@ -148,6 +148,10 @@
   <ItemGroup>
     <ClInclude Include="autoExpandHandler.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="buttonList.h" />
+    <ClInclude Include="editor.h" />
+    <ClInclude Include="fileHandler.h" />
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="keyboardHandler.h" />
     <ClInclude Include="MainFail.h" />
     <ClInclude Include="mouseHandler.h" />

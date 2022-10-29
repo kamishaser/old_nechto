@@ -1,10 +1,11 @@
 #pragma once
 #include "visualNode.h"
-#include "display.h"
+#include "GUI.h"
 #include "namedExCon.h"
 #include "periodLimiter.h"
 #include "textOut.h"
 #include "button.h"
+#include "buttonList.h"
 #include "selectHandler.h"
 #include "keyboardHandler.h"
 
@@ -12,78 +13,70 @@ namespace nechto::ide
 {
 	class mouseHandler
 	{
-		display& dp;
+		GUI& gui;
 		selectHandler& sh;
 		keyboardHandler& keyboard;
+
+		namedExCon cursor{ L"mouseCursor" };
+		namedExCon lClicked{ L"lastClickedNode" };
 	public:
-		namedExCon cursor;
+		
+		sharedButton leftButton{ L"leftMouseButton" };
+		sharedButton middleButton{ L"middleMouseButton" };
+		sharedButton rightButton{ L"rightMouseButton" };
 
-		sharedButton leftButton;
-		sharedButton middleButton;
-		sharedButton rightButton;
-
-		mouseHandler(display& dplay, 
+		mouseHandler(GUI& g, 
 			keyboardHandler& keyboardH, selectHandler& selectH)
-			:dp(dplay), keyboard(keyboardH), sh(selectH),
-			cursor(L"mouseCursor"),
-			leftButton(L"leftMouseButton"),
-			middleButton(L"middleMouseButton"),
-			rightButton(L"rightMouseButton")
-		{
-			NumNumConnect(cursor.get(), newNode(node::Variable, 1), 3, 0);//x
-			NumNumConnect(cursor.get(), newNode(node::Variable, 1), 4, 0);//y
-		}
-		~mouseHandler()
-		{
-			deleteNode(cursor.getConnection(3));
-			deleteNode(cursor.getConnection(4));
-		}
+			:gui(g), keyboard(keyboardH), sh(selectH){}
 
 		glm::vec2 cursorPosition() const
 		{
-			return SFML_GLM(sf::Mouse::getPosition(dp.window));
+			return SFML_GLM(sf::Mouse::getPosition(gui.dp.window));
 		}
-		nodePtr x()
+		visualNode* cursored() const
 		{
-			return cursor.getConnection(3);
+			return visualNode::getByNode(cursor.getConnection(0));
 		}
-		nodePtr y()
+		void setCursored(visualNode* cursoredNode)
 		{
-			return cursor.getConnection(4);
+			numDisconnect(cursor.get(), 0);
+			if(cursoredNode)
+				NumHubConnect(cursor.get(), cursoredNode->get(), 0);
 		}
-		nodePtr cursored()
+		visualNode* lastClicked() const
 		{
-			return cursor.getConnection(0);
+			return visualNode::getByNode(lClicked.getConnection(0));
 		}
-		/*возвращает nullptr, если нажата нода на workBoard или ничего, 
-		иначе на interfaceBoard*/
-		visualNode* update()
+		void click(visualNode* clickedNode)
 		{
-			if (dp.window.hasFocus() && dp.windowRect().contains(cursorPosition()))
+			numDisconnect(lClicked.get(), 0);
+			if(clickedNode)
+				NumHubConnect(lClicked.get(), clickedNode->get(), 0);
+		}
+		void update()
+		{
+			if (gui.dp.window.hasFocus() && 
+				gui.dp.windowRect().contains(cursorPosition()))
 			{
-				x()->setData<i64>(cursorPosition().x);
-				y()->setData<i64>(cursorPosition().y);
+				leftButton.update(sf::Mouse::isButtonPressed(sf::Mouse::Left), 
+					cursored());
+				middleButton.update(sf::Mouse::isButtonPressed(sf::Mouse::Middle), 
+					cursored());
+				rightButton.update(sf::Mouse::isButtonPressed(sf::Mouse::Right), 
+					cursored());
 
-				leftButton.update(
-					sf::Mouse::isButtonPressed(sf::Mouse::Left), cursored());
-				middleButton.update(
-					sf::Mouse::isButtonPressed(sf::Mouse::Middle), cursored());
-				rightButton.update(
-					sf::Mouse::isButtonPressed(sf::Mouse::Right), cursored());
+				setCursored(nullptr);
+				updateCursored(&gui.interfaceBoard, cursorPosition());
+				if (cursored() == nullptr)
+					updateCursored(&gui.workBoard, cursorPosition());
 
-				updateCursored(&dp.interfaceBoard, cursorPosition());
-				if (!cursored().exist())
-					updateCursored(&dp.workBoard, cursorPosition());
-				return updateLeftButton();
+				updateLeftButton();
 			}
 		}
 		
 	private:
 		void updateCursored(const nodeBoard* nBoard, glm::vec2 cursorPosition)
 		{
-			nodePtr last = cursor.getConnection(0);
-			if (last.exist())
-				numDisconnect(cursor.get(), 0);
 			groupIterator i1(nBoard->vNodeGroup());
 			do
 			{
@@ -91,12 +84,7 @@ namespace nechto::ide
 				if (!vNode)
 					continue;
 				if (vNode->frame.contains(cursorPosition))
-				{
-					if (vNode->get().exist())
-					{
-						NumHubConnect(cursor.get(), vNode->get(), 0);
-					}
-				}
+					setCursored(vNode);
 			} while (i1.stepForward());
 		}
 
@@ -106,35 +94,46 @@ namespace nechto::ide
 		void select(visualNode* vNode)
 		{
 			if (!sh.contains(vNode))
-			{
-				
 				sh.select(vNode);
-			}
 			else
 				sh.deselect(vNode);
 		}
+
 		//обработка действий левой кнопкой мыши (в основном)
-		visualNode* updateLeftButton()
+		void updateLeftButton()
 		{
 			auto vNode = visualNode::getByNode(leftButton.content());
-			if (vNode == nullptr)
+			bool clicked = leftButton.bClickEvent();
+			if (vNode == nullptr)//если мышь ни на что не наведена
 			{
-				if (leftButton.bClickEvent() &&
-					!(keyboard.control() || keyboard.shift()))
+				if (clicked && !(keyboard.control() || keyboard.shift()))
 					sh.deselectAll();
-				return nullptr;
+				return;
 			}
-			if(vNode->getNodeBoard() != dp.workBoard.get())
+			
+			
+			if (vNode->getNodeBoard() == gui.interfaceBoard.get())
 			{
-				leftButton.bClickEvent();
-				return vNode;
+				if (lastClicked() && (vNode->get() != lastClicked()->get()))
+				{
+					updateButtonByNode(lastClicked(), false);
+				}
+				updateButtonByNode(vNode, leftButton.isPressed());
 			}
-
-			if (leftButton.bClickEvent())
+			else if (vNode->getNodeBoard() == gui.workBoard.get())
+			{
+				updateWorkNode(vNode, clicked);
+				if (clicked)
+					click(vNode);
+			}
+		}
+		void updateWorkNode(visualNode* vNode, bool click)
+		{
+			if (click)
 			{
 				if (!sh.select(vNode))
 					sh.deselect(vNode);
-				dp.textBox.reset();
+				gui.textBox.reset();
 			}
 			else if (leftButton.pressTime() > pressTrigger)
 			{
@@ -151,7 +150,7 @@ namespace nechto::ide
 					else;
 				else;
 			}
-			else if(leftButton.eClickEvent())
+			else if (leftButton.eClickEvent())
 			{
 				bool selected = sh.contains(vNode);
 				if (!(keyboard.shift() || keyboard.control()))
@@ -160,7 +159,6 @@ namespace nechto::ide
 					sh.select(vNode);
 			}
 			lastCursorPosition = cursorPosition();
-			return nullptr;
 		}
 		void moveAllSelected(glm::vec2 offset)
 		{
@@ -173,6 +171,22 @@ namespace nechto::ide
 					vNode->frame.position += offset;
 				}
 			} while (gi.stepForward());
+		}
+		void updateButtonByNode(visualNode* vNode, bool status)
+		{
+			auto button =
+				sharedButton::getByNode(vNode->getConnection(0));
+			if (button)
+			{
+				button->update(status);
+				auto bList = buttonList::getByNode(button->getList());
+				if (bList && bList->choiseMode)
+					if (button->bClickEvent())
+					{
+						bList->click(button);
+						print(std::wstring(L"clickButton ") + to_string(button->get()));
+					}
+			}
 		}
 	};
 }

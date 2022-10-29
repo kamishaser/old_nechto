@@ -1,7 +1,7 @@
 #pragma once
 #include "periodLimiter.h"
 #include "nodeBoard.h"
-#include "display.h"
+#include "GUI.h"
 
 namespace nechto::ide
 {
@@ -9,9 +9,9 @@ namespace nechto::ide
 	{
 		
 	public:
-		display& dp;
-		autoExpandHandler(display& dplay)
-			:dp(dplay) {}
+		GUI& gui;
+		autoExpandHandler(GUI& g)
+			:gui(g) {}
 		void update()
 		{
 			deleteNonExistentNodes();
@@ -26,35 +26,35 @@ namespace nechto::ide
 			//visualNode и visualConnection отображать запрещено
 			auto vNode2 = visualNode::getByNode(expandAim.get());
 			if (vNode2 != nullptr &&
-				dp.workBoard.onThisBoard(vNode2))
+				gui.workBoard.onThisBoard(vNode2))
 				return false;
 			auto vConnection =
 				visualConnection::getByNode(expandAim.get());
 			if (vConnection != nullptr &&
-				dp.workBoard.onThisBoard(vConnection))
+				gui.workBoard.onThisBoard(vConnection))
 				return false;
-			vNode2 = dp.workBoard.visualized(expandAim.get());
+			vNode2 = gui.workBoard.visualized(expandAim.get());
 			if (vNode2 != nullptr)
 			{//если нода визуализированна, надо проверить наличие соединения с ней 
-				if (!dp.workBoard.connected(vNode1, vNode2))
+				if (!gui.workBoard.connected(vNode1, vNode2))
 				{//если нету - добавить
 					vConnection = new visualConnection(newExObjNode(), vNode1, vNode2);
-					dp.workBoard.addConnection(vConnection);
+					gui.workBoard.addConnection(vConnection);
 				}
 			}
 			else
 			{
 				//если нода не визуализированна, надо добавить visualNode 
 				vNode2 = new visualNode(newExObjNode(), expandAim.get());
-				dp.workBoard.addNode(vNode2);
+				gui.workBoard.addNode(vNode2);
 				vConnection = new visualConnection(newExObjNode(), vNode1, vNode2); 
-				dp.workBoard.addConnection(vConnection);
+				gui.workBoard.addConnection(vConnection);
 			}
 			return true;
 		}
 		void deleteNonExistentNodes()
 		{
-			groupIterator gi(dp.workBoard.vNodeGroup());
+			groupIterator gi(gui.workBoard.vNodeGroup());
 			do
 			{
 				nodePtr v1 = gi.get();
@@ -71,7 +71,7 @@ namespace nechto::ide
 		}
 		void deleteNonExistentConnections()
 		{
-			groupIterator gi(dp.workBoard.vConnectionGroup());
+			groupIterator gi(gui.workBoard.vConnectionGroup());
 			do
 			{
 				auto vConnection = visualConnection::getByNode(gi.get());
@@ -94,7 +94,7 @@ namespace nechto::ide
 		}
 		void expand()
 		{
-			groupIterator gi(dp.workBoard.vNodeGroup());
+			groupIterator gi(gui.workBoard.vNodeGroup());
 			do
 			{
 				if (!gi.get().exist() || !gi.get()->connection[0].load().exist())

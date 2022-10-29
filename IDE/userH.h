@@ -5,6 +5,7 @@
 #include "mouseHandler.h"
 #include "keyboardHandler.h"
 #include "selectHandler.h"
+#include "editor.h"
 
 namespace nechto::ide
 {
@@ -12,27 +13,33 @@ namespace nechto::ide
 	class userH
 	{
 	public:
-		display& dp;
+		GUI& gui;
+		editor& ed;
 		keyboardHandler keyboard;
 		selectHandler selectH;
 		mouseHandler mouse;
-		
-		
-		
-		userH(display& dplay)
-		:dp(dplay), selectH(dplay), mouse(dplay, keyboard, selectH){}
 
+		sharedButton testButton;
 		
-
-		enum ActiveAction
+		userH(GUI& g, editor& e)
+		:gui(g), ed(e), selectH(), mouse(g, keyboard, selectH),
+		testButton(L"testButton")
 		{
-			None,
-			Save,//ввод сохранения
-			Load,
+			gui.addButton(&testButton, &gui.bottomGroup);
+		}
 
-		};
-		ActiveAction aAction = None;
-		std::wstring aString;
+		void updateTestButton()
+		{
+			if (testButton.bClickEvent())
+			{
+				if(gui.activeButton.contains(testButton.content()))
+					disconnect(gui.activeButton.getConnection(0), 
+						testButton.content());
+				else
+					gui.activeButton.addNode(testButton.getConnection(0));
+			}
+		}
+
 		void update()
 		{
 			mouse.update();
@@ -43,59 +50,32 @@ namespace nechto::ide
 				if (vNode1)
 					editText(vNode1);
 				else
-					dp.textBox.reset();
+					gui.textBox.reset();
 			}
 			if (mouse.middleButton.bClickEvent())
-				editText(addTextNodeAndHubHubConnectToSelected());
-			if (!dp.textBox.hasFocus())
+				addNode();
+			if (!gui.textBox.hasFocus())
 			{
 				keyboard.update();
 				if (keyboard[sf::Keyboard::N].bClickEvent())//создание
-					editText(addTextNodeAndHubHubConnectToSelected());
+					addNode();
 				if (keyboard[sf::Keyboard::Delete].bClickEvent())//удаление
 					deleteAllSelected();
 				if (keyboard[sf::Keyboard::C].bClickEvent())//подключение
-					HHconnectSelected();
+					ed.connect(visualNode::getByNode(selectH.lastSelected()));
 				if (keyboard[sf::Keyboard::D].bClickEvent())//отключение
 					disconnectSelected();
-				if (keyboard[sf::Keyboard::S].bClickEvent())//сохранение
-				{
-					aAction = Save;
-					dp.textBox.focus(&aString);
-				}
-				if (keyboard[sf::Keyboard::L].bClickEvent())//загрузка
-				{
-					aAction = Load;
-					dp.textBox.focus(&aString);
-				}
 				if (keyboard[sf::Keyboard::A].bClickEvent())//выделение всех
-					selectH.selectGroup(dp.workBoard.vNodeGroup());
+					selectH.selectGroup(gui.workBoard.vNodeGroup());
 				if (keyboard[sf::Keyboard::R].bClickEvent())//рандомное смещение всех
 					randomOfsetSelected();
-				if (keyboard[sf::Keyboard::Tab].isPressed())//рандомное смещение всех
-					dp.cursoredParametrs.nodeText =
-					connectionsList(mouse.cursored());
+				if (keyboard[sf::Keyboard::Tab].isPressed())//описание соединений
+					if (mouse.cursored())
+						gui.cursoredParametrs.nodeText =
+						connectionsList(mouse.cursored()->getConnection(0));
+					else;
 				else
-					dp.cursoredParametrs.nodeText.clear();
-				if (!aString.empty())
-				{
-					switch (aAction)
-					{
-					case nechto::ide::userH::None:
-						break;
-					case nechto::ide::userH::Save:
-						dp.save(aString);
-						break;
-					case nechto::ide::userH::Load:
-						dp.load(aString);
-						break;
-					default:
-						break;
-					}
-					aAction = None;
-					aString.clear();
-				}
-				
+					gui.cursoredParametrs.nodeText = std::to_wstring(nodeStorage::terminal.numberOfNodes);
 			}
 			else
 			{
@@ -104,40 +84,22 @@ namespace nechto::ide
 				mouse.rightButton.bClickEvent();
 				mouse.middleButton.bClickEvent();
 			}
+			updateTestButton();
 		}
-		
+		void addNode()
+		{
+			auto vNode = ed.addNode();
+			vNode->frame.setPositionByCenter(mouse.cursorPosition());
+			editText(vNode);
+		}
 		void editText(visualNode* vNode1)
 		{
-			dp.textBox.reset();
+			gui.textBox.reset();
 			nodePtr v1 = vNode1->getConnection(0);
-			if (v1.exist() && typeCompare(v1, node::Text))
+			if (v1.exist())
 			{
-				NumHubConnect(dp.textBox.get(), vNode1->get(), 1);
-				dp.textBox.iText = text::get(v1);
-				dp.textBox.focus();
+				gui.textBox.focus(vNode1);
 			}
-		}
-		visualNode* addTextNodeAndHubHubConnectToSelected()
-		{
-			nodePtr v1 = newNode(node::Text);
-			auto vNode1 = new visualNode(newExObjNode(), v1);
-			vNode1->frame.setPositionByCenter(mouse.cursorPosition());
-			dp.workBoard.addNode(vNode1);
-			groupIterator gi(selectH.selectedGroup());
-			do
-			{
-				auto vNode2 = visualNode::getByNode(gi.get());
-				if (vNode2)
-				{
-					dp.workBoard.addConnection(new visualConnection(
-						newExObjNode(), vNode1, vNode2));
-					nodePtr v2 = vNode2->getConnection(0);
-					if (v2.exist())
-						HubHubConnect(v1, v2);
-				}
-
-			} while (gi.stepForward());
-			return vNode1;
 		}
 		void deleteAllSelected()
 		{
@@ -152,12 +114,11 @@ namespace nechto::ide
 				}
 			} while (gi.stepForward());
 		}
-		
-		void HHconnectSelected()
+
+		void connectSelected(visualNode* vNode1)
 		{
-			auto vNode1 = visualNode::getByNode(selectH.lastSelected());
 			if (vNode1 == nullptr)
-				return;			
+				return;
 			groupIterator gi(selectH.selectedGroup());
 			do
 			{
@@ -172,11 +133,11 @@ namespace nechto::ide
 						{
 							HubHubConnect(v1, v2);
 						}
-						if (!dp.workBoard.connected(vNode1, vNode2))
+						if (!gui.workBoard.connected(vNode1, vNode2))
 						{
 							auto vConnection = new visualConnection(
 								newExObjNode(), vNode1, vNode2);
-							dp.workBoard.addConnection(vConnection);
+							gui.workBoard.addConnection(vConnection);
 						}
 					}
 				}

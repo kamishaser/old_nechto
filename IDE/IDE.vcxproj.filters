@@ -92,5 +92,17 @@
     <ClInclude Include="visualGroup.h">
       <Filter>Исходные файлы\visual\visualGroup</Filter>
     </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="fileHandler.h">
+      <Filter>Исходные файлы\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>Исходные файлы\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="buttonList.h">
+      <Filter>Исходные файлы\display</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,7 +10,8 @@ namespace nechto::ide
 	//к третьему подключается vCon из nodeBoard
 	struct visualConnection :public externalObject
 	{
-		std::wstring text;
+		std::wstring fText = L"h";
+		std::wstring sText = L"h";
 
 		visualConnection(nodePtr emptyExternalObject, visualNode* vn1, visualNode* vn2)
 			:externalObject(emptyExternalObject)

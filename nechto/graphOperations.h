@@ -95,6 +95,7 @@ namespace nechto
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//создание
+	
 	nodePtr newNode(char type, char subtype)
 	{
 		nodePtr v1 = nodeStorage::terminal.allocate();
@@ -113,7 +114,7 @@ namespace nechto
 			text::initialize(v1);
 			break;
 		case node::ExternalObject:		//внешнее подключение
-			externalObject::intializeNode(v1);
+			externalObject::initializeNode(v1);
 			break;
 		case node::Group:
 			group::initializeEmpty(v1);
@@ -262,7 +263,6 @@ namespace nechto
 	{
 		assert(v1.exist());
 		assert(!typeCompare(v1, node::Deleted));//нельзя удалять дважды
-
 		switch (v1->getType())
 		{
 		case node::Hub:					//разветвитель

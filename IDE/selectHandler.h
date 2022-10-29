@@ -7,15 +7,13 @@ namespace nechto::ide
 	class selectHandler
 	{
 	public:
-		display& dp;
 		namedExCon groupOfSelected;//выделенные ноды
 		namedExCon lastSelectedNode;//4 последние выделенные ноды
 
 		int numberOfLastSelected = -1;//номер последней выделенной ноды
 
-		selectHandler(display& dplay)
-			:dp(dplay),
-			groupOfSelected(L"groupOfSelected"),
+		selectHandler()
+			:groupOfSelected(L"groupOfSelected"),
 			lastSelectedNode(L"lastSelected")
 		{
 			NumNumConnect(groupOfSelected.get(), newNode(node::Group), 0, 0);
@@ -51,6 +49,7 @@ namespace nechto::ide
 				lsBackShift();
 				NumHubConnect(lastSelectedNode.get(), vNode->get(), 3);
 			}
+			print(L"select");
 			return true;
 		}
 		//снять выделение

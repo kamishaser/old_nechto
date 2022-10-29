@@ -1,14 +1,11 @@
 #pragma once
-#include "visualGroup.h"
-#include "consistentGroup.h"
-#include "nodeBoard.h"
-#include "textInputBox.h"
-#include "textOut.h"
 
-#include "fileSerializer.h"
+#include "textInputBox.h"
 #include "SFML/Window.hpp"
 #include "GLM/gtx/rotate_vector.hpp"
 #include "periodLimiter.h"
+#include "nodeBoard.h"
+#include "visualGroup.h"
 #include <memory>
 
 namespace nechto::ide
@@ -26,71 +23,22 @@ namespace nechto::ide
 		};
 		settings dSettings;
 
-		nodeBoard workBoard;
-		consistentGroup leftChain{ newExObjNode(0) };
-		consistentGroup rightChain{ newExObjNode(0) };
-		visualGroup center = { newExObjNode(0) };
 
-		nodeBoard interfaceBoard;
-		consistentGroup topGroup{ newExObjNode(0) };
-		consistentGroup bottomGroup{ newExObjNode(0) };
 
-		visualNode cursoredParametrs{ newExObjNode(0) };
-		visualNode cursoredConnections{ newExObjNode(0) };
-		visualNode textBoxNode{ newExObjNode(0) };
-		visualNode consoleOut{ newExObjNode(0) };
-		textInputBox  textBox;
-		
 
 		display()
-			:window(sf::VideoMode(1000, 1000), "nechtoIDE"),
-			textBox(textBoxNode.get())
+			:window(sf::VideoMode(1000, 1000), "nechtoIDE")
 		{
 			//загрузка базового шрифта
 			assert(vnFont.loadFromFile("Fonts/arial.ttf"));
 			//добавление групп на доски
-			workBoard.addGroup(&leftChain);
-			workBoard.addGroup(&rightChain);
-			workBoard.addGroup(&center);
-			
-			interfaceBoard.addGroup(&topGroup);
-			interfaceBoard.addGroup(&bottomGroup);
-			//установка режима позицианирования
-			rightChain.mode.rightAlignment = true;
-			topGroup.mode.horisontal = true;
-			bottomGroup.mode.horisontal = true;
-			bottomGroup.mode.rightAlignment = true;
-			//bottomGroup.mode.rightAlignment = true;
-			//добавление элементов интерфейса
-			interfaceBoard.addNode(&cursoredParametrs);
-			interfaceBoard.addNode(&cursoredConnections);
-			interfaceBoard.addNode(&textBoxNode);
-			interfaceBoard.addNode(&consoleOut);
-
-			bottomGroup.addNode(&cursoredParametrs);
-			bottomGroup.addNode(&cursoredConnections);
-			bottomGroup.addNode(&textBoxNode);
-			bottomGroup.addNode(&consoleOut);
-			consoleText = &consoleOut.nodeText;
-
-			cursoredParametrs.nodeText = L"наведи на ноду для получения данных";
-
-			setChainsPosition();
-		}
-		void setChainsPosition()
-		{
-			leftChain.setPositionByStartPoint(glm::vec2(10, 10));
-			rightChain.setPositionByStartPoint(glm::vec2(window.getSize().x - 10, 10));
-			center.frame.setPositionByCenter(SFML_GLM(window.getSize()) / 2.f);
-			topGroup.setPositionByStartPoint(glm::vec2(10, 10));
-			bottomGroup.setPositionByStartPoint(glm::vec2(10, window.getSize().y - 10));
-			
 		}
 		rect windowRect() const
 		{
 			return rect(glm::vec2(0, 0), SFML_GLM(window.getSize()));
 		}
-		virtual bool update()
+		virtual bool update(nodeBoard& workBoard, nodeBoard& interfaceBoard,
+			textInputBox& textBox)
 		{
 			sf::Event event;
 			while (window.pollEvent(event))
@@ -103,10 +51,10 @@ namespace nechto::ide
 				else if (event.type == sf::Event::Resized)
 				{
 					rect winRect = windowRect();
-					window.setView(sf::View(GLM_SFML(winRect.center()), 
+					window.setView(sf::View(GLM_SFML(winRect.center()),
 						GLM_SFML(winRect.size)));
-					setChainsPosition();
-				} else if (event.type == sf::Event::TextEntered)
+				}
+				else if (event.type == sf::Event::TextEntered)
 					textBox.update(event.text.unicode);
 				/*else if (event.type == sf::Event::MouseWheelMoved)
 				{
@@ -118,33 +66,21 @@ namespace nechto::ide
 					window.setView(View);
 				}*/
 			}
-			
-			setChainsPosition();
-			rightChain.update();
-			leftChain.update();
-			topGroup.update();
-			bottomGroup.update();
 
-			groupIterator gi(interfaceBoard.vNodeGroup());
-			do
-			{
-				auto vNode = visualNode::getByNode(gi.get());
-				if (vNode)
-					vNode->frame.size = glm::vec2(0, 0);
-			} while (gi.stepForward());
+
 			window.clear(col::vGroupBackground);
 			drawBoard(&workBoard);
 			drawBoard(&interfaceBoard);
 			window.display();
-			
+
 			return true;
 		}
 	private:
 		void drawBoard(nodeBoard* nBoard)
 		{
-			
+
 			assert(nBoard);
-			
+
 			groupIterator i1(nBoard->vConnectionGroup());
 			do
 			{
@@ -159,7 +95,7 @@ namespace nechto::ide
 				if (vNode)
 					draw(vNode);
 			} while (i2.stepForward());
-			
+
 		}
 	public:
 
@@ -190,7 +126,7 @@ namespace nechto::ide
 			if (vNode->nShape.empty())
 				vNode->nShape = vnShape::rectangle();
 			sf::ConvexShape nShape(vNode->nShape.size());
-			nShape.setFillColor(col::vNodeG1);
+			nShape.setFillColor(vNode->shapeColor);
 			text.setFillColor(col::sel[2]);
 			for (int i = 0; i < vNode->nShape.size(); ++i)
 			{
@@ -218,13 +154,14 @@ namespace nechto::ide
 		{
 			visualNode* first = visualNode::getByNode(vCon->get()->connection[0]);
 			visualNode* second = visualNode::getByNode(vCon->get()->connection[1]);
-			assert(first && second);
+			assert((first) && (second));
 			////////////////////////////////////////////////////////////////////////
-			glm::vec2 fpos = first->frame.center();
-			glm::vec2 spos = second->frame.center();
+			const glm::vec2 fpos = first->frame.center();
+			const glm::vec2 spos = second->frame.center();
 			////////////////////////////////////////////////////////////////////////
 			sf::ConvexShape line(4);
 			glm::vec2 temp = spos - fpos;
+			glm::vec2 quarter = temp / 2.2f;
 			glm::vec3 normal(temp.x, temp.y, 0);
 			normal = glm::rotateZ(normal, 3.14f / 2);
 			temp = glm::vec2(normal.x, normal.y);
@@ -238,37 +175,27 @@ namespace nechto::ide
 			line.setFillColor(col::strong);
 			////////////////////////////////////////////////////////////////////////
 			window.draw(line);
-		}
+			////////////////////////////////////////////////////////////////////////
+			
+			
 
-		bool load(std::filesystem::path path)
-		{
-			fileDeserializer ds;
-			ds.open(path);
-			if (!ds.isOpen())
-				return false;
-			nodePtr temp = ds.deserialize();
-			while (temp.exist())
+			if (!vCon->fText.empty())
 			{
-				auto vNode = new visualNode(newExObjNode(), temp);
-				workBoard.addNode(vNode);
-				temp = ds.deserialize();
+				visualNode vNode1(newExObjNode());
+				vNode1.frame.position = fpos + quarter
+					- glm::vec2(dSettings.characterSize, dSettings.characterSize);
+				vNode1.nodeText = vCon->fText;
+				vNode1.shapeColor = col::strong;
+				draw(&vNode1);
 			}
-			ds.close();
-		}
-		bool save(std::filesystem::path path)
-		{
-			fileSerializer fs;
-			fs.open(path);
-			if (!fs.isOpen())
-				return false;
-			groupIterator gi(workBoard.vNodeGroup());
-			do
+			if (!vCon->sText.empty())
 			{
-				auto vNode = visualNode::getByNode(gi.get());
-				if (vNode && vNode->getConnection(0).exist())
-					fs.serialize(vNode->getConnection(0));
-			} while (gi.stepForward());
-			fs.close();
+				visualNode vNode2(newExObjNode());
+				vNode2.frame.position = spos - quarter;
+				vNode2.nodeText = vCon->sText;
+				vNode2.shapeColor = col::strong;
+				draw(&vNode2);
+			}
 		}
 	};
 }

@@ -10,7 +10,7 @@ namespace nechto::ide
 	//к порту 0 подключаетс€ 
 	//	отображаема€ нода, если visualNode используетс€ дл€ отображени€,
 	//	выполн€емые действи€, если visualNode используетс€ как кнопка
-	//к потру 1 подключаетс€ группа vNode управл€юща€ этой нодой
+	//к потру 1 подключаетс€ visualGroup управл€юща€ этой нодой
 	//к порту 3 подлкючаетс€ группа всех vNode в nodeBoard
 
 	struct visualNode:public externalObject
@@ -19,7 +19,7 @@ namespace nechto::ide
 		//это нужно дл€ стабильных и плавных перемещений
 		rect frame;//текуща€ рамка
 
-		color shapeColor = color::White;
+		color shapeColor = col::vNodeG1;
 		color lightColor = color(0, 0, 0);
 		geometricShape nShape;
 		std::wstring nodeText;

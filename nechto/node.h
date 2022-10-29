@@ -166,6 +166,8 @@ namespace nechto
 	using nodeEvent = std::function<bool(nodePtr)>;
 	const nodePtr nullNodePtr = nodePtr(); //аналог nullptr
 
+	enum class conType { Hub, Group, N0, N1, N2, N3 };
+
 	//временная замена консоли
 	std::wstring* consoleText;
 	std::wstring console[3];
@@ -301,7 +303,7 @@ namespace nechto
 	//удаление
 	void deleteNode(nodePtr v);
 
-
+	
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////
 	//всё, что ниже этой строки тебе не понадобится
@@ -498,6 +500,7 @@ namespace nechto
 					toFreeAllocator(*i);//высвобождает используемые контейнеры, делая их доступными для других терминалов
 				}
 			}
+			i64 numberOfNodes = 0; //количество нод
 			const nodePtr allocate()
 			{
 				assert(currentAllocator);
@@ -506,6 +509,7 @@ namespace nechto
 				nodePtr id;
 				id.first = currentAllocatorNumber;
 				id.second = currentAllocator->allocate();
+				++numberOfNodes;
 				return id;
 			}
 			void deallocate(nodePtr id)
@@ -513,6 +517,7 @@ namespace nechto
 				assert(getAllocator(id.first));
 				id->type = node::Deleted;
 				getAllocator(id.first)->deallocate(id.second);
+				--numberOfNodes;
 			}
 		};
 		bool Terminal::isFistTerminal = true;

@@ -4,7 +4,9 @@
 #include "autoExpandHandler.h"
 #include "userH.h"
 #include "vnDataUpdateH.h"
-#include "fileSerializer.h"
+#include "fileHandler.h"
+#include "editor.h"
+#include <iostream>
 
 namespace nechto::ide
 {
@@ -15,36 +17,36 @@ namespace nechto::ide
 	class nechtoIDE
 	{
 	public:
-		display dp;
+		GUI gui;
+		editor ed;
 		vnDataUpdateH vduh;
 		autoExpandHandler aeh;
+		fileHandler fh;
 		userH uh;
+		
 
 		
 
 		nechtoIDE()
-			:dp(),
-			vduh(dp),
-			uh(dp),
-			aeh(dp)			
+			:vduh(gui), ed(gui, uh.selectH),
+			uh(gui, ed),
+			aeh(gui),
+			fh(gui)
 		{
-			IterIterConnect(group::firstEmptyPort(dp.workBoard.taggedGroup()),
-				connectionIterator(uh.mouse.cursor.get(), 1));
-			IterIterConnect(group::firstEmptyPort(dp.interfaceBoard.taggedGroup()),
-				connectionIterator(uh.mouse.cursor.get(), 1));
-			dp.load(L"autosave.nechto");
+			fh.load(L"autosave.nechto");
 		}
 		~nechtoIDE()
 		{
-			dp.save(L"autosave.nechto");
+			fh.save(L"autosave.nechto", gui.workBoard.vNodeGroup());
 		}
 		bool update()
 		{
 			uh.update();
+			ed.update();
 			aeh.update();
 			vduh.update();
 			
-			return dp.update();
+			return gui.update();
 
 		}
 	private:

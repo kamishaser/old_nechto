@@ -1,23 +1,22 @@
 #pragma once
-#include "externalObject.h"
+#include "namedExConGroup.h"
 #include "visualNode.h"
 #include "rect.h"
 namespace nechto::ide
 {
-	
+
 	//соединение 0 - подконтрольная группа нод (обр номер 0)
+	//connection 1 - использующий группу
 	//cоединение 3 - vGroupGroup от nodeBoard
 	//набор правил и действий (что делать, если допустим на ноду нажал пользователь)
 	//группа visualNode
-	struct visualGroup :public externalObject
+	struct visualGroup :public namedExConGroup
 	{
 		rect frame;
-		visualGroup(nodePtr emptyExternalObject, glm::vec2 startPoint = glm::vec2{0,0})
-			:externalObject(emptyExternalObject), frame(startPoint, glm::vec2{1.f, 1.f})
-			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
-		{
-			NumNumConnect(get(), newNode(node::Group), 0, 0);
-		}
+		visualGroup(nodePtr emptyExternalObject, const std::wstring& name,
+			glm::vec2 startPoint = glm::vec2{ 0,0 })
+			:namedExConGroup(emptyExternalObject, name),
+			frame(startPoint, glm::vec2{ 1.f, 1.f }) {}
 		nodePtr vNodeGroup() const
 		{
 			return getConnection(0);
@@ -42,6 +41,12 @@ namespace nechto::ide
 			assert(vNode->getNodeBoard() == getNodeBoard());
 			IterIterConnect(connectionIterator(vNode->get(), 1),
 				group::firstEmptyPort(vNodeGroup()));
+		}
+		void addGroup(visualGroup* vGroup) const
+		{
+			//vNodeGroup может содержать ноды только из одного nodeBoard
+			assert(vGroup->getNodeBoard() == getNodeBoard());
+			IterHubConnect(group::firstEmptyPort(vNodeGroup()), vGroup->get());
 		}
 		i64 numberOfVNodes() const
 		{
@@ -78,7 +83,7 @@ namespace nechto::ide
 				return &vGroup->frame;
 			return nullptr;
 		}
-		
+
 		//////////////////////////////////////////////////////////////
 		virtual ~visualGroup()
 		{

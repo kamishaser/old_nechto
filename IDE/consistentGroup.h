@@ -44,10 +44,11 @@ namespace nechto::ide
 		};
 		
 		arrangeMode mode;
-		float distance = 5;
+		float distance = 2;
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(nodePtr emptyExternalObject, glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
-			:visualGroup(emptyExternalObject, startPoint), mode(Mode)
+		consistentGroup(nodePtr emptyExternalObject, const std::wstring& name, 
+			glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
+			:visualGroup(emptyExternalObject, name, startPoint), mode(Mode)
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
 		{}
 		void setPositionByStartPoint(glm::vec2 pos)
