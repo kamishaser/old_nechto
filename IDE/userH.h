@@ -69,6 +69,8 @@ namespace nechto::ide
 					selectH.selectGroup(gui.workBoard.vNodeGroup());
 				if (keyboard[sf::Keyboard::R].bClickEvent())//рандомное смещение всех
 					randomOfsetSelected();
+				if (keyboard[sf::Keyboard::S].bClickEvent())//рандомное смещение всех
+					operateLSelected();
 				if (keyboard[sf::Keyboard::Tab].isPressed())//описание соединений
 					if (mouse.cursored())
 						gui.cursoredParametrs.nodeText =
@@ -94,7 +96,6 @@ namespace nechto::ide
 		}
 		void editText(visualNode* vNode1)
 		{
-			gui.textBox.reset();
 			nodePtr v1 = vNode1->getConnection(0);
 			if (v1.exist())
 			{
@@ -168,6 +169,31 @@ namespace nechto::ide
 				if (vNode)
 					vNode->frame.position += randomOffset(100);
 			} while (gi.stepForward());
+		}
+		void operateLSelected()
+		{
+			nodePtr lSelected = selectH.lastSelected();
+			if (!lSelected.exist())
+				return;
+			lSelected = lSelected->connection[0];
+			if (!lSelected.exist())
+				return;
+			if (!(isAction(lSelected) && check(lSelected)))
+				return;
+			
+			lSelected = step(lSelected);
+			if (!lSelected.exist())
+				return;
+			connectionIterator ci(lSelected);
+			do
+			{
+				auto vNode = visualNode::getByNode(ci.get());
+				if (vNode)
+				{
+					selectH.select(vNode);
+					break;
+				}
+			} while (ci.stepForward());
 		}
 	};
 }

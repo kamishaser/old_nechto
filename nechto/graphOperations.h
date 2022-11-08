@@ -102,6 +102,9 @@ namespace nechto
 		v1->type = type;
 		v1->subtype = subtype;
 
+		for (int i = 0; i < 4; ++i)
+			v1->connection[i] = nullNodePtr;
+
 		//внимание! итераторы не могут быть пустыми!!!
 		switch (v1->getType())
 		{
@@ -262,7 +265,6 @@ namespace nechto
 	void deleteNode(nodePtr v1)
 	{
 		assert(v1.exist());
-		assert(!typeCompare(v1, node::Deleted));//нельзя удалять дважды
 		switch (v1->getType())
 		{
 		case node::Hub:					//разветвитель
@@ -298,7 +300,6 @@ namespace nechto
 				//при удалении ноды надо удалить все существующие соединения
 				if (typeSubtypeCompare(connection, 
 					node::Pointer, pointer::ConIter) &&
-					(connection->getSubtype() == pointer::ConIter) &&
 					(connection->connection[0] == v1))
 				{
 					connection->connection[0] = nullNodePtr;
@@ -313,13 +314,15 @@ namespace nechto
 			{
 				nodePtr vTemp = i1.currentHub;
 				bool end = !i1.GoToNextHub();
-				nodeStorage::terminal.deallocate(vTemp);
+				
 				i1.setLocalPos(0);
 				if (end)
 				{
 					assert(typeCompare(i1.currentHub, node::Deleted));
 					return;
 				}
+				else
+					nodeStorage::terminal.deallocate(vTemp);
 			}
 			else
 				i1.setLocalPos(i1.pos() + 1);

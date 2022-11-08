@@ -85,8 +85,9 @@ namespace nechto::ide
 			updateBox();
 			updateAim();
 		}
-		void focus(visualNode* vNode = nullptr)
+		void focus(visualNode* vNode)
 		{
+			reset();
 			Focus = true;
 			iText.clear();
 			nodePtr v1 = vNode->getConnection(0);
@@ -103,6 +104,7 @@ namespace nechto::ide
 						iText = std::to_wstring(v1->getData<i64>());
 					else
 						iText = std::to_wstring(v1->getData<f64>());
+					break;
 				default:
 					return;
 				}
@@ -124,6 +126,7 @@ namespace nechto::ide
 					return setAimData();
 				}
 			}
+			numDisconnect(get(), 1);
 			return false;
 		}
 		bool boxResetEvent()

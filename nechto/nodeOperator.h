@@ -1,12 +1,11 @@
 #pragma once
-#include "node.h"
 #include "connectionIterator.h"
 #include "connectionRule.h"
 
 #include "externalObject.h"
 #include "nodeOperationSet.h"
 #include "method.h"
-#include "group.h"
+#include "groupPtr.h"
 #include "text.h"
 
 namespace nechto

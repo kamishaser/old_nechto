@@ -138,28 +138,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="connecter.h" />
     <ClInclude Include="connectionRule.h" />
+    <ClInclude Include="creator.h" />
+    <ClInclude Include="typeDeclarations.h" />
     <ClInclude Include="fileSerializer.h" />
     <ClInclude Include="method.h" />
-    <ClInclude Include="group.h" />
+    <ClInclude Include="groupPtr.h" />
     <ClInclude Include="branching.h" />
     <ClInclude Include="checkAndStep.h" />
     <ClInclude Include="externalObject.h" />
     <ClInclude Include="connectionIterator.h" />
-    <ClInclude Include="hub.h" />
+    <ClInclude Include="hubPtr.h" />
     <ClInclude Include="namedExCon.h" />
     <ClInclude Include="graphOperations.h" />
     <ClInclude Include="mathOperator.h" />
     <ClInclude Include="namedExConGroup.h" />
     <ClInclude Include="nodeOperationSet.h" />
     <ClInclude Include="nodeOperator.h" />
+    <ClInclude Include="nodePtr.h" />
+    <ClInclude Include="nodeStorage.h" />
     <ClInclude Include="nodeTypeProperties.h" />
-    <ClInclude Include="pointer.h" />
+    <ClInclude Include="pointerPtr.h" />
     <ClInclude Include="serializer.h" />
-    <ClInclude Include="node.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="textOut.h" />
     <ClInclude Include="typeNames.h" />
+    <ClInclude Include="variablePtr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />

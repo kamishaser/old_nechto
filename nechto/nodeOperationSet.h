@@ -14,7 +14,7 @@ namespace nechto
 		//массив всех операций
 
 		//инициализация по initializer_list
-		constexpr staticNodeOperationSet(
+		staticNodeOperationSet(
 			std::initializer_list<namedOperation> ilist)
 			:size(ilist.size())
 		{
@@ -28,7 +28,7 @@ namespace nechto
 			}
 		}
 		//инициализация копированием с добавлением
-		constexpr staticNodeOperationSet(
+		staticNodeOperationSet(
 			const staticNodeOperationSet& snoSet,
 			std::initializer_list<namedOperation> ilist)
 			:size(snoSet.size + ilist.size())
