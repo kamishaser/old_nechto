@@ -16,13 +16,13 @@ namespace nechto::ide
 		display dp;
 
 		nodeBoard workBoard;
-		consistentGroup leftGroup{ newExObjNode(0), L"leftGroup" };
-		consistentGroup rightGroup{ newExObjNode(0), L"rightGroup" };
-		visualGroup center = { newExObjNode(0), L"center"};
+		consistentGroup leftGroup{ newExObjNode(0), u"leftGroup" };
+		consistentGroup rightGroup{ newExObjNode(0), u"rightGroup" };
+		visualGroup center = { newExObjNode(0), u"center"};
 
 		nodeBoard interfaceBoard;
-		consistentGroup topGroup{ newExObjNode(0), L"topGroup"};
-		consistentGroup bottomGroup{ newExObjNode(0), L"bottomGroup" };
+		consistentGroup topGroup{ newExObjNode(0), u"topGroup"};
+		consistentGroup bottomGroup{ newExObjNode(0), u"bottomGroup" };
 
 		visualNode cursoredParametrs{ newExObjNode(0) };
 		visualNode cursoredConnections{ newExObjNode(0) };
@@ -31,7 +31,7 @@ namespace nechto::ide
 		textInputBox  textBox;
 
 
-		namedExConGroup activeButton{ newExObjNode(0), L"pressedButton" };
+		namedExConGroup activeButton{ newExObjNode(0), u"pressedButton" };
 
 		GUI()
 			:dp(), textBox(textBoxNode.get())
@@ -61,7 +61,7 @@ namespace nechto::ide
 			bottomGroup.addNode(&consoleOut);
 			consoleText = &consoleOut.nodeText;
 
-			cursoredParametrs.nodeText = L"наведи на ноду для получения данных";
+			cursoredParametrs.nodeText = u"наведи на ноду для получения данных";
 
 			setChainsPosition();
 		}

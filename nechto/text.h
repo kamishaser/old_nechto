@@ -39,26 +39,26 @@ namespace nechto
 			return true;
 		}
 
-		void set(nodePtr v1, const std::wstring& data) noexcept
+		void set(nodePtr v1, const std::u16string& data) noexcept
 		{
 			assert(v1.exist());
 			assert(v1->getType() == node::Text);
 			nodeStorage::lock(v1);
-			if (v1->getData<std::wstring*>() == nullptr)
-				v1->setData(new std::wstring(data));
+			if (v1->getData<std::u16string*>() == nullptr)
+				v1->setData(new std::u16string(data));
 			else
-				*v1->getData<std::wstring*>() = data;
+				*v1->getData<std::u16string*>() = data;
 			nodeStorage::unlock(v1);
 		}
 
-		std::wstring get(nodePtr v1) noexcept
+		std::u16string get(nodePtr v1) noexcept
 		{
 			assert(v1.exist());
 			assert(v1->getType() == node::Text);
-			std::wstring temp;
+			std::u16string temp;
 			nodeStorage::lock(v1);
-			if (v1->getData<std::wstring*>())
-				temp = *v1->getData<std::wstring*>();
+			if (v1->getData<std::u16string*>())
+				temp = *v1->getData<std::u16string*>();
 			nodeStorage::unlock(v1);
 			return temp;
 		}
@@ -67,9 +67,9 @@ namespace nechto
 			assert(v1.exist());
 			assert(v1->getType() == node::Text);
 			nodeStorage::lock(v1);
-			if (v1->getData<std::wstring*>())
-				delete v1->getData<std::wstring*>();
-			v1->setData<std::wstring*>(nullptr);
+			if (v1->getData<std::u16string*>())
+				delete v1->getData<std::u16string*>();
+			v1->setData<std::u16string*>(nullptr);
 			nodeStorage::unlock(v1);
 		}
 
@@ -77,11 +77,11 @@ namespace nechto
 		{
 			assert(v1.exist());
 			assert(v1->getType() == node::Text);
-			set(v1, L"");
+			set(v1, u"");
 		}
-		void initialize(nodePtr v1, const std::wstring& text)
+		void initialize(nodePtr v1, const std::u16string& text)
 		{
-			v1->setData<std::wstring*>(nullptr);
+			v1->setData<std::u16string*>(nullptr);
 			set(v1, text);
 		}
 		//присваивание значения ноде того же тип

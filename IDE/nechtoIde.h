@@ -33,11 +33,11 @@ namespace nechto::ide
 			aeh(gui),
 			fh(gui)
 		{
-			fh.load(L"autosave.nechto");
+			fh.load(u"autosave.nechto");
 		}
 		~nechtoIDE()
 		{
-			fh.save(L"autosave.nechto", gui.workBoard.vNodeGroup());
+			fh.save(u"autosave.nechto", gui.workBoard.vNodeGroup());
 		}
 		bool update()
 		{
@@ -53,9 +53,9 @@ namespace nechto::ide
 		nodePtr example()
 		{
 			nodePtr descriptionText = newNode(node::Text);
-			text::set(descriptionText, std::wstring(L"Простейший алгоритм\n") +
-				L"для разработки и тестирования" +
-				L"системы базового отображения nechto");
+			text::set(descriptionText, std::u16string(u"Простейший алгоритм\n") +
+				u"для разработки и тестирования" +
+				u"системы базового отображения nechto");
 			
 			nodePtr vFirst= nullNodePtr;
 			nodePtr vLast = nullNodePtr;

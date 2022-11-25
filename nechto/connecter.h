@@ -55,31 +55,20 @@ namespace nechto
 			hub.node()->hubPort = next;
 			hubPtr(next).setPrevious(hub);
 		}
-		static bool excludeHubWithoutNotification(hubPtr hub)
-		{
-			nodePtr previous = hub.previous();
-			if (previous == hub)
-				return false;
-			nodePtr next = hub.hub();
-			previous.node()->hubPort = next;
-			hubPtr(next).setPrevious(previous);
-			return true;
-		}
+		//исключение хаба из цепочки без оповещения итераторов
+		
 		static void resetIterator(existing<iterator> iter)
 		{
-			if (iter.exist())
-			{
-				existing<nodePtr> node = iter.getHPPair().hub;
-				if (node.type() == nodeT::Pointer &&
-					(iter.pos() == 0) && (node.subtype() > 0))
-					pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
-			}
+			existing<nodePtr> node = iter.getHPPair().hub;
+			if (node.type() == nodeT::Pointer &&
+				(iter.pos() == 0) && (node.subtype() > 0))
+				pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
 		}
 	};
-	connectionIterator firstEmptyHubPort(existing<nodePtr> eptr)
+	portIterator firstEmptyHubPort(existing<nodePtr> eptr)
 	{
 		assert(eptr.type() != nodeT::Hub);
-		connectionIterator ci(eptr);
+		portIterator ci(eptr);
 		while (true)
 		{
 			nodePtr nextHub = ci.get().hub();
@@ -117,6 +106,28 @@ namespace nechto
 			gi.setHPPair(hubPosPair(nextHub, 0));
 		}
 	}
+	portIterator lastConnectedPort(existing<nodePtr> node)
+	{
+		portIterator iter(node);
+		portIterator lastConnected(node, hubPosPair());
+		do
+		{
+			if (iter.get().exist())
+				lastConnected = iter;
+		} while (iter.stepForward());
+		return lastConnected;
+	}
+	groupIterator lastConnectedGroupPort(groupPtr group)
+	{
+		groupIterator gi(group);
+		gi.stepBack();
+		do
+		{
+			if (gi.get().exist())
+				return gi;
+		} while (gi.stepBack());
+		return groupIterator(group, hubPosPair());
+	}
 	groupIterator backGroupPort(groupPtr group)
 	{
 		groupIterator gi(group);
@@ -136,16 +147,16 @@ namespace nechto
 	}
 	/*возврощает итератор на ближайший порт ноды node подключённый к connection.
 	* Ели не находит - возвращает пустой итератор */
-	connectionIterator findNearestNonGroupConnection(
+	portIterator findNearestNonGroupConnection(
 		existing<nodePtr> node, existing<nodePtr> connection)
 	{
-		connectionIterator ci(node);
+		portIterator ci(node);
 		do
 		{
 			if (ci.get() == connection)
 				return ci;
 		} while (ci.stepForward());
-		return connectionIterator(nullptr, hubPosPair(nullptr, 0));
+		return portIterator(nullptr, hubPosPair(nullptr, 0));
 	}
 	/*возврощает итератор на ближайший порт группы group подключённый к connection.
 	* Ели не находит - возвращает пустой итератор */
@@ -180,7 +191,7 @@ namespace nechto
 	}
 	void nearestDisconnect(existing<nodePtr> node1, char port)
 	{
-		nearestDisconnect(connectionIterator(node1, port));
+		nearestDisconnect(portIterator(node1, port));
 	}
 	void nearestDisconnect(existing<nodePtr> node1, existing<nodePtr> node2)
 	{
@@ -191,8 +202,8 @@ namespace nechto
 	void simplifiedNumNumConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1, char port2)
 	{
-		connectionIterator ci1(node1, port1);
-		connectionIterator ci2(node2, port2);
+		portIterator ci1(node1, port1);
+		portIterator ci2(node2, port2);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		if (ci2.get().exist())
@@ -202,7 +213,7 @@ namespace nechto
 	void simplifiedNumHubConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1)
 	{
-		connectionIterator ci1(node1, port1);
+		portIterator ci1(node1, port1);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
@@ -213,7 +224,7 @@ namespace nechto
 		connecter::connect(
 			firstEmptyHubPort(node1), firstEmptyHubPort(node2));
 	}
-	void simplifiedIterIterConnect(connectionIterator ci1, connectionIterator ci2)
+	void simplifiedIterIterConnect(portIterator ci1, portIterator ci2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -222,9 +233,9 @@ namespace nechto
 		connecter::connect(ci1, ci2);
 	}
 	void simplifiedIterNumConnect(
-		connectionIterator ci1, existing<nodePtr> node2, char port2)
+		portIterator ci1, existing<nodePtr> node2, char port2)
 	{
-		connectionIterator ci2(node2, port2);
+		portIterator ci2(node2, port2);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		if (ci2.get().exist())
@@ -232,7 +243,7 @@ namespace nechto
 		connecter::connect(ci1, ci2);
 	}
 	void simplifiedIterHubConnect(
-		connectionIterator ci1, existing<nodePtr> node2)
+		portIterator ci1, existing<nodePtr> node2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);

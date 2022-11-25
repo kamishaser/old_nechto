@@ -13,7 +13,7 @@ namespace nechto::ide
 	struct visualGroup :public namedExConGroup
 	{
 		rect frame;
-		visualGroup(nodePtr emptyExternalObject, const std::wstring& name,
+		visualGroup(nodePtr emptyExternalObject, const std::u16string& name,
 			glm::vec2 startPoint = glm::vec2{ 0,0 })
 			:namedExConGroup(emptyExternalObject, name),
 			frame(startPoint, glm::vec2{ 1.f, 1.f }) {}
@@ -100,10 +100,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<visualGroup*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -116,11 +116,11 @@ namespace nechto::ide
 			return cRule;
 		}
 	};
-	const std::wstring visualGroup::typeName = L"nechtoIde.visualGroup";
+	const std::u16string visualGroup::typeName = u"nechtoIde.visualGroup";
 	const connectionRule visualGroup::cRule = connectionRule{};
 	const staticNodeOperationSet visualGroup::methodSet
 	{
-		/*namedOperation(L"nothing", operation{
+		/*namedOperation(u"nothing", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{

@@ -114,10 +114,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<nodeBoard*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -131,7 +131,7 @@ namespace nechto::ide
 		}
 
 	};
-	const std::wstring nodeBoard::typeName = L"nechtoIde.nodeBoard";
+	const std::u16string nodeBoard::typeName = u"nechtoIde.nodeBoard";
 	const connectionRule nodeBoard::cRule = connectionRule{
 		conRule::Group, conRule::In_Output, nullptr,
 		conRule::Group, conRule::In_Output, nullptr,
@@ -139,7 +139,7 @@ namespace nechto::ide
 	};
 	const staticNodeOperationSet nodeBoard::methodSet
 	{
-		/*namedOperation(L"addNode", operation{
+		/*namedOperation(u"addNode", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input, [](nodePtr v1)
@@ -155,7 +155,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"addConnection", operation{
+		namedOperation(u"addConnection", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input, [](nodePtr v1)
@@ -179,7 +179,7 @@ namespace nechto::ide
 				auto vConnection = nBoard->addConnection(v1, vNode0, vNode1);
 				return true;
 			}}),
-		namedOperation(L"getAllVConnections", operation{
+		namedOperation(u"getAllVConnections", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input,
@@ -206,7 +206,7 @@ namespace nechto::ide
 				/////////////////////////////////////////////////////недоделано
 				return true;
 			}}),
-				namedOperation(L"getAllConnectedVNodes", operation{
+				namedOperation(u"getAllConnectedVNodes", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input,
@@ -233,7 +233,7 @@ namespace nechto::ide
 				/////////////////////////////////////////////////////недоделано
 				return true;
 			}}),
-		namedOperation(L"visualized", operation{
+		namedOperation(u"visualized", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::AnyPointer, conRule::Input, nullptr,

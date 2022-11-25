@@ -63,9 +63,9 @@ namespace nechto::ide
 		//№0 - content
 		//№3 - список кнопок в котором она находится
 	public:
-		sharedButton(std::wstring name)
+		sharedButton(std::u16string name)
 			:namedExCon(name){}
-		sharedButton(nodePtr emptyExternalObject, std::wstring name)
+		sharedButton(nodePtr emptyExternalObject, std::u16string name)
 			:namedExCon(emptyExternalObject, name) {}
 		nodePtr content()
 		{
@@ -108,7 +108,7 @@ namespace nechto::ide
 			return temp->connection[0];
 		}
 	};
-	sharedButton* createButton(const std::wstring& name)
+	sharedButton* createButton(const std::u16string& name)
 	{
 		return new sharedButton(newExObjNode(0), name);
 	}

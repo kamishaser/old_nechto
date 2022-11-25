@@ -145,48 +145,52 @@ namespace nechto
 			return true;
 		}
 	}
-	class mathPtr : public existing<nodePtr>
+	class mathOperatorPtr : public existing<nodePtr>
 	{
 	public:
 		static const staticNodeOperationSet operSet;
-		mathPtr(const existing<nodePtr>& eptr)
+		mathOperatorPtr(const existing<nodePtr>& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return eptr.type() == nodeT::Math;
+			return eptr.type() == nodeT::MathOperator;
 		}
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
+		const operation* getOperation() const
+		{
+			return &operSet.getOperation(subtype());
+		}
 	};
-	const staticNodeOperationSet mathPtr::operSet
+	const staticNodeOperationSet mathOperatorPtr::operSet
 	{
-		{L"assigment", {mathOperationF::assigmentF}},
-		{L"unaryMinus", {mathOperationF::unaryMinusF}},
+		{u"assigment", {mathOperationF::assigmentF}},
+		{u"unaryMinus", {mathOperationF::unaryMinusF}},
 
-		{L"addition", {mathOperationF::additionF}},
-		{L"subtraction", {mathOperationF::subtractionF}},
+		{u"addition", {mathOperationF::additionF}},
+		{u"subtraction", {mathOperationF::subtractionF}},
 
-		{L"multiplication", {mathOperationF::multiplicationF}},
-		{L"division", {mathOperationF::divisionF}},
+		{u"multiplication", {mathOperationF::multiplicationF}},
+		{u"division", {mathOperationF::divisionF}},
 
-		{L"equal", {mathOperationF::equalF}},
-		{L"notEqual", {mathOperationF::notEqualF}},
+		{u"equau", {mathOperationF::equalF}},
+		{u"notEquau", {mathOperationF::notEqualF}},
 
-		{L"less", {mathOperationF::lessF}},
-		{L"greater", {mathOperationF::greaterF}},
-		{L"lessOrEqual", {mathOperationF::lessOrEqualF}},
-		{L"greaterOrEqual", {mathOperationF::greaterOrEqualF}},
+		{u"less", {mathOperationF::lessF}},
+		{u"greater", {mathOperationF::greaterF}},
+		{u"lessOrEquau", {mathOperationF::lessOrEqualF}},
+		{u"greaterOrEquau", {mathOperationF::greaterOrEqualF}},
 
-		{L"logicNegation", {mathOperationF::logicNegationF}},
-		{L"logicAnd", {mathOperationF::logicAndF}},
-		{L"logicOr", {mathOperationF::logicOrF}},
+		{u"logicNegation", {mathOperationF::logicNegationF}},
+		{u"logicAnd", {mathOperationF::logicAndF}},
+		{u"logicOr", {mathOperationF::logicOrF}},
 
-		{L"increment", {mathOperationF::incrementF}},
-		{L"decrement", {mathOperationF::decrementF}}
+		{u"increment", {mathOperationF::incrementF}},
+		{u"decrement", {mathOperationF::decrementF}}
 	};
 }

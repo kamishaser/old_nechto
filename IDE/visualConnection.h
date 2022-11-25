@@ -10,8 +10,8 @@ namespace nechto::ide
 	//к третьему подключается vCon из nodeBoard
 	struct visualConnection :public externalObject
 	{
-		std::wstring fText = L"h";
-		std::wstring sText = L"h";
+		std::u16string fText = u"h";
+		std::u16string sText = u"h";
 
 		visualConnection(nodePtr emptyExternalObject, visualNode* vn1, visualNode* vn2)
 			:externalObject(emptyExternalObject)
@@ -42,7 +42,7 @@ namespace nechto::ide
 		}
 		virtual ~visualConnection()
 		{
-			print(L"visualConnectionDeleted");
+			print(u"visualConnectionDeleted");
 		}
 		/*получение указателя на visualConnection по объекту.
 		Возвращает nullptr при несоответствии*/
@@ -54,10 +54,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<visualConnection*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -70,11 +70,11 @@ namespace nechto::ide
 			return cRule;
 		}
 	};
-	const std::wstring visualConnection::typeName = L"nechtoIde.visualConnection";
+	const std::u16string visualConnection::typeName = u"nechtoIde.visualConnection";
 	const connectionRule visualConnection::cRule = connectionRule{};
 	const staticNodeOperationSet visualConnection::methodSet
 	{
-		/*namedOperation(L"getOtherEnd", operation{
+		/*namedOperation(u"getOtherEnd", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr,
 				conRule::ExternalObject, conRule::None, [](nodePtr v1)
 					{

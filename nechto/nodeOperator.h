@@ -13,7 +13,7 @@ namespace nechto
 	const staticNodeOperationSet nodeOperator
 	{
 		//основные проверки
-		namedOperation(L"exist", operation {
+		namedOperation(u"exist", operation {
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -24,7 +24,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"getType",operation{
+		namedOperation(u"getType",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -32,7 +32,7 @@ namespace nechto
 				v0->setData<i64>(v1->getType());
 				return true;
 			}}),
-		namedOperation(L"getSubtype",operation{
+		namedOperation(u"getSubtype",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -40,7 +40,7 @@ namespace nechto
 				v0->setData<i64>(v1->getSubtype());
 				return true;
 			}}),
-		namedOperation(L"typeCompare",operation{
+		namedOperation(u"typeCompare",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input, nullptr,
 				conRule::AnyPointer, conRule::Input),
@@ -52,7 +52,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"typeSubtypeCompare",operation{
+		namedOperation(u"typeSubtypeCompare",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input, nullptr,
 				conRule::AnyPointer, conRule::Input),
@@ -64,7 +64,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"checkTheCorrectness",operation{
+		namedOperation(u"checkTheCorrectness",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -75,7 +75,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"hasHub",operation{
+		namedOperation(u"hasHub",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -86,7 +86,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"numberOfExistingConnections",operation{
+		namedOperation(u"numberOfExistingConnections",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -101,7 +101,7 @@ namespace nechto
 				v0->setData<i64>(counter);
 				return true;
 			}}),
-		namedOperation(L"numberOfHubInGroup",operation{
+		namedOperation(u"numberOfHubInGroup",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::Group, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -118,7 +118,7 @@ namespace nechto
 					v1->setData<i64>(0);
 				return true;
 			}}),
-		namedOperation(L"numberOfGroupMembers",operation{
+		namedOperation(u"numberOfGroupMembers",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::Group, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -126,7 +126,7 @@ namespace nechto
 				v0->setData<i64>(group::numberOfMembers(v1));
 				return true;
 			} }),
-		namedOperation(L"exObjExist",operation{
+		namedOperation(u"exObjExist",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::ExternalObject, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -137,7 +137,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			} }),
-		namedOperation(L"textSize", operation{
+		namedOperation(u"textSize", operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::Text, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -145,7 +145,7 @@ namespace nechto
 				v0->setData<i64>(text::get(v1).size());
 				return true;
 			}}),
-		namedOperation(L"textsEqual",operation{
+		namedOperation(u"textsEquau",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::Text, conRule::Input, nullptr,
 				conRule::Text, conRule::Input),
@@ -157,7 +157,7 @@ namespace nechto
 					v0->setData<i64>(0);
 				return true;
 			} }),
-		namedOperation(L"compressGroup",operation{
+		namedOperation(u"compressGroup",operation{
 			connectionRule(conRule::Group, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -165,7 +165,7 @@ namespace nechto
 				return true;
 			} }),
 			//перемещение итератора
-		namedOperation(L"GoToNextHub",operation{
+		namedOperation(u"GoToNextHub",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -184,7 +184,7 @@ namespace nechto
 				}
 				return true;
 			} }),
-		namedOperation(L"GoToPreviousHub",operation{
+		namedOperation(u"GoToPreviousHub",operation{
 			connectionRule(conRule::GroupIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -194,7 +194,7 @@ namespace nechto
 					i.push(v0);
 				return true;
 			} }),
-		namedOperation(L"stepForward",operation{
+		namedOperation(u"stepForward",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -213,7 +213,7 @@ namespace nechto
 				}
 				return true;
 			} }),
-		namedOperation(L"stepBack",operation{
+		namedOperation(u"stepBack",operation{
 			connectionRule(conRule::GroupIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -223,7 +223,7 @@ namespace nechto
 					i.push(v0);
 				return true;
 			} }),
-		namedOperation(L"insertHub",operation{
+		namedOperation(u"insertHub",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -241,7 +241,7 @@ namespace nechto
 				}
 				return true;
 			} }),
-		namedOperation(L"eraseHub",operation{
+		namedOperation(u"eraseHub",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -259,7 +259,7 @@ namespace nechto
 				}
 				return true;
 			} }),
-		namedOperation(L"atFirstHub",operation{
+		namedOperation(u"atFirstHub",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -279,7 +279,7 @@ namespace nechto
 		//добавить перемещение в определённуюю локальную позицию
 		
 			//отключение
-		namedOperation(L"I_Disconnect",operation{
+		namedOperation(u"I_Disconnect",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -287,7 +287,7 @@ namespace nechto
 				i.disconnect();
 				return true;
 			} }),	
-		namedOperation(L"HH_disconnect",operation{
+		namedOperation(u"HH_disconnect",operation{
 			connectionRule(conRule::AnyPointer, conRule::In_Output, nullptr,
 				conRule::AnyPointer, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -296,7 +296,7 @@ namespace nechto
 				return true;
 			} }),
 			//подключение
-		namedOperation(L"II_Connect",operation{
+		namedOperation(u"II_Connect",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -306,7 +306,7 @@ namespace nechto
 				IterIterConnect(i0, i1);
 				return true;
 			} }),
-		namedOperation(L"IH_Connect",operation{
+		namedOperation(u"IH_Connect",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::AnyPointer, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -315,7 +315,7 @@ namespace nechto
 				IterHubConnect(i0, v1);
 				return true;
 			} }),
-		namedOperation(L"HH_Connect",operation{
+		namedOperation(u"HH_Connect",operation{
 			connectionRule(conRule::AnyPointer, conRule::In_Output, nullptr,
 				conRule::AnyPointer, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -323,7 +323,7 @@ namespace nechto
 				HubHubConnect(v0, v1);
 				return true;
 			} }),
-		namedOperation(L"swapConnections",operation{
+		namedOperation(u"swapConnections",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::In_Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -335,7 +335,7 @@ namespace nechto
 		//добавить подключение в первый свободный порт или конец группы
 		
 			//установка указателей и итераторов
-		namedOperation(L"setIterator",operation{
+		namedOperation(u"setIterator",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::Output, nullptr,
 				conRule::AnyPointer, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -352,7 +352,7 @@ namespace nechto
 				}
 				return true;
 			} }),
-		namedOperation(L"setPointer",operation{
+		namedOperation(u"setPointer",operation{
 			connectionRule(conRule::SimplePointer_NoTransit, conRule::Output, nullptr,
 				conRule::AnyPointer_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -364,7 +364,7 @@ namespace nechto
 					NumHubConnect(v1, temp, 0);
 				return true;
 			} }),
-		namedOperation(L"getMainNode",operation{
+		namedOperation(u"getMainNode",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -372,7 +372,7 @@ namespace nechto
 				assert(false);//pointer::set()
 				return true;
 			} }),
-		namedOperation(L"copyIterator",operation{
+		namedOperation(u"copyIterator",operation{
 			connectionRule(conRule::AnyIterator_NoTransit, conRule::Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -382,7 +382,7 @@ namespace nechto
 				return true;
 			} }),
 			//получение позиции итератора
-		namedOperation(L"globalPosition",operation{
+		namedOperation(u"globalPosition",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -419,7 +419,7 @@ namespace nechto
 				}
 				return false;
 			} }),
-		namedOperation(L"localPosition",operation{
+		namedOperation(u"localPosition",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::AnyIterator_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -428,7 +428,7 @@ namespace nechto
 				return true;
 			} }),
 			//создание нод различных типов
-		namedOperation(L"newVariable",operation{
+		namedOperation(u"newVariable",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -447,7 +447,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newMathOperator",operation{
+		namedOperation(u"newMathOperator",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -457,7 +457,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newConditionalBranching",operation{
+		namedOperation(u"newConditionalBranching",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -466,7 +466,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newMethod",operation{
+		namedOperation(u"newMethod",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -476,7 +476,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newExternalObject",operation{
+		namedOperation(u"newExternalObject",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -486,7 +486,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newText",operation{
+		namedOperation(u"newText",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -495,7 +495,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newPointer",operation{
+		namedOperation(u"newPointer",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Input, nullptr,
 				conRule::AnyPointer, conRule::In_Output),
@@ -528,7 +528,7 @@ namespace nechto
 					return false;
 				return true;
 			} }),
-		namedOperation(L"newGroup",operation{
+		namedOperation(u"newGroup",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
@@ -537,7 +537,7 @@ namespace nechto
 				pointer::set(v0, temp);
 				return true;
 			} }),
-		namedOperation(L"newNodeOperator",operation{
+		namedOperation(u"newNodeOperator",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::In_Output, nullptr,
 				conRule::I64Variable, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -548,7 +548,7 @@ namespace nechto
 				return true;
 			} }),
 			//дублирование
-		namedOperation(L"duplicate",operation{
+		namedOperation(u"duplicate",operation{
 			connectionRule(conRule::AnyPointer_NoTransit, conRule::Output, nullptr,
 				conRule::AnyPointer_NoTransit, conRule::Input),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -557,7 +557,7 @@ namespace nechto
 				return true;
 			} }),
 			//удаление ноды		
-		namedOperation(L"deleteNode",operation{
+		namedOperation(u"deleteNode",operation{
 				connectionRule(conRule::AnyPointer, conRule::In_Output),
 			[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{

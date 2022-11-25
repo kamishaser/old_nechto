@@ -75,26 +75,26 @@ namespace nechto::ide
 		}
 		void setConType(visualConnection* vConnection, int number, conType cType)
 		{
-			std::wstring& text = (number) ? vConnection->sText : vConnection->fText;
+			std::u16string& text = (number) ? vConnection->sText : vConnection->fText;
 			switch (cType)
 			{
 			case nechto::conType::Hub:
-				text = L"";
+				text = u"";
 				break;
 			case nechto::conType::Group:
-				text = L"G";
+				text = u"G";
 				break;
 			case nechto::conType::N0:
-				text = L"N0";
+				text = u"N0";
 				break;
 			case nechto::conType::N1:
-				text = L"N1";
+				text = u"N1";
 				break;
 			case nechto::conType::N2:
-				text = L"N2";
+				text = u"N2";
 				break;
 			case nechto::conType::N3:
-				text = L"N3";
+				text = u"N3";
 				break;
 			default:
 				break;

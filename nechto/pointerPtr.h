@@ -33,7 +33,7 @@ namespace nechto
 		{
 			setData(hpp);
 		}
-		nodePtr follow();
+		nodePtr follow() const;
 
 		/*функция определна после классов
 		simplePointerPtr, iteratorPtr, conIteratorPtr и groupIteratorPtr */
@@ -120,10 +120,10 @@ namespace nechto
 			return (purpose().exist()) ? getHPPair().exist() : true;
 		}
 	};
-	class conIteratorPtr : public iteratorPtr
+	class portIteratorPtr : public iteratorPtr
 	{
 	public:
-		conIteratorPtr(const iteratorPtr& eptr)
+		portIteratorPtr(const iteratorPtr& eptr)
 			:iteratorPtr(eptr)
 		{
 			assert(match(eptr));
@@ -140,8 +140,6 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		/*функция определна после классов
-		conIteratorPtr и groupIteratorPtr */
 	}; 
 	class groupIteratorPtr : public iteratorPtr
 	{
@@ -163,8 +161,6 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		/*функция определна после классов
-		conIteratorPtr и groupIteratorPtr */
 	};
 	nodePtr pointerPtr::follow() const
 	{
@@ -236,7 +232,6 @@ namespace nechto
 		//		v0->setData<hubPosPair>(v1->getData<hubPosPair>());
 		//	}
 		//}
-		bool set(nodePtr pointer, nodePtr v1);//определено в connectionIterator.h
 	}
 
 }

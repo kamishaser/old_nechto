@@ -17,13 +17,13 @@ namespace nechto::ide
 		selectHandler& sh;
 		keyboardHandler& keyboard;
 
-		namedExCon cursor{ L"mouseCursor" };
-		namedExCon lClicked{ L"lastClickedNode" };
+		namedExCon cursor{ u"mouseCursor" };
+		namedExCon lClicked{ u"lastClickedNode" };
 	public:
 		
-		sharedButton leftButton{ L"leftMouseButton" };
-		sharedButton middleButton{ L"middleMouseButton" };
-		sharedButton rightButton{ L"rightMouseButton" };
+		sharedButton leftButton{ u"leftMouseButton" };
+		sharedButton middleButton{ u"middleMouseButton" };
+		sharedButton rightButton{ u"rightMouseButton" };
 
 		mouseHandler(GUI& g, 
 			keyboardHandler& keyboardH, selectHandler& selectH)
@@ -184,7 +184,7 @@ namespace nechto::ide
 					if (button->bClickEvent())
 					{
 						bList->click(button);
-						print(std::wstring(L"clickButton ") + to_string(button->get()));
+						print(std::u16string(u"clickButton ") + to_string(button->get()));
 					}
 			}
 		}

@@ -20,7 +20,7 @@ namespace nechto::ide
 		clickEventT clickEvent = nullptr;
 		
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name,
+			const std::u16string& name,
 			bool choise = false)
 			:namedExConGroup(emptyExternalObject, name), 
 			choiseMode(choise)
@@ -28,9 +28,9 @@ namespace nechto::ide
 			NumNumConnect(get(), vGroup->get(), 1, 1);
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name, bool choise,
-			std::initializer_list<std::wstring> ilist, 
-			std::wstring firstActive = std::wstring())
+			const std::u16string& name, bool choise,
+			std::initializer_list<std::u16string> ilist, 
+			std::u16string firstActive = std::u16string())
 			:buttonList(emptyExternalObject, vGroup, name, choise)			
 		{
 			assert(ilist.size() > 0);
@@ -47,9 +47,9 @@ namespace nechto::ide
 			}
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name, bool choise,
-			const std::vector<std::wstring>& ilist,
-			std::wstring firstActive = std::wstring())
+			const std::u16string& name, bool choise,
+			const std::vector<std::u16string>& ilist,
+			std::u16string firstActive = std::u16string())
 			:buttonList(emptyExternalObject, vGroup, name, choise)
 		{
 			assert(ilist.size() > 0);
@@ -103,7 +103,7 @@ namespace nechto::ide
 		void addButton(sharedButton* button)
 		{
 			IterIterConnect(group::firstEmptyPort(getGroup()),
-				connectionIterator(button->get(), 3));
+				portIterator(button->get(), 3));
 			if (visible())
 				showButton(button, vNodeGroup(), 
 					nodeBoard::getByNode(vNodeGroup()->getNodeBoard()));
@@ -146,7 +146,7 @@ namespace nechto::ide
 			NumNumConnect(button->get(), vNode->get(), 0, 0);
 			//вставка ноды в visualGroup
 			IterIterConnect(group::firstEmptyPort(vGroup->getGroup()),
-				connectionIterator(vNode->get(), 1));
+				portIterator(vNode->get(), 1));
 			//подключение кнопки к interfaceBoard
 			nBoard->addNode(vNode);
 
@@ -166,10 +166,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<buttonList*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -182,6 +182,6 @@ namespace nechto::ide
 			hide();
 		}
 	};
-	const std::wstring buttonList::typeName = L"nechtoIde.buttonList";
+	const std::u16string buttonList::typeName = u"nechtoIde.buttonList";
 	const connectionRule buttonList::cRule = connectionRule{};
 }

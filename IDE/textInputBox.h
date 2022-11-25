@@ -30,7 +30,7 @@ namespace nechto::ide
 			case node::Variable:
 				if ((iText.size() > 12) || iText.empty())
 					return false;
-				if (iText == L"-")
+				if (iText == u"-")
 					return false;
 				if (v1->getSubtype())//i64
 					return isI64(iText);
@@ -45,11 +45,11 @@ namespace nechto::ide
 		}
 		
 		i64 limit = 1000;
-		std::wstring header = L"ввод текста";
-		std::wstring iText;
+		std::u16string header = u"ввод текста";
+		std::u16string iText;
 
 		textInputBox(nodePtr v1)
-			:namedExCon(L"TextInputBox")
+			:namedExCon(u"TextInputBox")
 		{
 			NumHubConnect(get(), v1, 0);
 		}
@@ -101,9 +101,9 @@ namespace nechto::ide
 					break;
 				case node::Variable:
 					if (v1->getSubtype())
-						iText = std::to_wstring(v1->getData<i64>());
+						iText = std::to_u16string(v1->getData<i64>());
 					else
-						iText = std::to_wstring(v1->getData<f64>());
+						iText = std::to_u16string(v1->getData<f64>());
 					break;
 				default:
 					return;
@@ -142,7 +142,7 @@ namespace nechto::ide
 		void updateBox()
 		{
 			box()->nodeText = header +
-				std::wstring((hasFocus()) ? L" *\n" : L" -\n") +
+				std::u16string((hasFocus()) ? u" *\n" : u" -\n") +
 				iText;
 		}
 		void updateAim()
@@ -169,7 +169,7 @@ namespace nechto::ide
 				}
 				else
 				{
-					aim()->nodeText = L"ERROR";
+					aim()->nodeText = u"ERROR";
 					if (!iText.empty() && !(isPoint(iText.back()) || isMinus(iText.back())))
 						backSpace();
 				}
@@ -207,7 +207,7 @@ namespace nechto::ide
 			return ch == L'-';
 		}
 		
-		static bool isI64(const std::wstring& text)
+		static bool isI64(const std::u16string& text)
 		{
 			if (text.empty())
 				return false;
@@ -220,7 +220,7 @@ namespace nechto::ide
 			return true;
 		}
 
-		static bool isF64(const std::wstring& text)
+		static bool isF64(const std::u16string& text)
 		{
 			if (text.empty())
 				return false;

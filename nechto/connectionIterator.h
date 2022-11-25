@@ -10,18 +10,23 @@ namespace nechto
 	protected:
 		hubPosPair hpp;
 		nodePtr purpose;
+
+		bool exist()
+		{//публичное использование сего имени опасно путсницей с get().exist()
+			return connected();
+		}
 	public:
 		iterator() {}
 		iterator(nodePtr Purpose, hubPosPair HPP)
 			:purpose(Purpose), hpp(HPP) {}
-		iterator(iteratorPtr iterPtr)
+		explicit iterator(iteratorPtr iterPtr)
 			:purpose(iterPtr.purpose()), hpp(iterPtr.getHPPair()) {}
-		bool exist()const
+		bool connected()const
 		{
 			return hpp.exist();
 		}
 		operator bool()const
-		{return exist(); }
+		{return connected(); }
 		nodePtr get()const 
 		{
 			return hpp.follow();
@@ -72,14 +77,14 @@ namespace nechto
 		}
 	};
 
-	class connectionIterator : public iterator
+	class portIterator : public iterator
 	{
 	public:
-		connectionIterator(existing<nodePtr> Purpose, char pos = 0)
+		explicit portIterator(existing<nodePtr> Purpose, char pos = 0)
 			:iterator(Purpose, hubPosPair(Purpose, 0)) {}
-		connectionIterator(conIteratorPtr conIter)
+		explicit portIterator(portIteratorPtr conIter)
 			:iterator(iteratorPtr(conIter)){}
-		connectionIterator(nodePtr Purpose, hubPosPair hpp)
+		portIterator(nodePtr Purpose, hubPosPair hpp)
 			:iterator(Purpose, hpp) {}
 		bool nextHub()
 		{
@@ -124,7 +129,7 @@ namespace nechto
 		}
 
 		
-		//static connectionIterator backEmptyHubPort(existing<nodePtr> eptr)
+		//static portIterator backEmptyHubPort(existing<nodePtr> eptr)
 		bool stepForwardToNextConnected()
 		{
 			do
@@ -146,7 +151,7 @@ namespace nechto
 		//{
 		//	assert(currentHub != mainNode);
 		//	//перебирает все подключённые ноды в поисках итератора, указывающего на удаляемый хаб
-		//	connectionIterator conIter(mainNode);
+		//	portIterator conIter(mainNode);
 		//	do
 		//	{
 		//		for (int i = 0; i < 4; ++i)
@@ -169,9 +174,9 @@ namespace nechto
 	class groupIterator : public iterator
 	{
 	public:
-		groupIterator(groupPtr group)
+		explicit groupIterator(groupPtr group)
 			:iterator(group, hubPosPair(group.firstGroupHub(), 0)){}
-		groupIterator(groupIteratorPtr groupIter)
+		explicit groupIterator(groupIteratorPtr groupIter)
 			:iterator(iteratorPtr(groupIter)){}
 		groupIterator(nodePtr Purpose, hubPosPair hpp)
 			:iterator(Purpose, hpp) {}
@@ -255,7 +260,7 @@ namespace nechto
 		//		return;
 		//	}
 		//	//перебирает все подключённые ноды в поисках итератора, указывающего на удаляемый хаб
-		//	connectionIterator conIter(mainNode);
+		//	portIterator conIter(mainNode);
 		//	do
 		//	{
 		//		for (int i = 0; i < 4; ++i)

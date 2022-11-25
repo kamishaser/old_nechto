@@ -46,7 +46,7 @@ namespace nechto::ide
 		arrangeMode mode;
 		float distance = 2;
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(nodePtr emptyExternalObject, const std::wstring& name, 
+		consistentGroup(nodePtr emptyExternalObject, const std::u16string& name, 
 			glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
 			:visualGroup(emptyExternalObject, name, startPoint), mode(Mode)
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
@@ -206,10 +206,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<consistentGroup*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -222,12 +222,12 @@ namespace nechto::ide
 			return cRule;
 		}
 	};
-	const std::wstring consistentGroup::typeName = L"nechtoIde.consistentGroup";
+	const std::u16string consistentGroup::typeName = u"nechtoIde.consistentGroup";
 	const connectionRule consistentGroup::cRule = connectionRule{};
 	const staticNodeOperationSet consistentGroup::methodSet
 	{
 		/*visualGroup::methodSet,
-		namedOperation(L"nothing", operation{
+		namedOperation(u"nothing", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{

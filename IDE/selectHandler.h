@@ -13,8 +13,8 @@ namespace nechto::ide
 		int numberOfLastSelected = -1;//номер последней выделенной ноды
 
 		selectHandler()
-			:groupOfSelected(L"groupOfSelected"),
-			lastSelectedNode(L"lastSelected")
+			:groupOfSelected(u"groupOfSelected"),
+			lastSelectedNode(u"lastSelected")
 		{
 			NumNumConnect(groupOfSelected.get(), newNode(node::Group), 0, 0);
 		}
@@ -49,7 +49,7 @@ namespace nechto::ide
 				lsBackShift();
 				NumHubConnect(lastSelectedNode.get(), vNode->get(), 3);
 			}
-			print(L"select");
+			print(u"select");
 			return true;
 		}
 		//снять выделение

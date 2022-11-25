@@ -109,7 +109,7 @@ namespace nechto::ide
 						checkAndExpand(gi2, vNode1);
 					} while (gi2.stepForward());
 				}
-				connectionIterator ci(v1);
+				portIterator ci(v1);
 				do
 				{
 					checkAndExpand(ci, vNode1);

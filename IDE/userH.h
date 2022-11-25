@@ -23,7 +23,7 @@ namespace nechto::ide
 		
 		userH(GUI& g, editor& e)
 		:gui(g), ed(e), selectH(), mouse(g, keyboard, selectH),
-		testButton(L"testButton")
+		testButton(u"testButton")
 		{
 			gui.addButton(&testButton, &gui.bottomGroup);
 		}
@@ -77,7 +77,7 @@ namespace nechto::ide
 						connectionsList(mouse.cursored()->getConnection(0));
 					else;
 				else
-					gui.cursoredParametrs.nodeText = std::to_wstring(nodeStorage::terminal.numberOfNodes);
+					gui.cursoredParametrs.nodeText = std::to_u16string(nodeStorage::terminal.numberOfNodes);
 			}
 			else
 			{

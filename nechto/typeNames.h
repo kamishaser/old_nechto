@@ -10,7 +10,7 @@ namespace nechto
 {
 	namespace typeName
 	{
-		const char find(const std::vector<std::wstring>& NameSet, const std::wstring name)
+		const char find(const std::vector<std::u16string>& NameSet, const std::u16string name)
 		{
 			for (int i = 0; i < NameSet.size(); i++)
 				if (NameSet[i] == name)
@@ -18,91 +18,91 @@ namespace nechto
 			return 0;
 
 		}
-		const std::vector<std::wstring> nodeT
+		const std::vector<std::u16string> nodeT
 		{
-			L"Deleted",				
-			L"Hub",					//разветвитель
-			L"Variable",				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
-			L"MathOperator",			//математический оператор
-			L"ConditionalBranching",	//if
-			L"ExternalObject",
-			L"Method",
-			L"Pointer",
-			L"Group",
-			L"Text",					//строковый объект. ћожет использоватьс€ как метка, название, комментарий или переменна€
-			L"NodeOperator"
+			u"Deleted",				
+			u"Hub",					//разветвитель
+			u"Variable",				//объект-переменна€ базового типа, хнан€ща€с€ внутри алгоритма (одинаков дл€ всех исполнителей)
+			u"MathOperator",			//математический оператор
+			u"ConditionalBranching",	//if
+			u"ExternalObject",
+			u"Method",
+			u"Pointer",
+			u"Group",
+			u"Text",					//строковый объект. ћожет использоватьс€ как метка, название, комментарий или переменна€
+			u"NodeOperator"
 		};
 		
-		const std::vector<std::wstring> variableT
+		const std::vector<std::u16string> variableT
 		{
-			L"F64",
-			L"I64",
+			u"F64",
+			u"I64",
 		};
 
-		const std::vector<std::wstring> pointerT
+		const std::vector<std::u16string> pointerT
 		{
-			L"Reference",//одиночна€ ссылка
-			L"ConIter",//итератор соединений
-			L"GroupIter"//итератор массива
+			u"Reference",//одиночна€ ссылка
+			u"ConIter",//итератор соединений
+			u"GroupIter"//итератор массива
 		};
 		
 		
-		const std::vector<std::wstring> mathOperatorT
+		const std::vector<std::u16string> mathOperatorT
 		{
-			L"Assigment",			// =		
-			L"UnaryMinus",			// -
+			u"Assigment",			// =		
+			u"UnaryMinus",			// -
 
-			L"Addition+",			// +
-			L"Subtraction",			// -
+			u"Addition+",			// +
+			u"Subtraction",			// -
 
-			L"Multiplication",		// *
-			L"Division",			// /
+			u"Multiplication",		// *
+			u"Division",			// /
 
-			L"Equal",				// ==
-			L"NotEqual",			// !=
+			u"Equau",				// ==
+			u"NotEquau",			// !=
 
-			L"Less",				// <
-			L"Greater",				// >
-			L"LessOrEqual",			// <=
-			L"GreaterOrEqual",		// >=
+			u"Less",				// <
+			u"Greater",				// >
+			u"LessOrEquau",			// <=
+			u"GreaterOrEquau",		// >=
 
-			L"LogicNegation",		// !
-			L"LogicAnd",			// &&
-			L"LogicOr",				// ||
+			u"LogicNegation",		// !
+			u"LogicAnd",			// &&
+			u"LogicOr",				// ||
 
-			L"Increment",			// ++
-			L"Decrement"			// --
+			u"Increment",			// ++
+			u"Decrement"			// --
 		};
 
-		const std::vector<std::wstring> mathOperatorShortT
+		const std::vector<std::u16string> mathOperatorShortT
 		{
-			L"=",
-			L"0-",
+			u"=",
+			u"0-",
 
-			L"+",
-			L"-",
+			u"+",
+			u"-",
 
-			L"*",
-			L"/",
+			u"*",
+			u"/",
 
-			L"==",
-			L"!=",
+			u"==",
+			u"!=",
 
-			L"<",
-			L">",
-			L"<=",
-			L">=",
+			u"<",
+			u">",
+			u"<=",
+			u">=",
 
-			L"!",
-			L"&&",
-			L"||",
+			u"!",
+			u"&&",
+			u"||",
 
-			L"++",
-			L"--"
+			u"++",
+			u"--"
 		};
 
 
-		char findSubtype(char type, std::wstring subtypeName)
+		char findSubtype(char type, std::u16string subtypeName)
 		{
 			switch (type)
 			{

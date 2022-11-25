@@ -22,7 +22,7 @@ namespace nechto::ide
 		color shapeColor = col::vNodeG1;
 		color lightColor = color(0, 0, 0);
 		geometricShape nShape;
-		std::wstring nodeText;
+		std::u16string nodeText;
 	
 		visualNode(nodePtr emptyExternalObject, nodePtr v1  = nullNodePtr)
 			:externalObject(emptyExternalObject), frame(glm::vec2{0.f, 0.f}, glm::vec2{1.f, 1.f})
@@ -43,7 +43,7 @@ namespace nechto::ide
 		}
 		virtual ~visualNode()
 		{
-			print(L"vNode deleted");
+			print(u"vNode deleted");
 		}
 		/*получение указателя на visualNode по объекту. 
 		Возвращает nullptr при несоответствии*/
@@ -55,10 +55,10 @@ namespace nechto::ide
 				return nullptr;
 			return dynamic_cast<visualNode*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -71,7 +71,7 @@ namespace nechto::ide
 			return cRule;
 		}
 	};
-	const std::wstring visualNode::typeName = L"nechtoIde.visualNode";
+	const std::u16string visualNode::typeName = u"nechtoIde.visualNode";
 	const connectionRule visualNode::cRule = connectionRule{
 		conRule::Any, conRule::In_Output, nullptr,
 		conRule::Any, conRule::None, nullptr,
@@ -82,14 +82,14 @@ namespace nechto::ide
 			if (!typeCompare(nBoard, node::ExternalObject))
 				return false;
 			if (nBoard->getData<externalObject*>()->getTypeName()
-				!= L"nechtoIde.nodeBoard")
+				!= u"nechtoIde.nodeBoard")
 				return false;
 			return true;
 		}
 	};
 	const staticNodeOperationSet visualNode::methodSet
 	{
-		/*namedOperation(L"getNodeText", operation{
+		/*namedOperation(u"getNodeText", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 				conRule::Text, conRule::Output),
@@ -99,7 +99,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"setNodeText", operation{
+		namedOperation(u"setNodeText", operation{
 				connectionRule(conRule::ExternalObject, conRule::Output, nullptr,
 				conRule::Text, conRule::Input),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
@@ -108,7 +108,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"getPosition", operation{
+		namedOperation(u"getPosition", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr,
 				conRule::F64Variable, conRule::Output, nullptr,
 				conRule::F64Variable, conRule::Output),
@@ -120,7 +120,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"setPosition", operation{
+		namedOperation(u"setPosition", operation{
 				connectionRule(conRule::ExternalObject, conRule::Output, nullptr,
 				conRule::F64Variable, conRule::Input, nullptr,
 				conRule::F64Variable, conRule::Input),
@@ -132,7 +132,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"move", operation{
+		namedOperation(u"move", operation{
 				connectionRule(conRule::ExternalObject, conRule::Output, nullptr,
 				conRule::F64Variable, conRule::Input, nullptr,
 				conRule::F64Variable, conRule::Input),
@@ -144,7 +144,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"getSize", operation{
+		namedOperation(u"getSize", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr,
 				conRule::F64Variable, conRule::Output, nullptr,
 				conRule::F64Variable, conRule::Output),
@@ -156,7 +156,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"setSize", operation{
+		namedOperation(u"setSize", operation{
 				connectionRule(conRule::ExternalObject, conRule::Output, nullptr,
 				conRule::F64Variable, conRule::Input, nullptr,
 				conRule::F64Variable, conRule::Input),
@@ -168,7 +168,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(L"setShape", operation{
+		namedOperation(u"setShape", operation{
 				connectionRule(conRule::ExternalObject, conRule::Output, nullptr,
 				conRule::I64Variable, conRule::Input),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)

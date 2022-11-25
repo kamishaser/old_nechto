@@ -14,8 +14,10 @@ namespace nechto
 	class nodePtr;
 	class connecter;
 	class creator;
+	class hubEraser;
 
-	struct nodeId//пришлось запрятать сюда для защиты от дурака
+	//базовый класс идентификатора ноды
+	struct nodeId
 	{
 	public:
 		ushort first = 0;
@@ -78,14 +80,8 @@ namespace nechto
 		nodeId port[4];
 		nodeId hubPort;
 	};
-	template<class TCon>
-	concept existOrNonExist =
-		requires(TCon a) 
-	{
-		a.exist();
-	};
 
-	template <existOrNonExist TCon>
+	template <class TCon>
 	class existing : public TCon
 	{
 	public:
@@ -102,7 +98,7 @@ namespace nechto
 			Deleted,
 			Hub,					//разветвитель
 			Variable,				//объект-переменная базового типа
-			Math,					//математический оператор
+			MathOperator,					//математический оператор
 			Condition,				//if
 			ExternalObject,			//внешний объект
 			Method,					//метод externalObject
@@ -126,7 +122,8 @@ namespace nechto
 	class groupPtr;
 	class methodPtr;
 	class mathPtr;
-	class exteranalObjectPtr;
+	class nonTypedExternalObjectPtr;
+	class externalObjectNullPtr;
 
 	namespace variableT
 	{
@@ -173,5 +170,30 @@ namespace nechto
 			ConIter,//итератор соединений
 			GroupIter//итератор массива
 		};
+	}
+	bool hasSubType(char type)
+	{
+		switch (type)
+		{
+		case nodeT::Hub:
+		case nodeT::Condition:
+		case nodeT::Group:
+			return false;
+		default:
+			return true;
+		}
+	}
+	bool hasData(char type)
+	{
+		switch (type)
+		{
+		case nodeT::Variable:
+		case nodeT::Text:
+		case nodeT::Group:
+		case nodeT::Pointer:
+			return true;
+		default:
+			return false;
+		}
 	}
 }

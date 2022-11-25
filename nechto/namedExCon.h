@@ -3,55 +3,46 @@
 
 namespace nechto
 {
-	struct namedExCon :public externalObject
+	class namedExCon :public externalObject
 	{
-		std::wstring name;
-		namedExCon(const std::wstring& n)
-			:externalObject(newExObjNode(0)), name(n)
-			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
-		{}
-		namedExCon(nodePtr emptyExternalObject, const std::wstring& n)
-			:externalObject(emptyExternalObject), name(n)
-			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
-		{}
+	protected:
+		nodePtr exConNode;
+		virtual void disconnect()
+		{
+			resetNode(exConNode);
+			exConNode = nullptr;
+		}
+	public:
+		const std::u16string name;
+		namedExCon(externalObjectNullPtr emptyExObj, const std::u16string& n)
+			:exConNode(emptyExObj), name(n) 
+		{
+			emptyExObj.set(this);
+		}
+		namedExCon(const std::u16string& n)
+			:exConNode(creator::createExternalObject(this, false)), name(n) {}
+		
+		//отключение namedExCon от ноды
+		
 		virtual ~namedExCon()
 		{
+			disconnect();
 		}
-		/*получение указателя на namedExCon по объекту.
-		Возвращает nullptr при несоответствии*/
-		static namedExCon* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<namedExCon*>(v1->getData<externalObject*>());
+		externalObjectPtr<namedExCon> get() const
+		{//внимание!!! Данная функция не может быть вызвана после disconnect!!!
+			return nonTypedExternalObjectPtr(existing<nodePtr>(exConNode));
 		}
-		const static std::wstring typeName;
-		//const static staticNodeOperationSet methodSet;
-		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		externalObjectPtr<namedExCon> operator->() const
 		{
-			return typeName;
+			return get();
 		}
-		/*virtual const operation& getMethod(char number)const override
+
+		const static externalObject::typeDefinition type;
+		virtual const externalObject::typeDefinition& getType() const override
 		{
-			return methodSet.getOperation(number);
-		}*/
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
+			return type;
 		}
 	};
-	const std::wstring namedExCon::typeName = L"namedExCon";
-	const connectionRule namedExCon::cRule = connectionRule{};
-	//const staticNodeOperationSet namedExCon::methodSet
-	//{
-	//	/*namedOperation(L"", operation{
-	//			connectionRule(conRule::ExternalObject, conRule::Input, nullptr,),
-	//			[](nodePtr v0, nodePtr v1, nodePtr v2)
-	//		{
-	//			return true;
-	//		}}),*/
-	//};
+	const externalObject::typeDefinition namedExCon::type
+	{ u"namedExCon" };
 }

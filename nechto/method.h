@@ -1,45 +1,59 @@
 #pragma once
 #include "externalObject.h"
 
-namespace nechto::method
+namespace nechto
 {
-	/*базовое правило подключения: 
-	на первое подключение всегда ставится объект*/
-	connectionRule defaultMmethodConnectionRule =
-		connectionRule(conRule::ExternalObject, conRule::In_Output);
-
-	externalObject* getObject(nodePtr methodNode)
+	class methodPtr : public existing<nodePtr>
 	{
-		nodePtr objectNode =
-			defaultMmethodConnectionRule.getConnection(methodNode, 0);
-		if (!objectNode.exist())
-			return nullptr;
-		return objectNode->getData<externalObject*>();
-	}
-	const operation& getMethod(nodePtr methodNode)
-	{
-		assert(typeCompare(methodNode, node::Method));
-		externalObject* object = getObject(methodNode);
-		if (object == nullptr)
-			return operation::None;
-		else
-			return object->getMethod(methodNode->getSubtype());
-	}
-	const std::wstring getMethodName(nodePtr methodNode)
-	{
-		assert(typeCompare(methodNode, node::Method));
-		externalObject* object = getObject(methodNode);
-		if (object == nullptr)
-			return std::wstring();
-		else
-			return object->getMethodName(methodNode->getSubtype());
-	}
-	bool operate(nodePtr methodNode)
-	{
-		return getMethod(methodNode).operate(methodNode);
-	}
-	bool check(nodePtr methodNode)
-	{
-		return getMethod(methodNode).cRule.check(methodNode);
-	}
+	public:
+		static const staticNodeOperationSet operSet;
+		methodPtr(const existing<nodePtr>& eptr)
+			:existing<nodePtr>(eptr)
+		{
+			assert(match(eptr));
+		}
+		static bool match(const existing<nodePtr>& eptr)
+		{
+			return eptr.type() == nodeT::Method;
+		}
+		static bool match(const nodePtr& ptr)
+		{
+			return ptr.exist() && match(existing<nodePtr>(ptr));
+		}
+		const connectionRule defaultConnectionRule =
+			connectionRule(conRule::ExternalObject, conRule::useType::readOrWrite);
+		nodePtr getObjectNode() const
+		{
+			return defaultConnectionRule.getConnection(*this, 0);
+		}
+		template<exTCon TCon>
+		TCon* getObject() const
+		{
+			nonTypedExternalObjectPtr object = getObjectNode();
+			if (!object.exist())
+				return nullptr;
+			return object.get<TCon>();
+		}
+		const externalObject::typeDefinition* getOjbectType() const
+		{
+			nodePtr temp = getObjectNode();
+			if (!temp.exist())
+				return nullptr;
+			nonTypedExternalObjectPtr object = existing<nodePtr>(temp);
+			if (!object.dataExist())
+				return nullptr;
+			return &object.get()->getType();
+		}
+		const operation* getOperation() const
+		{
+			auto type = getOjbectType();
+			if (type == nullptr)
+				return nullptr;
+			return &type->operset.getOperation(subtype());
+		}
+		const bool objectExist() const
+		{
+			return getObjectNode().exist();
+		}
+	};
 }

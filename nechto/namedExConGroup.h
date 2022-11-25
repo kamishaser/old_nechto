@@ -1,29 +1,31 @@
 #pragma once
 #include "namedExCon.h"
-#include "group.h"
+#include "connecter.h"
 
 namespace nechto
 {
 	struct namedExConGroup :public namedExCon
 	{
-		namedExConGroup(const std::wstring& n)
+		namedExConGroup(const std::u16string& n)
 			:namedExCon(n)
 		{
-			NumNumConnect(get(), newNode(node::Group), 0, 0);
+			
+			simplifiedNumNumConnect(get(), creator::createGroup(), 0, 0);
 		}
-		namedExConGroup(nodePtr emptyExternalObject, const std::wstring& n)
+		namedExConGroup(externalObjectNullPtr emptyExternalObject, 
+			const std::u16string& n)
 			:namedExCon(emptyExternalObject, n)
 		{
-			NumNumConnect(get(), newNode(node::Group), 0, 0);
+			simplifiedNumNumConnect(get(), creator::createGroup(), 0, 0);
 		}
 		virtual ~namedExConGroup()
 		{
-			if (getConnection(0).exist())
-				deleteNode(getConnection(0));
+			if (get().connection(0).exist())
+				creator::deleteNode(get().connection(0));
 		}
 		nodePtr getGroup() const
 		{
-			return getConnection(0);
+			return get().connection(0);
 		}
 		bool contains(nodePtr v1) const
 		{
@@ -51,10 +53,10 @@ namespace nechto
 				return nullptr;
 			return dynamic_cast<namedExConGroup*>(v1->getData<externalObject*>());
 		}
-		const static std::wstring typeName;
+		const static std::u16string typeName;
 		//const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		virtual const std::u16string& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -67,6 +69,6 @@ namespace nechto
 			return cRule;
 		}
 	};
-	const std::wstring namedExConGroup::typeName = L"namedExConGroup";
+	const std::u16string namedExConGroup::typeName = u"namedExConGroup";
 	const connectionRule namedExConGroup::cRule = connectionRule{};
 }

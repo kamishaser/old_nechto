@@ -21,16 +21,16 @@ namespace nechto::ide
 			switch (n1->getType())
 			{
 			case node::Deleted:
-				vn1->nodeText = L"error:\ndeleted\n" + to_string(n1);
+				vn1->nodeText = u"error:\ndeleted\n" + to_string(n1);
 				break;
 			case node::Hub:
-				vn1->nodeText = L"error:\nhub\n" + to_string(n1);
+				vn1->nodeText = u"error:\nhub\n" + to_string(n1);
 				break;
 			case node::Variable:
 				if (subtype)
-					vn1->nodeText = std::to_wstring(n1->getData<i64>());
+					vn1->nodeText = std::to_u16string(n1->getData<i64>());
 				else
-					vn1->nodeText = std::to_wstring(n1->getData<f64>());
+					vn1->nodeText = std::to_u16string(n1->getData<f64>());
 				break;
 			case node::MathOperator:
 				vn1->nodeText = 
@@ -40,24 +40,24 @@ namespace nechto::ide
 				vn1->nodeText = text::get(n1);
 				break;
 			case node::ConditionalBranching:
-				vn1->nodeText = L"if";
+				vn1->nodeText = u"if";
 				break;
 			case node::Method:
 				vn1->nodeText = method::getMethodName(n1);
 			case node::Pointer:
 				if(subtype == pointer::Simple)
-					vn1->nodeText = L"*s";
+					vn1->nodeText = u"*s";
 				else if (subtype == pointer::ConIter)
-					vn1->nodeText = L"*c";
+					vn1->nodeText = u"*c";
 				else
-					vn1->nodeText = L"*g";
+					vn1->nodeText = u"*g";
 				break;
 			case node::Group:
-				vn1->nodeText = L"group";
+				vn1->nodeText = u"group";
 				break;
 			case node::ExternalObject:
 				if (n1->getData<externalObject*>() == nullptr)
-					vn1->nodeText = L"nullptr";
+					vn1->nodeText = u"nullptr";
 				else
 					vn1->nodeText =
 					n1->getData<externalObject*>()->getTypeName();
@@ -67,7 +67,7 @@ namespace nechto::ide
 				vn1->nodeText =
 					nodeOperator.getName(subtype);
 			default:
-				vn1->nodeText = L"недоделал";
+				vn1->nodeText = u"недоделал";
 			}
 		}
 	}
@@ -110,7 +110,7 @@ namespace nechto::ide
 			int aColor = -2;
 			int bColor = -2;
 
-			assert(vNode->getTypeName() == L"nechtoIde.visualNode");
+			assert(vNode->getTypeName() == u"nechtoIde.visualNode");
 			assert(vNode->get().exist());
 			auto button = sharedButton::getByNode(vNode->getConnection(0));
 			if (button)
@@ -135,12 +135,12 @@ namespace nechto::ide
 				if (attribute)
 				{
 					//выделение
-					if (attribute->name == L"mouseCursor")
+					if (attribute->name == u"mouseCursor")
 						color = 4;
-					else if (attribute->name == L"groupOfSelected" &&
+					else if (attribute->name == u"groupOfSelected" &&
 						color < -1)
 						color = -1;
-					else if (attribute->name == L"lastSelected" &&
+					else if (attribute->name == u"lastSelected" &&
 						color < 4)
 					{
 						for (int i = 0; i < 4; ++i)
@@ -152,7 +152,7 @@ namespace nechto::ide
 							}
 					}
 					//нажатия кнопок
-					else if (attribute->name == L"pressedButton")
+					else if (attribute->name == u"pressedButton")
 						color = 3;
 				}
 			} while (ci.stepForward());

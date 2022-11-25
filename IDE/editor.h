@@ -12,7 +12,7 @@ namespace nechto::ide
 	{
 		GUI& gui;
 		selectHandler& sh;
-		namedExCon eCon{ L"editor" };
+		namedExCon eCon{ u"editor" };
 		//№0 bList
 		char creatingType = node::Text;
 		char creatingSubtype = 0;
@@ -24,39 +24,39 @@ namespace nechto::ide
 	public:
 		buttonList nList{ newExObjNode(), 
 			new consistentGroup(newExObjNode(),
-				L"тип создаваемой ноды", glm::vec2(100.f, 10.f)),
-			L"тип создаваемой ноды", true, {
-				L"Text",
-				L"I64",
-				L"F64",
-				L"Group",
-				L"If",
-				L"MathOperator"}, L"Text" };
+				u"тип создаваемой ноды", glm::vec2(100.f, 10.f)),
+			u"тип создаваемой ноды", true, {
+				u"Text",
+				u"I64",
+				u"F64",
+				u"Group",
+				u"If",
+				u"MathOperator"}, u"Text" };
 		buttonList c1List{ newExObjNode(),
 			new consistentGroup(newExObjNode(),
-				L"тип создаваемого соединения 1", glm::vec2(100.f, 30.f)),
-			L"тип создаваемого соединения 1", true, {
-				L"Hub",
-				L"Group",
-				L"N0",
-				L"N1",
-				L"N2",
-				L"N3"}, L"Hub"};
+				u"тип создаваемого соединения 1", glm::vec2(100.f, 30.f)),
+			u"тип создаваемого соединения 1", true, {
+				u"Hub",
+				u"Group",
+				u"N0",
+				u"N1",
+				u"N2",
+				u"N3"}, u"Hub"};
 		buttonList c2List{ newExObjNode(),
 			new consistentGroup(newExObjNode(),
-				L"тип создаваемого соединения 2", glm::vec2(100.f, 30.f)),
-			L"тип создаваемого соединения 2", true, {
-				L"Hub",
-				L"Group",
-				L"N0",
-				L"N1",
-				L"N2",
-				L"N3"}, L"Hub" };
+				u"тип создаваемого соединения 2", glm::vec2(100.f, 30.f)),
+			u"тип создаваемого соединения 2", true, {
+				u"Hub",
+				u"Group",
+				u"N0",
+				u"N1",
+				u"N2",
+				u"N3"}, u"Hub" };
 
 		buttonList mathOperatorList{ newExObjNode(),
 			new consistentGroup(newExObjNode(),
-				L"математический оператор", glm::vec2(100.f, 30.f)),
-			L"математический оператор", true, typeName::mathOperatorShortT };
+				u"математический оператор", glm::vec2(100.f, 30.f)),
+			u"математический оператор", true, typeName::mathOperatorShortT };
 		editor(GUI& g, selectHandler& shandler)
 			:gui(g), sh(shandler)
 		{
@@ -65,18 +65,18 @@ namespace nechto::ide
 					auto vNode = visualNode::getByNode(
 						bList->lClicked()->getConnection(0));
 
-					const std::wstring& name = bList->lClicked()->name;
-					if (name == L"Text")
+					const std::u16string& name = bList->lClicked()->name;
+					if (name == u"Text")
 						setActiveTypeAndSubtype(node::Text);
-					else if (name == L"I64")
+					else if (name == u"I64")
 						setActiveTypeAndSubtype(node::Variable, 1);
-					else if (name == L"F64")
+					else if (name == u"F64")
 						setActiveTypeAndSubtype(node::Variable, 0);
-					else if (name == L"If")
+					else if (name == u"If")
 						setActiveTypeAndSubtype(node::ConditionalBranching);
-					else if (name == L"Group")
+					else if (name == u"Group")
 						setActiveTypeAndSubtype(node::Group);
-					else if (name == L"MathOperator")
+					else if (name == u"MathOperator")
 					{
 						setActiveTypeAndSubtype(node::MathOperator, 
 							creatingMathOperatorSubtype);
@@ -90,40 +90,40 @@ namespace nechto::ide
 				});
 			setbList(c2List, [&](buttonList* bList)
 			{
-					const std::wstring& name = bList->lClicked()->name;
-					if (name == L"Hub")
+					const std::u16string& name = bList->lClicked()->name;
+					if (name == u"Hub")
 						con2Type = conType::Hub;
-					else if (name == L"Group")
+					else if (name == u"Group")
 						con2Type = conType::Group;
-					else if (name == L"N0")
+					else if (name == u"N0")
 						con2Type = conType::N0;
-					else if (name == L"N1")
+					else if (name == u"N1")
 						con2Type = conType::N1;
-					else if (name == L"N2")
+					else if (name == u"N2")
 						con2Type = conType::N2;
-					else if (name == L"N3")
+					else if (name == u"N3")
 						con2Type = conType::N3;
 			});
 			setbList(c1List, [&](buttonList* bList)
 				{
-					const std::wstring& name = bList->lClicked()->name;
-					if (name == L"Hub")
+					const std::u16string& name = bList->lClicked()->name;
+					if (name == u"Hub")
 						con1Type = conType::Hub;
-					else if (name == L"Group")
+					else if (name == u"Group")
 						con1Type = conType::Group;
-					else if (name == L"N0")
+					else if (name == u"N0")
 						con1Type = conType::N0;
-					else if (name == L"N1")
+					else if (name == u"N1")
 						con1Type = conType::N1;
-					else if (name == L"N2")
+					else if (name == u"N2")
 						con1Type = conType::N2;
-					else if (name == L"N3")
+					else if (name == u"N3")
 						con1Type = conType::N3;
 				});
 
 			setDropList(mathOperatorList, [&](buttonList* bList)
 				{
-					const std::wstring& name = bList->lClicked()->name;
+					const std::u16string& name = bList->lClicked()->name;
 					for (int i = 0; i < typeName::mathOperatorShortT.size(); ++i)
 						if (name == typeName::mathOperatorShortT[i])
 						{

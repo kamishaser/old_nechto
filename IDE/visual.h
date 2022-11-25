@@ -18,11 +18,11 @@ namespace nechto::ide
 	{
 		return glm::vec2(v.x, v.y);
 	}
-	std::wstring to_string(glm::vec2 vec)
+	std::u16string to_string(glm::vec2 vec)
 	{
-		return static_cast<std::wstring>(L"[") +
-			std::to_wstring(vec.x) + L' ' +
-			std::to_wstring(vec.y) + L']';
+		return static_cast<std::u16string>(u"[") +
+			std::to_u16string(vec.x) + L' ' +
+			std::to_u16string(vec.y) + L']';
 	}
 	using color = sf::Color;
 	using geometricShape = std::vector<glm::vec2>;

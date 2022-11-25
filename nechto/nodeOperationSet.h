@@ -4,12 +4,12 @@
 
 namespace nechto
 {
-	using namedOperation = std::pair<std::wstring, operation>;
+	using namedOperation = std::pair<std::u16string, operation>;
 	class staticNodeOperationSet
 	{
 	public:
 		std::array<operation, 256> opSet;
-		std::array<std::wstring, 256> nameSet;
+		std::array<std::u16string, 256> nameSet;
 		char size;
 		//массив всех операций
 
@@ -48,11 +48,11 @@ namespace nechto
 			}
 		}
 
-		constexpr const std::wstring& getName(char number) const
+		constexpr const std::u16string& getName(char number) const
 		{
 			return nameSet[number];
 		}
-		constexpr char getNumber(const std::wstring& name) const
+		constexpr char getNumber(const std::u16string& name) const
 		{
 			for (int i = 0; i < 256; ++i)
 				if (nameSet[i] == name)

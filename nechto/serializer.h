@@ -55,7 +55,7 @@ namespace nechto
 				writeByValue(v1->getData<i64>());
 				break;
 			case node::Text:
-				writeWString(text::get(v1));
+				writeu16string(text::get(v1));
 				break;
 			case node::Group:
 				writeGroup(v1);
@@ -84,7 +84,7 @@ namespace nechto
 				writeByValue<nodePtr>(hi.get());
 			}
 		}
-		void writeWString(const std::wstring& string)
+		void writeu16string(const std::u16string& string)
 		{
 			int32_t size = string.size();
 			writeByPointer(&size);
@@ -169,7 +169,7 @@ namespace nechto
 				v1->setData<i64>(readByValue<i64>()) ;
 				break;
 			case node::Text:
-				text::set(v1, readWString());
+				text::set(v1, readu16string());
 				break;
 			case node::Group:
 				readGroup(conMap, v1, old);
@@ -227,11 +227,11 @@ namespace nechto
 			read(reinterpret_cast<char*>(&temp), sizeof(temp));
 			return temp;
 		}
-		std::wstring readWString()
+		std::u16string readu16string()
 		{
 			int32_t size;
 			read(reinterpret_cast<char*>(&size), sizeof(size));
-			std::wstring string;
+			std::u16string string;
 			string.resize(size);
 			for (int32_t i = 0; i < size; ++i)
 				read(reinterpret_cast<char*>(&string[i]), sizeof(wchar_t));

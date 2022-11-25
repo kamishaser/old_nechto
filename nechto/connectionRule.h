@@ -3,6 +3,7 @@
 #include "pointerPtr.h"
 #include "variablePtr.h"
 #include <array>
+#include <string>
 namespace nechto
 {
 
@@ -11,7 +12,7 @@ namespace nechto
 		//корректный тип подключения
 		enum conType
 		{
-			Any,
+			Any,//что угодно без проверки. Указатели игрнорятся
 			I64Variable,
 			F64Variable,
 			AnyVariable,
@@ -27,11 +28,14 @@ namespace nechto
 			Math,
 			Method
 		};
+		//тип использования соединения (на запись и чтения данных
 		enum useType
 		{
 			None,
 			readOnly,
+			writeOnly,
 			readOrWrite,
+			readWithoutCheck
 		};
 		
 		std::array<conType, 4> cType;
@@ -193,7 +197,7 @@ namespace nechto
 				return conRule::conType::SimplePointer_NoTransit;
 			if constexpr (std::is_same<conType, iteratorPtr>())
 				return conRule::conType::AnyIterator_NoTransit;
-			if constexpr (std::is_same<conType, conIteratorPtr>())
+			if constexpr (std::is_same<conType, portIteratorPtr>())
 				return conRule::conType::ConIterator_NoTransit;
 			if constexpr (std::is_same<conType, groupIteratorPtr>())
 				return conRule::conType::GroupIterator_NoTransit;

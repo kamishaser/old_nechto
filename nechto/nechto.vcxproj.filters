@@ -21,12 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graphOperations.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="mathOperator.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="checkAndStep.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
@@ -35,15 +29,6 @@
     </ClInclude>
     <ClInclude Include="serializer.h">
       <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeTypeProperties.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="branching.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
-    <ClInclude Include="externalObject.h">
-      <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="textOut.h">
       <Filter>Исходные файлы</Filter>
@@ -58,12 +43,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="nodeOperator.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeOperationSet.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="method.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="fileSerializer.h">
@@ -100,6 +79,27 @@
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
     <ClInclude Include="variablePtr.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="nodeOperationSet.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="mathOperator.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="condition.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="externalObject.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="method.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="group.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="hubEraser.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
   </ItemGroup>
