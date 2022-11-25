@@ -5,17 +5,20 @@ namespace nechto
 	//хаб каждый хаб обязательно содержит следующие данные:
 		//hubConnection: следующий хаб
 		//data: предыдущий хаб
-	class connecter;
 	class hubPtr : public existing<nodePtr>
 	{
 		friend class connecter;
 		friend class creator;
 		friend class hubEraser;
 
-		void connect(nodePtr previous)
+		void connect(existing<nodePtr> previous)
 		{
 			setData<nodePtr>(previous);
 			previous.node()->hubPort = *this;
+		}
+		void setNext(nodePtr next)
+		{
+			node()->hubPort = next;
 		}
 	public:
 		hubPtr(const existing<nodePtr>& eptr)

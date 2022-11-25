@@ -4,7 +4,7 @@
 
 namespace nechto
 {
-	
+	class hubPtr;
 	class nodePtr : public nodeId
 	{
 	protected:
@@ -29,6 +29,7 @@ namespace nechto
 		friend class connecter;
 		friend class creator;
 		friend class hubEraser;
+		friend class hubPtr;
 	public:
 		nodePtr(nodeId id)
 			:nodeId(id) {}
