@@ -1,6 +1,7 @@
 #pragma once
 #include "nodePtr.h"
 #include "hubPtr.h"
+#include "hubPosPair.h"
 
 namespace nechto
 {
@@ -10,7 +11,11 @@ namespace nechto
 		friend class hubEraser;
 		void setFirstGroupHub(hubPtr hub)
 		{
-			setData<nodePtr>(hub);
+			(reinterpret_cast<hubPosPair*>(&node()->data))->hub = hub;
+		}
+		void setSize(int32_t size)
+		{
+			(reinterpret_cast<hubPosPair*>(&node()->data))->setGlobalPos(size);
 		}
 	public:
 		groupPtr(const existing<nodePtr>& eptr)
@@ -18,9 +23,13 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		hubPtr firstGroupHub()
+		hubPtr firstGroupHub() const
 		{
-			return existing<nodePtr>(getData<nodePtr>());
+			return existing<nodePtr>(getData<hubPosPair>().hub);
+		}
+		int32_t getSize() const
+		{
+			return getData<hubPosPair>().getGlobalPos();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{

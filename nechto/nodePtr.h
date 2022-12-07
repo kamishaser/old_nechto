@@ -6,7 +6,7 @@ namespace nechto
 {
 	class hubPtr;
 	class nodePtr : public nodeId
-	{
+	{		
 	protected:
 		auto* node() const
 		{

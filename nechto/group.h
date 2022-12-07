@@ -4,46 +4,10 @@
 
 #include "creator.h"
 #include "connecter.h"
+#include "hubEraser.h"
 
-namespace nechto::group
+namespace nechto::groupOperations
 {
-	//void reset(nodePtr v1)
-	//{
-	//	groupIterator i1(v1);
-	//	while (true)
-	//	{
-	//		nodePtr connection = i1.oneSideDisconnect();
-	//		if (connection.exist())
-	//		{
-	//			//при удалении ноды надо удалить все существующие соединения
-	//			if (typeSubtypeCompare(
-	//				connection, node::Pointer, pointer::GroupIter) &&
-	//				(connection->connection[0] == v1))
-	//			{
-	//				connection->connection[0] = nullNodePtr;
-	//				connection->setData<pointer::hubPosPair>(
-	//					pointer::hubPosPair(nullNodePtr, 0));
-
-	//			}
-	//			else
-	//				oneSideDisconnect(connection, v1);
-	//		}
-	//		if (i1.pos() == 3)
-	//		{
-	//			nodePtr vTemp = i1.currentHub;
-	//			bool end = !i1.GoToNextHub();
-	//			nodeStorage::terminal.deallocate(vTemp);
-	//			i1.setLocalPos(0);
-	//			if (end)
-	//			{
-	//				assert(typeCompare(i1.currentHub, node::Deleted));
-	//				return;
-	//			}
-	//		}
-	//		else
-	//			i1.stepForward();
-	//	}
-	//}
 	i64 numberOfMembers(groupPtr group)
 	{
 		i64 counter = 0;
@@ -66,10 +30,22 @@ namespace nechto::group
 		return true;
 	}
 
-	void clear(groupPtr v1)
+	
+	void nearestGroupDisconnectAll(groupPtr group)
 	{
-		reset(v1);
-		initializeEmpty(v1);
+		groupIterator gi(group);
+		do
+		{
+			if (gi.get().exist())
+				nearestDisconnect(gi);
+		} while (gi.stepForward());
+	}
+	void clear(groupPtr group)
+	{
+		nearestGroupDisconnectAll(group);
+		groupIterator gi(group);
+		gi.stepForward();
+		hubEraser::eraseHubChain(gi);
 	}
 	bool contains(groupPtr group, nodePtr v1)
 	{
@@ -89,23 +65,49 @@ namespace nechto::group
 			if (gi.get() == v1)
 				return gi;
 		} while (gi.stepForward());
-		return groupIterator(nullNodePtr, pointer::hubPosPair(nullNodePtr, 0));
+		return nullGroupIterator;
 	}
-	bool check(groupPtr v1)
+	void hubOrderedList(std::vector<hubPtr>& hubSet, groupPtr group, 
+		const groupIterator& begin)
 	{
-		assert(v1->getType() == node::Group);
-		if (v1->data < 1)
-			return false;
-		//nodePtr hubIter = v1->connection[0];
+		groupIterator gi(group);
+		while (true)
+		{
+			if (gi.getHPPair().hub == begin)
+				break;
+			if (!gi.nextHub())
+				return;
+		} 
+		do
+		{
+			hubSet.push_back(existing<nodePtr>(gi.getHPPair().hub));
+		} while (gi.nextHub());
+	}
+	void orderedIteratorList(std::vector<groupIteratorPtr>& iterSet, 
+		groupPtr group, const existing<groupIterator>& begin)
+	{
+		std::vector<hubPtr> hubSet;
+		hubOrderedList(hubSet, group, begin.getHPPair().hub);
+		auto nearestIterator = iterSet.begin();
+		if(nearestIterator->getHPPair().hub == begin.getHPPair().hub)
+			while (nearestIterator->getHPPair().getPos() < begin.getHPPair().getPos())
+				++nearestIterator;
 
-		//if (!v1->getType())
-		return true;
+		for (int i1 = 0; i1 < iterSet.size(); ++i1)
+		{
+			for (int i2 = i1; i2 < iterSet.size() ++i2)
+			{
+			}
+		}
 	}
 
 	void compress(const groupIterator& begin)
 	{
+
 		groupIterator pullIter = begin;
 		groupIterator pushIter = begin;
+		std::vector<groupIteratorPtr> iterSet;
+		hubEraser::getAllGroupIterators(iterSet, begin.getPurpose());
 		do
 		{
 			if (pullIter.get().exist())
@@ -115,12 +117,8 @@ namespace nechto::group
 			}
 		} while (pullIter.stepForward());
 		if (pushIter.pos() != 0)
-			pushIter.stepForward();
-		while (pushIter.currentHub != pushIter.mainNode->connection[0])
-		{
-			assert(hub::empty(pushIter.currentHub));
-			pushIter.eraseHub();
-		}
+			pushIter.nextHub();
+		hubEraser::eraseHubChain(pushIter);
 	}
 	void compress(groupPtr group)
 	{

@@ -16,6 +16,10 @@ namespace nechto
 	class creator;
 	class hubEraser;
 
+	class iterator;
+	class portIterator;
+	class groupIterator;
+
 	//базовый класс идентификатора ноды
 	struct nodeId
 	{

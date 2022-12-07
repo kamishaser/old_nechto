@@ -139,37 +139,6 @@ namespace nechto
 			} while (get().exist());
 			return true;
 		}
-
-
-		////вставить хаб после текущего
-		//nodePtr insertHub()
-		//{
-		//	return hub::insert(currentHub, mainNode);
-		//}
-		////удалить текущий хаб. ѕеревести все указывающие на него итераторы на следующий
-		//void eraseHub()
-		//{
-		//	assert(currentHub != mainNode);
-		//	//перебирает все подключЄнные ноды в поисках итератора, указывающего на удал€емый хаб
-		//	portIterator conIter(mainNode);
-		//	do
-		//	{
-		//		for (int i = 0; i < 4; ++i)
-		//		{
-		//			nodePtr temp = conIter.get();
-		//			if (temp.exist())
-		//				if (typeSubtypeCompare(temp, node::Pointer, pointer::ConIter))
-		//				{//переводит на следующий
-		//					nodePtr hub = temp->connection[0];
-		//					if (hub == currentHub)
-		//						temp->connection[0] = hub::next(hub);
-		//				}
-		//		}
-		//	} while (conIter.stepForward());
-		//	nodePtr next = hub::next(currentHub);
-		//	hub::erase(currentHub, mainNode);
-		//	currentHub = next;
-		//}
 	};
 	class groupIterator : public iterator
 	{
@@ -247,80 +216,9 @@ namespace nechto
 				return false;
 			return atFirstHub();
 		}
-		//nodePtr insertHub()
-		//{
-		//	return hub::insert(currentHub, mainNode);
-		//}
-		//void eraseHub()
-		//{
-		//	assert(currentHub != mainNode);
-		//	if (mainNode->data.fetch_add(-1) == 1)
-		//	{//нельз€ удал€ть последний хаб
-		//		mainNode->data.fetch_add(1);
-		//		return;
-		//	}
-		//	//перебирает все подключЄнные ноды в поисках итератора, указывающего на удал€емый хаб
-		//	portIterator conIter(mainNode);
-		//	do
-		//	{
-		//		for (int i = 0; i < 4; ++i)
-		//		{
-		//			nodePtr temp = conIter.get();
-		//			if (temp.exist())
-		//				if (typeSubtypeCompare(temp, node::Pointer, pointer::GroupIter))
-		//				{//переводит на следующий
-		//					nodePtr hub = temp->connection[0];
-		//					if (hub == currentHub)
-		//						temp->connection[0] = hub::next(hub);
-		//				}
-		//		}
-		//	} while (conIter.stepForward());
-		//	if (atFirstHub())
-		//		mainNode->setData<nodePtr>(hub::next(currentHub));
-		//	nodePtr next = hub::next(currentHub);
-		//	hub::erase(currentHub, mainNode);
-		//	currentHub = next;
-		//}
-		///*вставл€ет элемент. 
-		//ѕри необходимости сдвигает следующие элементы вперЄд на 1 хаб*/
-		//bool insert(hubIterator backConnection)
-		//{
-		//	bool newHub = false;
-		//	if (get().exist())
-		//	{
-		//		insertHub();
-		//		newHub = true;
-		//		nodePtr nextHub = hub::next(currentHub);
-		//		for (int i = pos(); i < 4; ++i)
-		//		{
-		//			nextHub->connection[i] = currentHub->connection[i].load();
-		//			currentHub->connection[i] = nullNodePtr;
-		//		}
-		//		IterIterConnect(*this, backConnection);
-		//		stepForward();
-		//	}
-		//	else
-		//	{
-		//		IterIterConnect(*this, backConnection);
-		//		if (pos() != 3)
-		//			++position;
-		//		else
-		//		{
-		//			nodePtr next = hub::next(currentHub);
-		//			if (next == firstHub())
-		//			{
-		//				next = insertHub();
-		//				newHub = true;
-		//			}
-		//			currentHub = next;
-
-		//			setLocalPos(0);
-		//			////////////////////////////////////////////////////////////недоделал
-		//		}
-		//	}
-		//	return newHub;
-		//}
 	};
+	const portIterator nullPortIterator = portIterator(nullptr, hubPosPair());
+	const groupIterator nullGroupIterator = groupIterator(nullptr, hubPosPair());
 	/*bool pointer::set(nodePtr pointer, nodePtr v1)
 	{
 		if (pointer->getSubtype() == pointer::Simple)

@@ -41,20 +41,7 @@ namespace nechto
 			iter1.getHPPair().hub.node()->port[iter1.pos()] = iter2.get();
 			iter2.getHPPair().hub.node()->port[iter2.pos()] = temp;
 		}
-		//вставляет hub после iter
-		static void insertHub(existing<iterator> iter, hubPtr hub)
-		{
-			//hub нигде не задействован
-			assert(!hub.previous().exist() && !hub.hub().exist());
-			nodePtr previous = iter.getHPPair().hub;
-			nodePtr next = previous.hub();
-			previous.node()->hubPort = hub;
-			hub.setPrevious(previous);
-			if (!next.exist())//если хаб последний в цепочке
-				return;
-			hub.node()->hubPort = next;
-			hubPtr(next).setPrevious(hub);
-		}
+		
 		//исключение хаба из цепочки без оповещения итераторов
 		
 		static void resetIterator(existing<iterator> iter)

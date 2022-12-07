@@ -102,6 +102,9 @@
     <ClInclude Include="hubEraser.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
+    <ClInclude Include="hubPosPair.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

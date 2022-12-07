@@ -65,7 +65,7 @@ namespace nechto
 			return getObjectPtr() != nullptr;
 		}
 		//единоличное владение указателем (объектом)
-		bool own() const
+		bool owner() const
 		{
 			return subtype();
 		}
@@ -78,7 +78,7 @@ namespace nechto
 		{
 			if (getObjectPtr() != nullptr)
 			{
-				if(own())
+				if(owner())
 					delete getObjectPtr();
 				setObjectPtr(nullptr);
 			}
