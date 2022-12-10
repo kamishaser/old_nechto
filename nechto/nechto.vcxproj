@@ -138,6 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="compressor.h" />
     <ClInclude Include="connecter.h" />
     <ClInclude Include="connectionRule.h" />
     <ClInclude Include="creator.h" />

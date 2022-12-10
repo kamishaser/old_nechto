@@ -2,6 +2,7 @@
 #include "typeDeclarations.h"
 #include "nodePtr.h"
 #include "hubPtr.h"
+#include "hubPosPair.h"
 
 namespace nechto
 {
@@ -13,7 +14,7 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		pointerPtr(const nodePtr& eptr)
+		explicit pointerPtr(const nodePtr& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
@@ -51,6 +52,16 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
+		explicit simplePointerPtr(const existing<nodePtr>& eptr)
+			:pointerPtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		explicit simplePointerPtr(const nodePtr& eptr)
+			:pointerPtr(eptr)
+		{
+			assert(match(eptr));
+		}
 		static bool match(const pointerPtr& eptr)
 		{
 			return !eptr.subtype();
@@ -71,40 +82,6 @@ namespace nechto
 		/*функция определна после классов
 		conIteratorPtr и groupIteratorPtr */
 	};
-	struct hubPosPair
-	{
-	private:
-		uint32_t pos;
-	public:
-		
-		nodePtr hub;
-		char getLocalPos()
-		{
-			return pos & 3ui32;
-		}
-		uint32_t getGlobalPos()
-		{
-			return pos;
-		}
-		
-
-		bool exist() const
-		{
-			return hub.exist();
-		}
-		nodePtr follow() const
-		{
-			return hub.connection(pos & 3);
-		}
-		bool operator== (const hubPosPair hpp) const
-		{
-			return (hub == hpp.hub) && (pos == hpp.pos);
-		}
-		bool operator!= (const hubPosPair hpp) const
-		{
-			return (hub != hpp.hub) || (pos != hpp.pos);
-		}
-	};
 	class iteratorPtr : public pointerPtr
 	{
 	public:
@@ -113,12 +90,12 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		iteratorPtr(const existing<nodePtr>& eptr)
+		explicit iteratorPtr(const existing<nodePtr>& eptr)
 			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		iteratorPtr(const nodePtr& eptr)
+		explicit iteratorPtr(const nodePtr& eptr)
 			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
@@ -146,6 +123,11 @@ namespace nechto
 		{
 			return (purpose().exist()) ? getHPPair().exist() : true;
 		}
+		ui32 getGlobalPos() const
+		{
+			return getHPPair().getGlobalPos();
+		}
+		
 	};
 	class portIteratorPtr : public iteratorPtr
 	{
@@ -155,12 +137,12 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		portIteratorPtr(const existing<nodePtr>& eptr)
+		explicit portIteratorPtr(const existing<nodePtr>& eptr)
 			:iteratorPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		portIteratorPtr(const nodePtr& eptr)
+		explicit portIteratorPtr(const nodePtr& eptr)
 			:iteratorPtr(eptr)
 		{
 			assert(match(eptr));
@@ -177,6 +159,12 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
+
+		bool operator<(const portIteratorPtr& iter)
+		{
+			assert(purpose() == iter.purpose());
+			return getGlobalPos() < iter.getGlobalPos();
+		}
 	}; 
 	class groupIteratorPtr : public iteratorPtr
 	{
@@ -186,12 +174,12 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		groupIteratorPtr(const existing<nodePtr>& eptr)
+		explicit groupIteratorPtr(const existing<nodePtr>& eptr)
 			:iteratorPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		groupIteratorPtr(const nodePtr& eptr)
+		explicit groupIteratorPtr(const nodePtr& eptr)
 			:iteratorPtr(eptr)
 		{
 			assert(match(eptr));
@@ -207,6 +195,11 @@ namespace nechto
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
+		}
+		bool operator<(const groupIteratorPtr& iter)
+		{
+			assert(purpose() == iter.purpose());
+			return getGlobalPos() < iter.getGlobalPos();
 		}
 	};
 	nodePtr pointerPtr::follow() const

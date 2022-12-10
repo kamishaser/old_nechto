@@ -145,7 +145,7 @@ namespace nechto
 				v0->setData<i64>(text::get(v1).size());
 				return true;
 			}}),
-		namedOperation(u"textsEquau",operation{
+		namedOperation(u"textsEqual",operation{
 			connectionRule(conRule::I64Variable, conRule::Output, nullptr,
 				conRule::Text, conRule::Input, nullptr,
 				conRule::Text, conRule::Input),

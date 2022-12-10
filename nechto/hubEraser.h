@@ -12,182 +12,244 @@ namespace nechto
 	class hubEraser
 	{
 	public:
-		//удаление хаба из основной цепочки
-		static bool eraseHub(existing<portIterator> iter)
+		static void insertHub(existing<portIterator> begin, int quantity = 1)
 		{
-			if (iter.getHPPair().hub.type() != nodeT::Hub)
-				return false;
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			nodePtr previous = hub.previous();//предыдущий хаб
-			nodePtr next = hub.hub();//следующий хаб
-			std::vector<portIteratorPtr> iterSet;//список всех итераторов на сию ноду
-			getAllPortIterators(iterSet, iter.getPurpose());
-			if (!erase(iterSet, iter))
-				return false;
+			nodePtr previous = begin.getHPPair().hub;
+			nodePtr next = previous.hub();
+			ui32 hubNumber = begin.getHubNumber();
+			//цикл создания и вставки хабов
+			for (int i = 0; i < quantity; ++i)
+			{
+				hubPtr hub = creator::createHub();
+				hub.connect(previous);
+				previous = hub;
+			}
 			if (!next.exist())
-				previous.node()->hubPort = nullptr;
+				return;
+			//замыкание цепочки
 			hubPtr(next).connect(previous);
-			return true;
-		}
-		//удаление хаба из группы
-		static bool eraseHub(existing<groupIterator> iter)
-		{
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			nodePtr previous = hub.previous();//предыдущий хаб
-			hubPtr next = existing<nodePtr>(hub.hub());//следующий хаб
-			std::vector<groupIteratorPtr> iterSet;//список всех итераторов на сию ноду
-
-			getAllGroupIterators(iterSet, iter.getPurpose());
-			if (!erase(iterSet, iter))
-				return false;
-			next.connect(previous);
-			return true;
-		}
-		
-		//вырезать цепь хабов
-		static bool eraseHubChain(existing<portIterator> iter, 
-			portIterator end = nullPortIterator)
-		{
-			if (iter.getHPPair().hub.type() != nodeT::Hub)
-				return false;
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			nodePtr previous = hub.previous();//предыдущий хаб
-			nodePtr next = hub.hub();//следующий хаб
-			std::vector<portIteratorPtr> iterSet;//список всех итераторов на сию ноду
-			getAllPortIterators(iterSet, iter.getPurpose());
-			bool success = true;
-			while (true)
-			{
-				if (!erase(iterSet, iter))
-				{
-					success = false;
-					break;
-				}
-				
-				if (!next.exist())//если удалён последний хаб в цепочке
-					break;
-				if (hub == end.getHPPair().hub)//хаб совпадает с end
-					break;
-				hub = hubPtr(existing<nodePtr>(next));
-				next = hub.hub();
-			}
-			if (success)
-			{
-				if (!next.exist())
-					previous.node()->hubPort = nullptr;
-				hubPtr(next).connect(previous);
-			}
-			else
-			{
-				hub.connect(previous);
-			}
-			return success;
-		}
-		static bool eraseHubChain(existing<groupIterator> iter,
-			groupIterator end = nullGroupIterator)
-		{
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			nodePtr previous = hub.previous();//предыдущий хаб
-			hubPtr next = existing<nodePtr>(hub.hub());//следующий хаб
-			groupPtr group = existing<nodePtr>(iter.getPurpose());
-
-			std::vector<groupIteratorPtr> iterSet;//список всех итераторов на сию ноду
-			getAllGroupIterators(iterSet, iter.getPurpose());
-			bool success = true;
-			while (true)
-			{
-				if (!erase(iterSet, iter))
-				{
-					success = false;
-					break;
-				}
-
-				if (next == group.firstGroupHub())//если next - первая нода
-					break;
-				if (hub == end.getHPPair().hub)//хаб совпадает с end
-					break;
-				hub = hubPtr(existing<nodePtr>(next));
-				next = existing<nodePtr>(hub.hub());
-			}
-			if (success)
-				next.connect(previous);
-			else
-				hub.connect(previous);
-			return success;
-		}
-
-
-		//получить все итераторы, указывающие на ноду
-		static void getAllPortIterators(std::vector<portIteratorPtr>& iteratorSet,
-				existing<nodePtr> node)
-		{
-			portIterator iter(node);
+			portIterator iter(begin.getPurpose());
 			do
-			{//если к сему порту подключен итератор указывающий на эту ноду
-				if ((portIteratorPtr::match(iter.get())) &&
-					(iter.get().connection(0) == node))
-					iteratorSet.push_back(
-						iteratorPtr(pointerPtr(existing<nodePtr>(iter.get()))));
-
+			{
+				if (portIteratorPtr::match(iter.get()))
+				{
+					auto hpp = portIteratorPtr(iter.get()).getHPPair();
+					if (hpp.getHubNumber() > hubNumber)
+					{
+						hpp.setHubNumber(hpp.getHubNumber() + quantity);
+						portIteratorPtr(iter.get()).setHPPair(hpp);
+					}
+				}
 			} while (iter.stepForward());
 		}
-		static void getAllGroupIterators(std::vector<groupIteratorPtr>& iteratorSet,
-			existing<nodePtr> node)
+		static void insertHub(existing<groupIterator> begin, int quantity = 1)
 		{
-			portIterator iter(node);
-			do
-			{//если к сему порту подключен итератор указывающий на эту ноду
-				if ((groupIteratorPtr::match(iter.get())) &&
-					(iter.get().connection(0) == node))
-					iteratorSet.push_back(
-						iteratorPtr(pointerPtr(existing<nodePtr>(iter.get()))));
+			hubPtr previous = begin.getHPPair().hub;
+			hubPtr next = previous.hub();
+			ui32 hubNumber = begin.getHubNumber();
+			//цикл создания и вставки хабов
+			for (int i = 0; i < quantity; ++i)
+			{
+				hubPtr hub = creator::createHub();
+				hub.connect(previous);
+				previous = hub;
+			}
+			//замыкание цепочки
+			hubPtr(next).connect(previous);
+			if (next == begin.firstHub())
+				return;
 
+			portIterator iter(begin.getPurpose());
+			do
+			{
+				if (groupIteratorPtr::match(iter.get()))
+				{
+					auto hpp = groupIteratorPtr(iter.get()).getHPPair();
+					if (hpp.getHubNumber() > hubNumber)
+					{
+						hpp.setHubNumber(hpp.getHubNumber() + quantity);
+						groupIteratorPtr(iter.get()).setHPPair(hpp);
+					}
+				}
 			} while (iter.stepForward());
 		}
+		static bool eraseHub(existing<portIterator>& begin, int quantity)
+		{
+			return pEraser(begin, quantity).eraseWithNotification();
+		}
+		static bool eraseHub(existing<groupIterator>& begin, int quantity);
 	private:
-		static bool erase(std::vector<portIteratorPtr>& iterSet,
-			existing<portIterator> iter)
+		static bool eraseHubWithNoNotificationIterators( // without - WOnotif
+			existing<portIterator>& begin, int quantity);
+		static bool eraseHubWithNoNotificationIterators(
+			existing<groupIterator>& begin, int quantity);
+		//структурки для взаимодействия функций удавления
+		struct pEraser
 		{
-			if (!hubPtr::match(existing<nodePtr>(iter.getHPPair().hub)))
-				return false; // удалять можно только существующие хабы
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			//нельзя удалять хаб, не удалив предварительно все его подлкючения
-			if (!hub.empty())
-				return false;
-			for (int i = 0; i < iterSet.size(); ++i)
+			existing<portIterator>& begin;
+			hubPtr hub;
+			nodePtr next;
+			existing<nodePtr> previous;
+			int quantity;//количество удаляемых хабов. Позже становится счётчиком
+			pEraser(existing<portIterator>& b, int q)
+				:begin(b), hub(begin.hub),
+				previous(hub.previous()), next(hub.hub()), quantity(q) {}
+
+			bool eraseWOnotification()
 			{
-				if (iterSet[i].getHPPair().hub == iter.getHPPair().hub)
+				if (begin.getHPPair().hub.type() != nodeT::Hub)
+					return false;
+				bool result = erase();
+				close(result);
+				return result;
+			}
+			bool eraseWithNotification()
+			{
+				if (begin.getHPPair().hub.type() != nodeT::Hub)
+					return false;
+				bool result = erase();
+				close(result);
+				notify();
+				return result;
+			}
+		private:
+			//удавить
+			bool erase()
+			{
+				int max = quantity;
+				quantity = 0;
+				while (quantity < max)
 				{
-					iterSet[i].setHPPair(hubPosPair());//сброс
-					iterSet[i] = iterSet.back();//удаление из списка
-					iterSet.pop_back();
+					next = hub.hub();
+					if (!hub.empty())//нельзя удалять не пустые хабы
+					{
+						return false;
+					}
+					creator::deleteHub(hub);
+					++quantity;
+					if (!next.exist())//цепочка прервана
+						return true;
+					hub = hubPtr(next);
+				}
+				return true;
+			}
+			//замкнуть + переместить итератор
+			void close(bool result)
+			{
+				//установка итератора begin в следующий после удалённых хаб
+				begin.hub = hub;
+				begin.setGlobalPos(begin.getGlobalPos() + (quantity << 2));
+
+				if (!result)//если завершено с ошибкой
+					hub.connect(previous);
+				else
+				{
+					if (next.exist())
+						hub.connect(previous);
+					else
+						previous.node()->hubPort = nullptr;
 				}
 			}
-			creator::deleteHub(hub);
-			return true;
-		}
-		static bool erase(std::vector<groupIteratorPtr>& iterSet,
-			existing<groupIterator> iter)
-		{
-			hubPtr hub(existing<nodePtr>(iter.getHPPair().hub));
-			groupPtr group = existing<nodePtr>(iter.getPurpose());
-			//нельзя удалять хаб, не удалив предварительно все его подлкючения
-			if (!hub.empty())
-				return false;
-			if (hub == group.firstGroupHub())
-				return false;//нельзя удалять первый хаб в группе
-			for (int i = 0; i < iterSet.size(); ++i)
+			//оповестить
+			void notify()
 			{
-				if (iterSet[i].getHPPair().hub == iter.getHPPair().hub)
+				//замыкание цепочки
+				int max = begin.getHubNumber();
+				int min = max - quantity;
+				if (quantity == 0)
+					return;
+				portIterator iter(begin.getPurpose());
+				do
 				{
-					iterSet[i].setHPPair(hubPosPair());//сброс
-					iterSet[i] = iterSet.back();//удаление из списка
-					iterSet.pop_back();
-				}
+					if (portIteratorPtr::match(iter.get()))
+					{
+						portIteratorPtr temp(iter.get());
+						if (temp.connection(0) != begin.getPurpose())
+							continue;
+						auto hpp = temp.getHPPair();
+						int hubNumber = hpp.getHubNumber();
+						if (hubNumber < min)
+							continue;//следующая итерация
+						if (hubNumber < max)
+							hpp = hubPosPair();
+						else
+							hpp.setHubNumber(hubNumber - quantity);
+						temp.setHPPair(hpp);
+					}
+				} while (iter);
 			}
-			creator::deleteHub(hub);//итоговое удаление хаба
-			return true;
+
+		};
+		struct eraserGData
+		{
+			existing<groupIterator>& begin;
+			hubPtr hub;
+			hubPtr next;
+			hubPtr previous;
+			int quantity;
+			eraserGData(existing<groupIterator>& b, int q)
+				:begin(b), hub(begin.getHPPair().hub),
+				previous(hub.previous()), next(hub.hub()), quantity(q) {}
+		private:
+			//удавить
+			bool erase()
+				//замкнуть
+			bool close();
+			//оповестить
+			void notify();
+
+		};
+	public:
+		//удаление хаба из группы
+		static bool eraseHub(existing<groupIterator>& begin, int quantity)
+		{
+			hubPtr hub(begin.getHPPair().hub);
+			existing<nodePtr> previous = hub.previous();//предыдущий хаб
+			hubPtr next(hub.hub());//следующий хаб
+			
+
+			bool error = false;
+			int i = 0;//счётчик удалённых хабов
+			while (i < quantity)
+			{
+				next = hub.hub();
+				if (!hub.empty())//нельзя удалять не пустые хабы
+				{
+					error = true;
+					break;
+				}
+				creator::deleteHub(hub);
+				++i;
+				hub = next;
+				if (hub == begin.group().firstGroupHub())//цепочка прервана
+					break;
+			}
+			//установка итератора begin в следующий после удалённых хаб
+			begin.hub = hub;
+			begin.setGlobalPos(begin.getGlobalPos() + (i << 2));
+			//замыкание цепочки
+			hub.connect(previous);
+			//оповещение всех итераторов
+			int min = begin.getHubNumber();//опасно!! в begin старая позиция!!
+			int max = min + i;
+			portIterator iter(begin.getPurpose());
+			do
+			{
+				if (groupIteratorPtr::match(iter.get()))
+				{
+					groupIteratorPtr temp(iter.get());
+					auto hpp = temp.getHPPair();
+					int hubNumber = hpp.getHubNumber();
+					if (hubNumber < min)
+						continue;//следующая итерация
+					if (hubNumber < max)
+						hpp = hubPosPair();
+					else
+						hpp.setHubNumber(hubNumber - i);
+					temp.setHPPair(hpp);
+				}
+			} while (iter);
+			return !error;
 		}
 	};
-	
 }

@@ -7,6 +7,7 @@ namespace nechto
 	{
 	private:
 		uint32_t position;
+		friend class iterator;
 	public:
 		nodePtr hub;
 
@@ -25,30 +26,26 @@ namespace nechto
 		{
 			position = position - getLocalPos() + pos;
 		}
-		//ќпасно!!! ”становить глобальную позицию
+		//”становить глобальную позицию
 		void setGlobalPos(uint32_t pos)
 		{
 			position = pos;
+		}
+		//получить номер хаба
+		ui32 getHubNumber() const
+		{
+			return getGlobalPos() >> 2;
+		}
+		//установить номер хаба
+		void setHubNumber(uint32_t number)
+		{
+			position = (number << 2) + getLocalPos();
 		}
 		//пр€ма€ ссылка на позицию
 		uint32_t& posRef()
 		{
 			return position;
 		}
-		bool operator++()
-		{
-			if (((++position) & 3U) == 0)
-				return true;
-			return false;
-		}
-		bool operator--()
-		{
-			if (((--position) & 3U) == 3)
-				return true;
-			return false;
-		}
-
-
 		bool exist() const
 		{
 			return hub.exist();
@@ -64,6 +61,23 @@ namespace nechto
 		bool operator!= (const hubPosPair hpp) const
 		{
 			return (hub != hpp.hub) || (position != hpp.position);
+		}
+	protected:
+		bool operator++()
+		{
+			if (((++position) & 3U) == 0)
+				return true;
+			return false;
+		}
+		bool operator--()
+		{
+			if (((--position) & 3U) == 3)
+				return true;
+			return false;
+		}
+		void shift(uint32_t offset)
+		{
+			position += offset;
 		}
 	};
 }

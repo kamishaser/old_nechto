@@ -87,10 +87,10 @@ namespace nechto::groupOperations
 		groupPtr group, const existing<groupIterator>& begin)
 	{
 		std::vector<hubPtr> hubSet;
-		hubOrderedList(hubSet, group, begin.getHPPair().hub);
+		hubOrderedList(hubSet, group, groupIterator(begin.getHPPair().hub));
 		auto nearestIterator = iterSet.begin();
 		if(nearestIterator->getHPPair().hub == begin.getHPPair().hub)
-			while (nearestIterator->getHPPair().getPos() < begin.getHPPair().getPos())
+			while (nearestIterator->getHPPair().getLocalPos() < begin.getHPPair().getLocalPos())
 				++nearestIterator;
 
 		for (int i1 = 0; i1 < iterSet.size(); ++i1)
@@ -116,7 +116,7 @@ namespace nechto::groupOperations
 				pushIter.stepForward();
 			}
 		} while (pullIter.stepForward());
-		if (pushIter.pos() != 0)
+		if (pushIter.getLocalPos() != 0)
 			pushIter.nextHub();
 		hubEraser::eraseHubChain(pushIter);
 	}

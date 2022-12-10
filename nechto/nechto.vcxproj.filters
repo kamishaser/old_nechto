@@ -105,6 +105,9 @@
     <ClInclude Include="hubPosPair.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
+    <ClInclude Include="compressor.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp">

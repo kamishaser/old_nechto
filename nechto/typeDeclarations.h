@@ -5,6 +5,7 @@ namespace nechto
 	using ushort = unsigned short;
 	using i64 = long long;
 	using f64 = double;
+	using ui32 = unsigned long;
 
 	namespace nodeStorage
 	{
@@ -15,6 +16,7 @@ namespace nechto
 	class connecter;
 	class creator;
 	class hubEraser;
+	class compressor;
 
 	class iterator;
 	class portIterator;
@@ -100,15 +102,17 @@ namespace nechto
 		enum Type :char//список типов нод
 		{
 			Deleted,
-			Hub,					//разветвитель
-			Variable,				//объект-переменная базового типа
-			MathOperator,					//математический оператор
-			Condition,				//if
-			ExternalObject,			//внешний объект
-			Method,					//метод externalObject
-			Pointer,				//указатель на объект
-			Group,					//группа объектов
-			Text,					//текст
+			Hub = 1,				//разветвитель
+			Group = 2,				//группа объектов
+			Pointer = 3,			//указатель на объект
+			Variable = 4,			//объект-переменная базового типа
+			ExternalObject = 5,		//внешний объект
+			Text = 6,				//текст
+
+			MathOperator = 65,		//математический оператор
+			Condition = 66,			//if
+			Method = 67,			//метод externalObject
+			
 			NodeOperator,			//узловой оператор
 		};
 	}

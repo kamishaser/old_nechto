@@ -26,6 +26,11 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
+		hubPtr(const nodePtr& eptr)
+			:existing<nodePtr>(eptr)
+		{
+			assert(match(eptr));
+		}
 		existing<nodePtr> previous() const
 		{
 			return existing<nodePtr>(getData<nodePtr>());
