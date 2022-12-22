@@ -1,11 +1,23 @@
 #pragma once
 #include "nodePtr.h"
-#include "pointerPtr.h"
-#include "variablePtr.h"
+
 #include <array>
 #include <string>
 namespace nechto
 {
+	using ntV = variablePtr;
+	using ntI64 = i64VariablePtr;
+	using ntF64 = f64VariablePtr;
+	using ntPo = pointerPtr;
+	using ntSP = simplePointerPtr;
+	using ntPI = portIteratorPtr;
+	using ntGI = groupIteratorPtr;
+	using ntI = iteratorPtr;
+	using ntT = textPtr;
+	using ntG = groupPtr;
+	using ntO = nonTypedObjectPtr;
+	using ntMa = mathOperatorPtr;
+	using ntMe = methodPtr;
 
 	struct connectionRule
 	{
@@ -24,7 +36,7 @@ namespace nechto
 			AnyIterator_NoTransit,
 			Text,
 			Group,
-			ExternalObject,
+			Object,
 			Math,
 			Method
 		};
@@ -56,85 +68,8 @@ namespace nechto
 			:cType{ ct0, ct1, ct2, ct3 },
 			uType{ ut0, ut1, ut2, ut3 } {}
 
-		nodePtr getConnection(existing<nodePtr> v1, int number)const
-		{
-			nodePtr vCon = v1.connection(number);
-			char type = vCon.type();
-			bool transited = false;
-			if (!vCon.exist())
-				return nullptr;
-			if (type == nodeT::Pointer && transit(cType[number]))
-			{
-				vCon = pointerPtr(vCon).follow();
-				transited = true;
-				if (!vCon.exist())
-					return nullptr;
-				type = vCon.type();
-			}
-			char subtype = vCon.subtype();
-			switch (cType[number])
-			{
-			case nechto::connectionRule::Any:
-				break;
-			case nechto::connectionRule::I64Variable:
-				if (type != nodeT::Variable || !subtype)
-					return nullptr;
-				break;
-			case nechto::connectionRule::F64Variable:
-				if (type != nodeT::Variable || subtype)
-					return nullptr;
-				break;
-			case nechto::connectionRule::AnyVariable:
-				if (type != nodeT::Variable)
-					return nullptr;
-				break;
-			case nechto::connectionRule::AnyPointer:
-				if (!transited)
-					return nullptr;
-				break;
-			case nechto::connectionRule::AnyPointer_NoTransit:
-				if (type != nodeT::Pointer)
-					return nullptr;
-				break;
-			case nechto::connectionRule::SimplePointer_NoTransit:
-				if (type != nodeT::Pointer || subtype != pointerT::Simple)
-					return nullptr;
-				break;
-			case nechto::connectionRule::ConIterator_NoTransit:
-				if (type != nodeT::Pointer || subtype != pointerT::ConIter)
-					return nullptr;
-				break;
-			case nechto::connectionRule::GroupIterator_NoTransit:
-				if (type != nodeT::Pointer || subtype != pointerT::GroupIter)
-					return nullptr;
-				break;
-			case nechto::connectionRule::AnyIterator_NoTransit:
-				if (type != nodeT::Pointer || 
-					subtype == pointerT::Simple)
-					return nullptr;
-				break;
-			case nechto::connectionRule::Text:
-				if (type != nodeT::Text)
-					return nullptr;
-				break;
-			case nechto::connectionRule::Group:
-				if (type != nodeT::Group)
-					return nullptr;
-				break;
-			case nechto::connectionRule::ExternalObject:
-				if (type != nodeT::ExternalObject)
-					return nullptr;
-				break;
-			case nechto::connectionRule::Method:
-				if (type != nodeT::Method)
-					return nullptr;
-				break;
-			default:
-				assert(false);
-				break;
-			}
-			return vCon;
-		}
+		nodePtr getConnection(existing<nodePtr> v1, int number)const;
+		
 		bool check(nodePtr v1) const
 		{
 			for (int i = 0; i < 4; ++i)
@@ -155,35 +90,9 @@ namespace nechto
 		operation(connectionRule cr = conRule::NoneCR, 
 			bool(*op)(nodePtr, nodePtr, nodePtr) = nullptr)
 			:cRule(cr), operationPtr(op) {}
-		//конструктор с автоматической генерацией правила
-		template<typedNodePtr con0Type, typedNodePtr con1Type, typedNodePtr con2Type>
-		constexpr operation(bool(*op)(con0Type, con1Type, con2Type))
-			:cRule
-			(
-				getConType<con0Type>(), getUseType<con0Type>(),
-				getConType<con1Type>(), getUseType<con1Type>(),
-				getConType<con2Type>(), getUseType<con2Type>()
-			),
-			operationPtr(wrapper3<con0Type, con1Type, con2Type, op>){}
-		template<typedNodePtr con0Type, typedNodePtr con1Type>
-		constexpr operation(bool(*op)(con0Type, con1Type))
-			:cRule
-			(
-				getConType<con0Type>(), getUseType<con0Type>(),
-				getConType<con1Type>(), getUseType<con1Type>()
-			),
-			operationPtr(wrapper2<con0Type, con1Type, op>) {}
-		template<typedNodePtr con0Type>
-		constexpr operation(bool(*op)(con0Type))
-			:cRule
-			(
-				getConType<con0Type>(), getUseType<con0Type>()
-			),
-			operationPtr(wrapper2<con0Type, op>) {}
-
 		//получение типа подключения в зависимости от типа аргумента
 		template<typedNodePtr conType>
-		static conRule::conType getConType()
+		static constexpr conRule::conType getConType()
 		{
 			if constexpr (std::is_same<conType, i64VariablePtr>())
 				return conRule::conType::I64Variable;
@@ -205,14 +114,14 @@ namespace nechto
 				return conRule::conType::Group;
 			if constexpr (std::is_same<conType, methodPtr>())
 				return conRule::conType::Method;
-			if constexpr (std::is_same<conType, mathPtr>())
+			if constexpr (std::is_same<conType, mathOperatorPtr>())
 				return conRule::conType::Math;
-			if constexpr (std::is_same<conType, exteranalObjectPtr>())
-				return conRule::conType::ExternalObject;
+			if constexpr (std::is_same<conType, nonTypedObjectPtr>())
+				return conRule::conType::Object;
 			return conRule::conType::Any;
 		}
 		template<typedNodePtr conType>
-		static conRule::useType getUseType()
+		static constexpr conRule::useType getUseType()
 		{
 			if constexpr (std::is_same<conType, nullNodePtrT>())
 				return conRule::useType::None;
@@ -223,22 +132,22 @@ namespace nechto
 
 		//обёртка для преобразования аргументов в nodePtr
 		template<typedNodePtr con0Type, typedNodePtr con1Type, typedNodePtr con2Type,
-		bool(*operation)(con0Type, con1Type, con2Type)>
-		bool wrapper3(nodePtr con0, nodePtr con1, nodePtr con2)
+		bool(*op)(con0Type, con1Type, con2Type)>
+		static bool wrapper3(nodePtr con0, nodePtr con1, nodePtr con2)
 		{
-			return operation(con0, con1, con2);
+			return op(con0, con1, con2);
 		}
-		template<typedNodePtr con0Type, typedNodePtr con1Type,
-			bool(*operation)(con0Type, con1Type)>
-		bool wrapper2(nodePtr con0, nodePtr con1, nodePtr con2)
+		template<class con0Type, class con1Type,
+			bool(*op)(con0Type, con1Type)>
+		static bool wrapper2(nodePtr con0, nodePtr con1, nodePtr con2)
 		{
-			return operation(con0, con1);
+			return op(con0, con1);
 		}
 		template<typedNodePtr con0Type,
-			bool(*operation)(con0Type)>
-		bool wrapper1(nodePtr con0, nodePtr con1, nodePtr con2)
+			bool(*op)(con0Type)>
+		static bool wrapper1(nodePtr con0, nodePtr con1, nodePtr con2)
 		{
-			return operation(con0);
+			return op(con0);
 		}
 
 		bool operate(nodePtr v1) const
@@ -253,6 +162,51 @@ namespace nechto
 			if (operationPtr == nullptr)
 				return false;
 			return operationPtr(n[0], n[1], n[2]);
+		}
+
+		template<typedNodePtr con0Type, typedNodePtr con1Type, typedNodePtr con2Type, 
+			bool(*op)(con0Type, con1Type, con2Type)>
+		constexpr static operation wrap()
+		{
+			operation oper;
+			oper.cRule = connectionRule
+			(
+				getConType<con0Type>(), getUseType<con0Type>(),
+				getConType<con1Type>(), getUseType<con1Type>(),
+				getConType<con2Type>(), getUseType<con2Type>()
+			);
+			oper.operationPtr = wrapper3<con0Type, con1Type, con2Type, op>;
+			return oper;
+		}
+		template<typedNodePtr con0Type, typedNodePtr con1Type,
+			bool(*op)(con0Type, con1Type)>
+		constexpr static operation wrap()
+		{
+			operation oper;
+			oper.cRule = connectionRule
+			(
+				getConType<con0Type>(), getUseType<con0Type>(),
+				getConType<con1Type>(), getUseType<con1Type>()
+			);
+			oper.operationPtr = wrapper2<con0Type, con1Type, op>;
+			return oper;
+		}
+		template<typedNodePtr con0Type, bool(*op)(con0Type)>
+		constexpr static operation wrap()
+		{
+			operation oper;
+			oper.cRule = connectionRule
+			(
+				getConType<con0Type>(), getUseType<con0Type>()
+			);
+			oper.operationPtr = wrapper1<con0Type, op>;
+			return oper;
+		}
+
+		constexpr void operator=(const operation& op)
+		{
+			cRule = op.cRule;
+			operationPtr = op.operationPtr;
 		}
 	}; 
 	const operation operation::None = operation();

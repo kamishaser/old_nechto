@@ -1,11 +1,13 @@
 #pragma once
 #include <cassert>
+#include <string>
 namespace nechto
 {
 	using ushort = unsigned short;
 	using i64 = long long;
 	using f64 = double;
 	using ui32 = unsigned long;
+	using ustr = std::u16string;
 
 	namespace nodeStorage
 	{
@@ -15,12 +17,15 @@ namespace nechto
 	class nodePtr;
 	class connecter;
 	class creator;
-	class hubEraser;
+	class hubManager;
 	class compressor;
 
-	class iterator;
+	struct iterator;
 	class portIterator;
 	class groupIterator;
+
+	class serializer;
+	class deserializer;
 
 	//базовый класс идентификатора ноды
 	struct nodeId
@@ -57,18 +62,18 @@ namespace nechto
 		friend class nodeStorage::threadLocalAllocator;
 		friend class nodeStorage::nodeAllocator;
 		friend class nodePtr;
-		friend class nodeData;
+		friend struct nodeData;
 
-		void operator=(nullptr_t)
+		void operator=(std::nullptr_t)
 		{
 			first = 0;
 			second = 0;
 		}
-		bool operator==(nullptr_t) const
+		bool operator==(std::nullptr_t) const
 		{
 			return !exist();
 		}
-		bool operator!=(nullptr_t) const
+		bool operator!=(std::nullptr_t) const
 		{
 			return exist();
 		}
@@ -106,12 +111,12 @@ namespace nechto
 			Group = 2,				//группа объектов
 			Pointer = 3,			//указатель на объект
 			Variable = 4,			//объект-переменная базового типа
-			ExternalObject = 5,		//внешний объект
+			Object = 5,		//внешний объект
 			Text = 6,				//текст
 
 			MathOperator = 65,		//математический оператор
 			Condition = 66,			//if
-			Method = 67,			//метод externalObject
+			Method = 67,			//метод Object
 			
 			NodeOperator,			//узловой оператор
 		};
@@ -125,13 +130,17 @@ namespace nechto
 	class pointerPtr;
 	class simplePointerPtr;
 	class iteratorPtr;
-	class conIteratorPtr;
+	class portIteratorPtr;
 	class groupIteratorPtr;
+	class textPtr;
 	class groupPtr;
 	class methodPtr;
-	class mathPtr;
-	class nonTypedExternalObjectPtr;
-	class externalObjectNullPtr;
+	class mathOperatorPtr;
+	class nonTypedObjectPtr;
+	class objectNullPtr;
+
+	class namedExCon;
+	class namedExConGroup;
 
 	namespace variableT
 	{
@@ -139,6 +148,30 @@ namespace nechto
 		{
 			F64 = 0,//false
 			I64 = 1 //true
+		};
+	}
+	namespace objectT
+	{
+		enum Type :char
+		{
+			NotOwning = 0,//false
+			Owning = 1 //true
+		};
+	}
+	namespace textT
+	{
+		enum Type :char
+		{
+			NotOwning = 0,//false
+			Owning = 1 //true
+		};
+	}
+	namespace groupT
+	{
+		enum Type :char
+		{
+			weak = 0,//false
+			strong = 1 //true
 		};
 	}
 	namespace mathOperatorT

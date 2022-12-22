@@ -28,8 +28,10 @@ namespace nechto
 		}
 		friend class connecter;
 		friend class creator;
-		friend class hubEraser;
+		friend class hubManager;
 		friend class hubPtr;
+		friend class serializer;
+		friend class deserializer;
 	public:
 		nodePtr(nodeId id)
 			:nodeId(id) {}

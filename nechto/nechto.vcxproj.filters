@@ -21,35 +21,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="checkAndStep.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="text.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="serializer.h">
       <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="textOut.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="typeNames.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="namedExCon.h">
-      <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="connectionRule.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="nodeOperator.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="fileSerializer.h">
       <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="namedExConGroup.h">
-      <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="nodePtr.h">
       <Filter>Исходные файлы новой версии</Filter>
@@ -90,7 +69,7 @@
     <ClInclude Include="condition.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
-    <ClInclude Include="externalObject.h">
+    <ClInclude Include="object.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
     <ClInclude Include="method.h">
@@ -99,13 +78,37 @@
     <ClInclude Include="group.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
-    <ClInclude Include="hubEraser.h">
+    <ClInclude Include="hubManager.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
     <ClInclude Include="hubPosPair.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
     <ClInclude Include="compressor.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="typeNames.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="string_numberConverter.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="textOut.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="text.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="portSearch.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="connectionRuleCheck.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="namedExCon.h">
+      <Filter>Исходные файлы новой версии</Filter>
+    </ClInclude>
+    <ClInclude Include="namedExConGroup.h">
       <Filter>Исходные файлы новой версии</Filter>
     </ClInclude>
   </ItemGroup>

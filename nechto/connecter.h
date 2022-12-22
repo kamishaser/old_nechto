@@ -15,8 +15,15 @@ namespace nechto
 		{
 			if ((iter1.get().exist()) || (iter2.get().exist()))
 				return false;
-			iter1.getHPPair().hub.node()->port[iter1.pos()] = iter2.getPurpose();
-			iter2.getHPPair().hub.node()->port[iter2.pos()] = iter1.getPurpose();
+			if(iter1.inGroup())
+				if(groupConnectProhibition(groupIterator(iter1), iter2))
+					return false;
+			if (iter2.inGroup())
+				if (groupConnectProhibition(groupIterator(iter2), iter1))
+					return false;
+			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = iter2.getPurpose();
+			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = iter1.getPurpose();
+			return true;
 		}
 		static bool disconnect(existing<iterator> iter1, existing<iterator> iter2)
 		{
@@ -24,8 +31,9 @@ namespace nechto
 				return false;//только двустороннии соединения
 			resetIterator(iter1);
 			resetIterator(iter2);
-			iter1.getHPPair().hub.node()->port[iter1.pos()] = nullptr;
-			iter2.getHPPair().hub.node()->port[iter2.pos()] = nullptr;
+			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = nullptr;
+			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = nullptr;
+			return true;
 		}
 		static bool isConnection(existing<iterator> iter1, existing<iterator> iter2)
 		{
@@ -38,8 +46,8 @@ namespace nechto
 			resetIterator(iter1);
 			resetIterator(iter2);
 			nodePtr temp = iter1.get();
-			iter1.getHPPair().hub.node()->port[iter1.pos()] = iter2.get();
-			iter2.getHPPair().hub.node()->port[iter2.pos()] = temp;
+			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = iter2.get();
+			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = temp;
 		}
 		
 		//исключение хаба из цепочки без оповещения итераторов
@@ -48,128 +56,20 @@ namespace nechto
 		{
 			existing<nodePtr> node = iter.getHPPair().hub;
 			if (node.type() == nodeT::Pointer &&
-				(iter.pos() == 0) && (node.subtype() > 0))
+				(iter.getLocalPos() == 0) && (node.subtype() > 0))
 				pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
 		}
+		static bool groupConnectProhibition(groupIterator gi, iterator iter)
+		{
+			if (iter.hub.type() == nodeT::Pointer)
+				if (iter.getGlobalPos() == 0)
+					return true;
+			return false;
+		}
 	};
-	portIterator firstEmptyHubPort(existing<nodePtr> eptr)
-	{
-		assert(eptr.type() != nodeT::Hub);
-		portIterator ci(eptr);
-		while (true)
-		{
-			nodePtr nextHub = ci.get().hub();
-			if (!nextHub.exist())
-			{
-				nextHub = creator::createHub();
-				connecter::insertHub(ci, hubPtr(nextHub));
-			}
-			ci.setHPPair(hubPosPair(nextHub, 0));
-			for (int i = 0; i < 4; ++i)
-				if (!nextHub.connection(i).exist())
-				{
-					ci.setLocalPos(i);
-					return ci;
-				}
-		}
-	}
-	groupIterator firstEmptyGroupPort(groupPtr group)
-	{
-		groupIterator gi(group);
-		while (true)
-		{
-			for (int i = 0; i < 4; ++i)
-			{
-				gi.setLocalPos(i);
-				if (!gi.get().exist())
-					return gi;
-			}
-			nodePtr nextHub = gi.get().hub();
-			if (!nextHub.exist())
-			{
-				nextHub = creator::createHub();
-				connecter::insertHub(gi, hubPtr(nextHub));
-			}
-			gi.setHPPair(hubPosPair(nextHub, 0));
-		}
-	}
-	portIterator lastConnectedPort(existing<nodePtr> node)
-	{
-		portIterator iter(node);
-		portIterator lastConnected(node, hubPosPair());
-		do
-		{
-			if (iter.get().exist())
-				lastConnected = iter;
-		} while (iter.stepForward());
-		return lastConnected;
-	}
-	groupIterator lastConnectedGroupPort(groupPtr group)
-	{
-		groupIterator gi(group);
-		gi.stepBack();
-		do
-		{
-			if (gi.get().exist())
-				return gi;
-		} while (gi.stepBack());
-		return groupIterator(group, hubPosPair());
-	}
-	groupIterator backGroupPort(groupPtr group)
-	{
-		groupIterator gi(group);
-		gi.stepBack();
-		
-		if (gi.get().exist())//если последний порт занят
-		{
-			hubPtr nextHub = creator::createHub();
-			connecter::insertHub(gi, nextHub);
-			gi.setHPPair(hubPosPair(nextHub, 0));
-			return gi;			
-		}
-		gi.stepBackToNextConnected();
-		gi.stepForward();
-		assert(!gi.get().exist());
-		return gi;
-	}
-	/*возврощает итератор на ближайший порт ноды node подключённый к connection.
-	* Ели не находит - возвращает пустой итератор */
-	portIterator findNearestNonGroupConnection(
-		existing<nodePtr> node, existing<nodePtr> connection)
-	{
-		portIterator ci(node);
-		do
-		{
-			if (ci.get() == connection)
-				return ci;
-		} while (ci.stepForward());
-		return portIterator(nullptr, hubPosPair(nullptr, 0));
-	}
-	/*возврощает итератор на ближайший порт группы group подключённый к connection.
-	* Ели не находит - возвращает пустой итератор */
-	groupIterator findNearestGroupConnection(
-		groupPtr group, existing<nodePtr> connection)
-	{
-		groupIterator gi(group);
-		do
-		{
-			if (gi.get() == connection)
-				return gi;
-		} while (gi.stepForward());
-		return groupIterator(nullptr, hubPosPair(nullptr, 0));
-	}
 	iterator findNearestConnection(
-		existing<nodePtr> node, existing<nodePtr> connection)
-	{
-		if (node.type() == nodeT::Group)
-		{
-			auto gi = findNearestGroupConnection(groupPtr(node), connection);
-			if(gi.exist())
-				return gi;
-		}
-		auto ci = findNearestNonGroupConnection(node, connection);
-		return ci;
-	}
+		existing<nodePtr> node, existing<nodePtr> connection);//определено в portSearch
+	portIterator firstEmptyHubPort(existing<nodePtr> eptr);
 	void nearestDisconnect(existing<iterator> i1)
 	{
 		if (!i1.getPurpose().exist())
@@ -211,7 +111,7 @@ namespace nechto
 		connecter::connect(
 			firstEmptyHubPort(node1), firstEmptyHubPort(node2));
 	}
-	void simplifiedIterIterConnect(portIterator ci1, portIterator ci2)
+	void simplifiedIterIterConnect(iterator ci1, iterator ci2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -220,8 +120,9 @@ namespace nechto
 		connecter::connect(ci1, ci2);
 	}
 	void simplifiedIterNumConnect(
-		portIterator ci1, existing<nodePtr> node2, char port2)
+		iterator ci1, existing<nodePtr> node2, char port2)
 	{
+		assert(port2 < 4);
 		portIterator ci2(node2, port2);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -230,10 +131,26 @@ namespace nechto
 		connecter::connect(ci1, ci2);
 	}
 	void simplifiedIterHubConnect(
-		portIterator ci1, existing<nodePtr> node2)
+		iterator ci1, existing<nodePtr> node2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
+	}
+	void creator::disconnectAll(existing<nodePtr> node)
+	{
+		portIterator iter(node);
+		do
+		{
+			nearestDisconnect(iter);
+		} while (iter.stepForward());
+	}
+	void creator::disconnectAllGroup(groupPtr group)
+	{
+		groupIterator iter(group);
+		do
+		{
+			nearestDisconnect(iter);
+		} while (iter.stepForward());
 	}
 }

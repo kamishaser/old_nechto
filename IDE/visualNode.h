@@ -1,6 +1,6 @@
 #pragma once
 #include "GLM/glm.hpp"
-#include "externalObject.h"
+#include "object.h"
 #include "nodeOperationSet.h"
 #include "visual.h"
 #include "rect.h"

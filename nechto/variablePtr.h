@@ -11,6 +11,11 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
+		variablePtr(const nodePtr& eptr)
+			:existing<nodePtr>(eptr)
+		{
+			assert(match(eptr));
+		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
 			return eptr.type() == nodeT::Variable;
@@ -19,8 +24,8 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		i64 operator= (i64 value);
-		f64 operator= (f64 value);
+		void operator= (i64 value);
+		void operator= (f64 value);
 
 		operator i64() const;
 		operator f64() const;
@@ -29,6 +34,16 @@ namespace nechto
 	{
 	public:
 		i64VariablePtr(const variablePtr& eptr)
+			:variablePtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		i64VariablePtr(const existing<nodePtr>& eptr)
+			:variablePtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		i64VariablePtr(const nodePtr& eptr)
 			:variablePtr(eptr)
 		{
 			assert(match(eptr));
@@ -50,7 +65,11 @@ namespace nechto
 			setData<i64>(value);
 			return value;
 		}
-		operator i64()
+		i64 get() const
+		{
+			return getData<i64>();
+		}
+		operator i64() const
 		{
 			return getData<i64>();
 		}
@@ -59,6 +78,16 @@ namespace nechto
 	{
 	public:
 		f64VariablePtr(const variablePtr& eptr)
+			:variablePtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		f64VariablePtr(existing<nodePtr>& eptr)
+			:variablePtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		f64VariablePtr(nodePtr& eptr)
 			:variablePtr(eptr)
 		{
 			assert(match(eptr));
@@ -80,20 +109,24 @@ namespace nechto
 			setData<f64>(value);
 			return value;
 		}
-		operator f64()
+		f64 get() const
+		{
+			return getData<f64>();
+		}
+		operator f64() const
 		{
 			return getData<f64>();
 		}
 	};
 
-	i64 variablePtr::operator= (i64 value)
+	void variablePtr::operator= (i64 value)
 	{
 		if (subtype())
 			setData<i64>(value);
 		else
 			setData<f64>(static_cast<f64>(value));
 	}
-	f64 variablePtr::operator= (f64 value)
+	void variablePtr::operator= (f64 value)
 	{
 		if (subtype())
 			setData<i64>(static_cast<i64>(value));

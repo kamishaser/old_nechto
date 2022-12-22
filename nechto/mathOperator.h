@@ -135,13 +135,13 @@ namespace nechto
 		bool incrementF(
 			i64VariablePtr Arg)
 		{
-			Arg = Arg + 1;
+			Arg = Arg.get() + 1;
 			return true;
 		}
 		bool decrementF(
 			i64VariablePtr Arg)
 		{
-			Arg = Arg - 1;
+			Arg = Arg.get() - 1;
 			return true;
 		}
 	}
@@ -169,28 +169,28 @@ namespace nechto
 	};
 	const staticNodeOperationSet mathOperatorPtr::operSet
 	{
-		{u"assigment", {mathOperationF::assigmentF}},
-		{u"unaryMinus", {mathOperationF::unaryMinusF}},
+		{u"assigment", operation::wrap<ntV, const ntV, mathOperationF::assigmentF>()},
+		{u"unaryMinus", operation::wrap<ntV, const ntV, mathOperationF::unaryMinusF>()},
 
-		{u"addition", {mathOperationF::additionF}},
-		{u"subtraction", {mathOperationF::subtractionF}},
+		{u"addition", operation::wrap<ntV, const ntV, const ntV, mathOperationF::additionF>()},
+		{u"subtraction", operation::wrap<ntV, const ntV, const ntV, mathOperationF::subtractionF>()},
 
-		{u"multiplication", {mathOperationF::multiplicationF}},
-		{u"division", {mathOperationF::divisionF}},
+		{u"multiplication", operation::wrap<ntV, const ntV, const ntV, mathOperationF::multiplicationF>()},
+		{u"division", operation::wrap<ntV, const ntV, const ntV, mathOperationF::divisionF>()},
 
-		{u"equau", {mathOperationF::equalF}},
-		{u"notEquau", {mathOperationF::notEqualF}},
+		{u"equal", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::equalF>()},
+		{u"notEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::notEqualF>()},
 
-		{u"less", {mathOperationF::lessF}},
-		{u"greater", {mathOperationF::greaterF}},
-		{u"lessOrEquau", {mathOperationF::lessOrEqualF}},
-		{u"greaterOrEquau", {mathOperationF::greaterOrEqualF}},
+		{u"less", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::lessF>()},
+		{u"greater", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::greaterF>()},
+		{u"lessOrEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::lessOrEqualF>()},
+		{u"greaterOrEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::greaterOrEqualF>()},
 
-		{u"logicNegation", {mathOperationF::logicNegationF}},
-		{u"logicAnd", {mathOperationF::logicAndF}},
-		{u"logicOr", {mathOperationF::logicOrF}},
+		{u"logicNegation", operation::wrap<ntI64, const ntI64, mathOperationF::logicNegationF>()},
+		{u"logicAnd", operation::wrap<ntI64, const ntI64, const ntI64, mathOperationF::logicAndF>()},
+		{u"logicOr", operation::wrap<ntI64, const ntI64, const ntI64, mathOperationF::logicOrF>()},
 
-		{u"increment", {mathOperationF::incrementF}},
-		{u"decrement", {mathOperationF::decrementF}}
+		{u"increment", operation::wrap<ntI64, mathOperationF::incrementF>()},
+		{u"decrement", operation::wrap<ntI64, mathOperationF::decrementF>()}
 	};
 }

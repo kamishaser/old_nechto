@@ -1,98 +1,87 @@
 #pragma once
-#include "node.h"
+#include "nodePtr.h"
+#include "typeNames.h"
 #include <map>
 
 
 namespace nechto
 {
-	namespace text
+	class textPtr : public existing<nodePtr>
 	{
-		static_assert(sizeof(wchar_t) == 2);
-		bool isConnectedToNumber(nodePtr v1)
+		friend class creator;
+		friend class hubManager;
+		
+	public:
+		textPtr(const existing<nodePtr>& eptr)
+			:existing<nodePtr>(eptr)
 		{
-			nodePtr vtemp = v1;
-			while (true)
+			assert(match(eptr));
+		}
+		textPtr(const nodePtr& eptr)
+			:existing<nodePtr>(eptr)
+		{
+			assert(match(eptr));
+		}
+		ustr* getPtr() const
+		{
+			return getData<ustr*>();
+		}
+		bool textExist() const
+		{
+			return getPtr() != nullptr;
+		}
+		bool owner() const
+		{
+			return subtype();
+		}
+		void reset()
+		{
+			if (textExist())
 			{
-				for (int i1 = 0; i1 < 4; ++i1)
-				{
-					nodePtr vback = vtemp->connection[i1];
-					while (true)
-					{
-						for (char i = 0; i < 4; i++)
-							if (vback->connection[i].load() == v1)
-								return true;
-						if (!vback->hasHub())
-							break;
-						vback = vback->hubConnection;
-					}
-				}
-				if (!vtemp->hasHub())
-					break;
-				vtemp = vtemp->hubConnection;
+				if (owner())
+					delete getPtr();
+				setData<ustr*>(nullptr);
 			}
-			return false;
 		}
-		bool check(nodePtr tag)
+		void set(ustr* text)
 		{
-			assert(tag.exist());
-			assert(tag->getType() == node::Text);
-			return true;
+			reset();
+			setData<ustr*>(text);
 		}
-
-		void set(nodePtr v1, const std::u16string& data) noexcept
+		void set(const ustr& text)
 		{
-			assert(v1.exist());
-			assert(v1->getType() == node::Text);
-			nodeStorage::lock(v1);
-			if (v1->getData<std::u16string*>() == nullptr)
-				v1->setData(new std::u16string(data));
+			if (textExist())
+				*getPtr() = text;
 			else
-				*v1->getData<std::u16string*>() = data;
-			nodeStorage::unlock(v1);
+				set(new ustr(text));
+		}
+		ustr& operator=(const ustr& text)
+		{
+			set(text);
+			return *getPtr();
+		}
+		i64 getSize() const
+		{
+			if (!textExist())
+				return 0;
+			return getPtr()->size();
+		}
+		ustr& operator*() const
+		{
+			return *getPtr();
+		}
+		ustr& operator->() const
+		{
+			return *getPtr();
 		}
 
-		std::u16string get(nodePtr v1) noexcept
+		static bool match(const existing<nodePtr>& eptr)
 		{
-			assert(v1.exist());
-			assert(v1->getType() == node::Text);
-			std::u16string temp;
-			nodeStorage::lock(v1);
-			if (v1->getData<std::u16string*>())
-				temp = *v1->getData<std::u16string*>();
-			nodeStorage::unlock(v1);
-			return temp;
+			return eptr.type() == nodeT::Group;
 		}
-		void reset(nodePtr v1) noexcept
+		static bool match(const nodePtr& ptr)
 		{
-			assert(v1.exist());
-			assert(v1->getType() == node::Text);
-			nodeStorage::lock(v1);
-			if (v1->getData<std::u16string*>())
-				delete v1->getData<std::u16string*>();
-			v1->setData<std::u16string*>(nullptr);
-			nodeStorage::unlock(v1);
+			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-
-		void initialize(nodePtr v1)
-		{
-			assert(v1.exist());
-			assert(v1->getType() == node::Text);
-			set(v1, u"");
-		}
-		void initialize(nodePtr v1, const std::u16string& text)
-		{
-			v1->setData<std::u16string*>(nullptr);
-			set(v1, text);
-		}
-		//присваивание значения ноде того же тип
-		void assigment(nodePtr v0, nodePtr v1)
-		{
-			set(v0, get(v1));
-		}
-	}
-	//std::function<void(nodePtr, size_t)>addTag;
-	//std::function<nodePtr(size_t)> GetAddressByID;
-	//std::function<>
-
-	
+	};
 }

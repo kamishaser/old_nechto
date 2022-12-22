@@ -169,7 +169,7 @@ namespace nechto::nodeStorage
 		void deallocate(nodeId id)
 		{
 			assert(getAllocator(id.exist()));
-			getNode(id)->type != nodeT::Deleted;
+			getNode(id)->type = nodeT::Deleted;
 			getAllocator(id.first)->deallocate(id.second);
 			--numberOfNodes;
 		}

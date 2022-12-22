@@ -46,7 +46,7 @@ namespace nechto
 		{
 			return purpose;
 		}
-		hubPosPair getHPPair() const
+		const hubPosPair& getHPPair() const
 		{
 			return *this;
 		}
@@ -123,6 +123,15 @@ namespace nechto
 			:iterator(group, hubPosPair(group.firstGroupHub(), 0)){}
 		explicit groupIterator(groupIteratorPtr groupIter)
 			:iterator(iteratorPtr(groupIter)){}
+		explicit groupIterator(iterator iter)
+			:iterator(iter) 
+		{
+			if (iter.exist())
+			{
+				assert(iter.getPurpose() == nodeT::Group);
+				assert(inGroup());
+			}
+		}
 		groupIterator(nodePtr Purpose, hubPosPair hpp)
 			:iterator(Purpose, hpp) {}
 

@@ -7,7 +7,7 @@
 #include "pointerPtr.h"
 #include "groupPtr.h"
 #include "mathOperator.h"
-#include "externalObject.h"
+#include "object.h"
 #include "condition.h"
 #include "method.h"
 
@@ -15,17 +15,7 @@ namespace nechto
 {
 	class creator
 	{
-		static existing<nodePtr> allocate(char type, char subtype = 0)
-		{
-			nodePtr node = nodeStorage::terminal.allocate();
-			node.node()->type = type;
-			node.node()->subtype = subtype;
-			return node;
-		}
-		static void deallocate(existing<nodePtr> node)
-		{
-			nodeStorage::terminal.deallocate(node);
-		}
+		friend class hubManager;
 	public:
 		/*static existing<nodePtr> addNode(char type, char subtype)
 		{
@@ -33,9 +23,9 @@ namespace nechto
 		}*/
 		
 
-		static hubPtr createHub()
+		static hubPtr createHub(bool groupHub)
 		{
-			existing<nodePtr> node = allocate(nodeT::Hub);
+			existing<nodePtr> node = allocate(nodeT::Hub, groupHub);
 			return node;
 		}
 		static i64VariablePtr createI64()
@@ -53,19 +43,19 @@ namespace nechto
 		static simplePointerPtr createSimplePointer()
 		{
 			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::Simple);
-			return node;
+			return simplePointerPtr(node);
 		}
 		static portIteratorPtr createConIterator()
 		{
 			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::ConIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
-			return node;
+			return portIteratorPtr(node);
 		}
 		static groupIteratorPtr createGroupIterator()
 		{
 			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::GroupIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
-			return node;
+			return groupIteratorPtr(node);
 		}
 		static mathOperatorPtr createMathOperator(char operationType)
 		{
@@ -82,31 +72,106 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::Condition);
 			return node;
 		}
-		static nonTypedExternalObjectPtr createExternalObject(
-			externalObject* object = nullptr, char own = 1)
+		static nonTypedObjectPtr createObject(char own,
+			object* object = nullptr)
 		{
-			existing<nodePtr> node = allocate(nodeT::ExternalObject, own);
-			nonTypedExternalObjectPtr(node).setObjectPtr(object);
+			existing<nodePtr> node = allocate(nodeT::Object, own);
+			nonTypedObjectPtr(node).setObjectPtr(object);
+			return node;
+		}
+		static nonTypedObjectPtr createText(char own)
+		{
+			existing<nodePtr> node = allocate(nodeT::Text, own);
+			textPtr(node).setData<ustr*>(nullptr);
 			return node;
 		}
 		static groupPtr createGroup(bool own = true)
 		{
 			existing<nodePtr> node = allocate(nodeT::Group, own);
-			hubPtr hub = createHub();
-			hub.setPrevious(hub);
-			hub.node()->hubPort = hub;
+			hubPtr hub = createHub(1);
+			hub.connect(hub);
 			groupPtr(node).setFirstGroupHub(hub);
 			return node;
 		}
-
-		static void deleteNode(char type)
+		
+		static void deleteNode(existing<nodePtr> node)
 		{
-			//...
-			//deallocate(type);
+			switch (node.type())
+			{
+			case nechto::nodeT::Deleted:
+				break;
+			case nechto::nodeT::Hub:
+				assert(false);//ошибка! ’абы удал€ютс€ только через hubManager
+				break;
+			case nechto::nodeT::Group:
+				disconnectAllGroup(node);
+				deleteAllGroupHubs(node);
+				break;
+			case nechto::nodeT::Pointer:
+				break;
+			case nechto::nodeT::Variable:
+				break;
+			case nechto::nodeT::Object:
+				if (nonTypedObjectPtr(node).owner())
+					delete nonTypedObjectPtr(node).getObjectPtr();
+				break;
+			case nechto::nodeT::Text:
+				textPtr(node).reset();
+				break;
+			case nechto::nodeT::Method:
+				break;
+			case nechto::nodeT::NodeOperator:
+				break;
+			default:
+				break;
+			}
+			node.node()->data = 0;
+			node.node()->type = 0;
+			node.node()->subtype = 0;
+			disconnectAll(node);
+			deleteAllHubs(node);
+		}
+	private:
+
+		static void disconnectAll(existing<nodePtr> node);
+		static void disconnectAllGroup(groupPtr group);
+		static existing<nodePtr> allocate(char type, char subtype = 0)
+		{
+			nodePtr node = nodeStorage::terminal.allocate();
+			node.node()->type = type;
+			node.node()->subtype = subtype;
+			return node;
+		}
+		static void deallocate(existing<nodePtr> node)
+		{
+			for (int i = 0; i < 4; ++i)
+				assert(!node.connection(i).exist());
+			nodeStorage::terminal.deallocate(node);
 		}
 		static void deleteHub(hubPtr hub)
 		{
 			deallocate(hub);
+		}
+		static void deleteAllGroupHubs(groupPtr group)
+		{
+			const hubPtr firstHub = group.firstGroupHub();//первый хаб
+			nodePtr currentHub = firstHub;
+			do
+			{
+				nodePtr next = currentHub.hub();
+				deleteHub(currentHub);
+				currentHub = next;
+			} while (currentHub != firstHub);
+		}
+		static void deleteAllHubs(existing<nodePtr> node)
+		{
+			nodePtr currentHub = node;
+			do
+			{
+				nodePtr next = currentHub.hub();
+				deleteHub(currentHub);
+				currentHub = next;
+			} while (currentHub.exist());
 		}
 	};
 }

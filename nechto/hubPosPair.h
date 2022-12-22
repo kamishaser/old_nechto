@@ -7,7 +7,7 @@ namespace nechto
 	{
 	private:
 		uint32_t position;
-		friend class iterator;
+		friend struct iterator;
 	public:
 		nodePtr hub;
 
@@ -61,6 +61,12 @@ namespace nechto
 		bool operator!= (const hubPosPair hpp) const
 		{
 			return (hub != hpp.hub) || (position != hpp.position);
+		}
+		bool inGroup() const
+		{
+			if (!hubPtr::match(hub))
+				return false;
+			return hub.subtype();
 		}
 	protected:
 		bool operator++()

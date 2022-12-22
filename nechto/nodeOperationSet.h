@@ -16,7 +16,7 @@ namespace nechto
 		//инициализация по initializer_list
 		staticNodeOperationSet(
 			std::initializer_list<namedOperation> ilist)
-			:size(ilist.size())
+			:size(static_cast<char>(ilist.size()))
 		{
 			assert(ilist.size() < 256);
 			char number = 0;
@@ -27,11 +27,13 @@ namespace nechto
 				number++;
 			}
 		}
+		staticNodeOperationSet()
+			:size(0) {}
 		//инициализация копированием с добавлением
 		staticNodeOperationSet(
 			const staticNodeOperationSet& snoSet,
 			std::initializer_list<namedOperation> ilist)
-			:size(snoSet.size + ilist.size())
+			:size(static_cast<char>(snoSet.size + ilist.size()))
 		{
 			assert((ilist.size() + snoSet.size) < 256);
 			char number = 0;

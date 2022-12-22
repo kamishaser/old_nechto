@@ -4,7 +4,7 @@
 
 #include "creator.h"
 #include "connecter.h"
-#include "hubEraser.h"
+#include "hubManager.h"
 
 namespace nechto::groupOperations
 {
@@ -44,8 +44,8 @@ namespace nechto::groupOperations
 	{
 		nearestGroupDisconnectAll(group);
 		groupIterator gi(group);
-		gi.stepForward();
-		hubEraser::eraseHubChain(gi);
+		gi.goToNextHub();
+		hubManager::eraseHub(gi, -1);
 	}
 	bool contains(groupPtr group, nodePtr v1)
 	{
@@ -66,62 +66,5 @@ namespace nechto::groupOperations
 				return gi;
 		} while (gi.stepForward());
 		return nullGroupIterator;
-	}
-	void hubOrderedList(std::vector<hubPtr>& hubSet, groupPtr group, 
-		const groupIterator& begin)
-	{
-		groupIterator gi(group);
-		while (true)
-		{
-			if (gi.getHPPair().hub == begin)
-				break;
-			if (!gi.nextHub())
-				return;
-		} 
-		do
-		{
-			hubSet.push_back(existing<nodePtr>(gi.getHPPair().hub));
-		} while (gi.nextHub());
-	}
-	void orderedIteratorList(std::vector<groupIteratorPtr>& iterSet, 
-		groupPtr group, const existing<groupIterator>& begin)
-	{
-		std::vector<hubPtr> hubSet;
-		hubOrderedList(hubSet, group, groupIterator(begin.getHPPair().hub));
-		auto nearestIterator = iterSet.begin();
-		if(nearestIterator->getHPPair().hub == begin.getHPPair().hub)
-			while (nearestIterator->getHPPair().getLocalPos() < begin.getHPPair().getLocalPos())
-				++nearestIterator;
-
-		for (int i1 = 0; i1 < iterSet.size(); ++i1)
-		{
-			for (int i2 = i1; i2 < iterSet.size() ++i2)
-			{
-			}
-		}
-	}
-
-	void compress(const groupIterator& begin)
-	{
-
-		groupIterator pullIter = begin;
-		groupIterator pushIter = begin;
-		std::vector<groupIteratorPtr> iterSet;
-		hubEraser::getAllGroupIterators(iterSet, begin.getPurpose());
-		do
-		{
-			if (pullIter.get().exist())
-			{
-				connecter::swap(pullIter, pushIter);
-				pushIter.stepForward();
-			}
-		} while (pullIter.stepForward());
-		if (pushIter.getLocalPos() != 0)
-			pushIter.nextHub();
-		hubEraser::eraseHubChain(pushIter);
-	}
-	void compress(groupPtr group)
-	{
-		compress(groupIterator(group));
 	}
 }

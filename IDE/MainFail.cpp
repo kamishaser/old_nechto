@@ -1,5 +1,3 @@
-#include "checkAndStep.h"
-
 #include "nechtoIde.h"
 #include "nodeBoard.h"
 #include "nodeOperator.h"

@@ -8,7 +8,7 @@ namespace nechto
 	class groupPtr : public existing<nodePtr>
 	{
 		friend class creator;
-		friend class hubEraser;
+		friend class hubManager;
 		void setFirstGroupHub(hubPtr hub)
 		{
 			(reinterpret_cast<hubPosPair*>(&node()->data))->hub = hub;
@@ -19,6 +19,11 @@ namespace nechto
 		}
 	public:
 		groupPtr(const existing<nodePtr>& eptr)
+			:existing<nodePtr>(eptr)
+		{
+			assert(match(eptr));
+		}
+		groupPtr(const nodePtr& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));

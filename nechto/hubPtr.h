@@ -9,7 +9,7 @@ namespace nechto
 	{
 		friend class connecter;
 		friend class creator;
-		friend class hubEraser;
+		friend class hubManager;
 
 		void connect(existing<nodePtr> previous)
 		{
