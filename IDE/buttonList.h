@@ -20,17 +20,17 @@ namespace nechto::ide
 		clickEventT clickEvent = nullptr;
 		
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::u16string& name,
+			const std::wstring& name,
 			bool choise = false)
 			:namedExConGroup(emptyExternalObject, name), 
 			choiseMode(choise)
 		{
-			NumNumConnect(get(), vGroup->get(), 1, 1);
+			NumNumConnect(node(), vGroup->node(), 1, 1);
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::u16string& name, bool choise,
-			std::initializer_list<std::u16string> ilist, 
-			std::u16string firstActive = std::u16string())
+			const std::wstring& name, bool choise,
+			std::initializer_list<std::wstring> ilist, 
+			std::wstring firstActive = std::wstring())
 			:buttonList(emptyExternalObject, vGroup, name, choise)			
 		{
 			assert(ilist.size() > 0);
@@ -47,9 +47,9 @@ namespace nechto::ide
 			}
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::u16string& name, bool choise,
-			const std::vector<std::u16string>& ilist,
-			std::u16string firstActive = std::u16string())
+			const std::wstring& name, bool choise,
+			const std::vector<std::wstring>& ilist,
+			std::wstring firstActive = std::wstring())
 			:buttonList(emptyExternalObject, vGroup, name, choise)
 		{
 			assert(ilist.size() > 0);
@@ -69,7 +69,7 @@ namespace nechto::ide
 		{
 			if (!vNodeGroup())
 				return false;
-			return vNodeGroup()->getConnection(3).exist();
+			return vNodeGroup()->node().connection(3).exist();
 		}
 		void hide()
 		{
@@ -77,111 +77,97 @@ namespace nechto::ide
 			groupIterator gi(getGroup());
 			do
 			{
-				auto button = sharedButton::getByNode(gi.get());
+				auto button = getObject<sharedButton>(gi.get());
 				if (button)
 					hideButton(button);
 			} while (gi.stepForward());
-			numDisconnect(vNodeGroup()->get(), 3);
+			nearestDisconnect(vNodeGroup()->node(), 3);
 		}
 		visualGroup* vNodeGroup() const
 		{
-			return visualGroup::getByNode(getConnection(1));
+			return getObject<visualGroup>(node().connection(1));
 		}
 		void show(nodeBoard* nBoard)
 		{
 			assert(vNodeGroup());
-			nBoard->addGroup(vNodeGroup());
+			nBoard->addGroup(getObjectPtr<visualGroup>(vNodeGroup()));
 
 			groupIterator buttonGi(getGroup());
 			do
 			{
-				auto button = sharedButton::getByNode(buttonGi.get());
+				auto button = getObject<sharedButton>(buttonGi.get());
 				if (button)
 					showButton(button, vNodeGroup(), nBoard);
 			} while (buttonGi.stepForward());
 		}
 		void addButton(sharedButton* button)
 		{
-			IterIterConnect(group::firstEmptyPort(getGroup()),
-				portIterator(button->get(), 3));
+			IterIterConnect(firstEmptyGroupPort(getGroup()),
+				portIterator(button->node(), 3));
 			if (visible())
 				showButton(button, vNodeGroup(), 
-					nodeBoard::getByNode(vNodeGroup()->getNodeBoard()));
+					getObject<nodeBoard>(vNodeGroup()->getNodeBoard()));
 		}
 		void resetButton(sharedButton* button)
 		{
 			if (visible())
 				hideButton(button);
-			numDisconnect(button->get(), 3);
+			nearestDisconnect(button->node(), 3);
 		}
 		bool containsButton(sharedButton* button)
 		{
-			return (button->getConnection(0) == getGroup());
+			return (button->node().connection(0) == getGroup());
 		}
 		sharedButton* lClicked()
 		{
-			return sharedButton::getByNode(getConnection(2));
+			return getObject<sharedButton>(node().connection(2));
 		}
 		bool isLClicked(sharedButton* button)
 		{
 			if (!(button && lClicked()))
 				return false;
-			return button->get() == lClicked()->get();
+			return button->node() == lClicked()->node();
 		}
 		void resetLastClicked()
 		{
-			numDisconnect(get(), 2);
+			nearestDisconnect(node(), 2);
 		}
 		void click(sharedButton* button)
 		{
-			NumHubConnect(get(), button->get(), 2);
+			NumHubConnect(node(), button->node(), 2);
 			if(clickEvent != nullptr)
 				clickEvent(this);
 		}
 	private:
 		void showButton(sharedButton* button, visualGroup* vGroup, nodeBoard* nBoard)
 		{
-			auto vNode = new visualNode(newExObjNode());
+			auto vNode = new visualNode(creator::createObject(1));
 			//подключение ноды к кнопке
-			NumNumConnect(button->get(), vNode->get(), 0, 0);
+			NumNumConnect(button->node(), vNode->node(), 0, 0);
 			//вставка ноды в visualGroup
-			IterIterConnect(group::firstEmptyPort(vGroup->getGroup()),
-				portIterator(vNode->get(), 1));
+			IterIterConnect(firstEmptyGroupPort(vGroup->getGroup()),
+				portIterator(vNode->node(), 1));
 			//подключение кнопки к interfaceBoard
-			nBoard->addNode(vNode);
+			nBoard->addNode(getObjectPtr(vNode));
 
 			vNode->nodeText = button->name;
 		}
 		void hideButton(sharedButton* button)
 		{
-			if (button->getConnection(0).exist())
-				deleteNode(button->getConnection(0));
+			if (button->node().connection(0).exist())
+				creator::deleteNode(button->node().connection(0));
 		}
 	public:
-		static buttonList* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<buttonList*>(v1->getData<externalObject*>());
-		}
-		const static std::u16string typeName;
+		const static std::wstring typeName;
 		const static staticNodeOperationSet methodSet;
-		const static connectionRule cRule;
-		virtual const std::u16string& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
-		}
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
 		}
 		virtual ~buttonList()
 		{
 			hide();
 		}
 	};
-	const std::u16string buttonList::typeName = u"nechtoIde.buttonList";
-	const connectionRule buttonList::cRule = connectionRule{};
+	const std::wstring buttonList::typeName = L"nechtoIde.buttonList";
 }

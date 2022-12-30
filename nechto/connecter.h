@@ -72,7 +72,7 @@ namespace nechto
 	portIterator firstEmptyHubPort(existing<nodePtr> eptr);
 	void nearestDisconnect(existing<iterator> i1)
 	{
-		if (!i1.getPurpose().exist())
+		if (!(i1.getPurpose().exist() && i1.get().exist()))
 			return;
 		connecter::disconnect(i1, findNearestConnection(i1.get(), i1.getPurpose()));
 	}
@@ -86,7 +86,7 @@ namespace nechto
 			findNearestConnection(node1, node2), findNearestConnection(node2, node1));
 	}
 
-	void simplifiedNumNumConnect(
+	void NumNumConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1, char port2)
 	{
 		portIterator ci1(node1, port1);
@@ -97,7 +97,7 @@ namespace nechto
 			nearestDisconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
-	void simplifiedNumHubConnect(
+	void NumHubConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1)
 	{
 		portIterator ci1(node1, port1);
@@ -105,13 +105,13 @@ namespace nechto
 			nearestDisconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
 	}
-	void simplifiedHubHubConnect(
-		existing<nodePtr> node1, existing<nodePtr> node2, char port1)
+	void HubHubConnect(
+		existing<nodePtr> node1, existing<nodePtr> node2)
 	{
 		connecter::connect(
 			firstEmptyHubPort(node1), firstEmptyHubPort(node2));
 	}
-	void simplifiedIterIterConnect(iterator ci1, iterator ci2)
+	void IterIterConnect(iterator ci1, iterator ci2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -119,7 +119,7 @@ namespace nechto
 			nearestDisconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
-	void simplifiedIterNumConnect(
+	void IterNumConnect(
 		iterator ci1, existing<nodePtr> node2, char port2)
 	{
 		assert(port2 < 4);
@@ -130,7 +130,7 @@ namespace nechto
 			nearestDisconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
-	void simplifiedIterHubConnect(
+	void IterHubConnect(
 		iterator ci1, existing<nodePtr> node2)
 	{
 		if (ci1.get().exist())

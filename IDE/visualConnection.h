@@ -1,5 +1,5 @@
 #pragma once
-#include "node.h"
+#include "connecter.h"
 #include "visualNode.h"
 #include "group.h"
 
@@ -8,85 +8,46 @@ namespace nechto::ide
 	
 	//к нулевому и первому подключаются ноды
 	//к третьему подключается vCon из nodeBoard
-	struct visualConnection :public externalObject
+	class visualConnection :public object
 	{
-		std::u16string fText = u"h";
-		std::u16string sText = u"h";
+		visualConnection() :object() {}
+	public:
+		std::wstring fText = L"h";
+		std::wstring sText = L"h";
 
-		visualConnection(nodePtr emptyExternalObject, visualNode* vn1, visualNode* vn2)
-			:externalObject(emptyExternalObject)
-			//при удалении ноды, удалится и сей объект. 
-			//!!!только выделять через new!!!
+		static objectPtr<visualConnection> create(
+			objectPtr<visualNode> vn0, objectPtr<visualNode> vn1)
 		{
-			/*IterIterConnect(group::firstEmptyPort(vConnectionGroup),
-				hubIterator(get(), get(), 3));*/
-			nodePtr v1 = vn1->exObj;
-			nodePtr v2 = vn2->exObj;
-			NumHubConnect(exObj, v1, 0);
-			NumHubConnect(exObj, v2, 1);
+			objectPtr<visualConnection> vc1 = 
+				creator::createObject(true, new visualConnection());
+			NumHubConnect(vc1, vn0, 0);
+			NumHubConnect(vc1, vn1, 1);
+			return vc1;
 		}
-		nodePtr getOtherEnd(nodePtr v1)
+		static nodePtr getOtherEnd(objectPtr<visualConnection> vc1, objectPtr<visualNode> vn1)
 		{
-			if (get()->connection[0].load() == v1)
-				return get()->connection[1];
+			if (vc1.connection(0) == vn1)
+				return vc1.connection(1);
 			else
-				return get()->connection[0];
+				return vn1.connection(0);
 		}
-		nodePtr getNodeBoard()
+		static nodePtr getNodeBoard(objectPtr<visualConnection> vc1)
 		{
-			nodePtr temp = get()->connection[3].load();
+			nodePtr temp = vc1.connection(3);
 			if (!temp.exist())
-				return nullNodePtr;
-			temp = temp->connection[0];
+				return nullptr;
+			temp = temp.connection(0);
 			return temp;
 		}
 		virtual ~visualConnection()
 		{
-			print(u"visualConnectionDeleted");
+			std::wcout << L"visualConnectionDeleted" << std::endl;
 		}
-		/*получение указателя на visualConnection по объекту.
-		Возвращает nullptr при несоответствии*/
-		static visualConnection* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<visualConnection*>(v1->getData<externalObject*>());
-		}
-		const static std::u16string typeName;
-		const static staticNodeOperationSet methodSet;
-		const static connectionRule cRule;
-		virtual const std::u16string& getTypeName() const override
+		const static std::wstring typeName;
+		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
 		}
-		virtual const operation& getMethod(char number)const override
-		{
-			return methodSet.getOperation(number);
-		}
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
-		}
 	};
-	const std::u16string visualConnection::typeName = u"nechtoIde.visualConnection";
-	const connectionRule visualConnection::cRule = connectionRule{};
-	const staticNodeOperationSet visualConnection::methodSet
-	{
-		/*namedOperation(u"getOtherEnd", operation{
-				connectionRule(conRule::ExternalObject, conRule::Input, nullptr,
-				conRule::ExternalObject, conRule::None, [](nodePtr v1)
-					{
-						return (visualNode::getByNode(v1) != nullptr);
-					},
-					conRule::AnyPointer_NoTransit, conRule::Output, nullptr),
-				[](nodePtr v0, nodePtr v1, nodePtr v2)
-			{
-				auto vConnection = v0->getData<visualConnection*>();
-				nodePtr temp = vConnection->getOtherEnd(v1);
-				pointer::set(v2, temp);
-				return temp.exist();
-			}})*/
-	};
+	const std::wstring visualConnection::typeName = L"nechtoIde.visualConnection";
 }

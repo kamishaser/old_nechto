@@ -46,7 +46,7 @@ namespace nechto::ide
 		arrangeMode mode;
 		float distance = 2;
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(nodePtr emptyExternalObject, const std::u16string& name, 
+		consistentGroup(nodePtr emptyExternalObject, const std::wstring& name, 
 			glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
 			:visualGroup(emptyExternalObject, name, startPoint), mode(Mode)
 			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
@@ -97,7 +97,7 @@ namespace nechto::ide
 				std::array<float, 4> rPos =
 					rowPos(startPos[mode.width()], distance);
 				if (mode.reverseDirection)//реверс идёт с последней к первой
-					gi.GoToPreviousHub();
+					gi.goToPreviousHub();
 				do
 				{
 					glm::vec2 size = arrangeRow(gi, rPos, lenghtPos);
@@ -109,7 +109,7 @@ namespace nechto::ide
 							size[mode.width()] - frame.size[mode.width()];
 						frame.size[mode.width()] = size[mode.width()];
 					}
-				} while ((mode.reverseDirection) ? gi.GoToPreviousHub() : gi.GoToNextHub());
+				} while ((mode.reverseDirection) ? gi.goToPreviousHub() : gi.goToNextHub());
 			}
 			lenghtPos -= distance;
 			if (lenghtPos > frame.size[mode.lenght()])
@@ -160,7 +160,8 @@ namespace nechto::ide
 		}
 		float maxSizeInRow(int rowNumber) const
 		{
-			groupIterator gi(vNodeGroup(), rowNumber);
+			groupIterator gi = groupIterator(groupPtr(getGroup()));
+			gi.setLocalPos(rowNumber);
 			float maxRSize = 0;//поиск максимального размера
 			do
 			{
@@ -171,7 +172,7 @@ namespace nechto::ide
 					if (rSize > maxRSize)
 						maxRSize = rSize;
 				}
-			} while (gi.GoToNextHub());
+			} while (gi.goToNextHub());
 			return maxRSize;
 		}
 		//получение стартовой точки каждого ряда для 4table
@@ -194,22 +195,9 @@ namespace nechto::ide
 			return rowPos;
 		}
 	public:
-		
-		
-		/*получение указателя на consistentGroup по объекту.
-		Возвращает nullptr при несоответствии*/
-		static consistentGroup* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<consistentGroup*>(v1->getData<externalObject*>());
-		}
-		const static std::u16string typeName;
+		const static std::wstring typeName;
 		const static staticNodeOperationSet methodSet;
-		const static connectionRule cRule;
-		virtual const std::u16string& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -217,17 +205,12 @@ namespace nechto::ide
 		{
 			return methodSet.getOperation(number);
 		}
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
-		}
 	};
-	const std::u16string consistentGroup::typeName = u"nechtoIde.consistentGroup";
-	const connectionRule consistentGroup::cRule = connectionRule{};
+	const std::wstring consistentGroup::typeName = L"nechtoIde.consistentGroup";
 	const staticNodeOperationSet consistentGroup::methodSet
 	{
 		/*visualGroup::methodSet,
-		namedOperation(u"nothing", operation{
+		namedOperation(L"nothing", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{

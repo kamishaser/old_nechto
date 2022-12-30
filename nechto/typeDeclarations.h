@@ -1,13 +1,13 @@
 #pragma once
 #include <cassert>
 #include <string>
+#include <iostream>
 namespace nechto
 {
 	using ushort = unsigned short;
 	using i64 = long long;
 	using f64 = double;
 	using ui32 = unsigned long;
-	using ustr = std::u16string;
 
 	namespace nodeStorage
 	{
@@ -51,13 +51,9 @@ namespace nechto
 		{
 			return !(*this == another);
 		}
-		operator bool() const
-		{
-			return exist();
-		}
 		bool exist() const
 		{
-			return (first && second);
+			return first;
 		}
 		friend class nodeStorage::threadLocalAllocator;
 		friend class nodeStorage::nodeAllocator;
@@ -76,6 +72,17 @@ namespace nechto
 		bool operator!=(std::nullptr_t) const
 		{
 			return exist();
+		}
+		bool operator<(const nodeId id) const
+		{
+			if (first > id.first)
+				return false;
+			if (first < id.first)
+				return true;
+			if (second < id.second)
+				return true;
+			return false;
+
 		}
 	private:
 		nodeId(ushort f, ushort s)
@@ -208,7 +215,7 @@ namespace nechto
 		enum Type :char
 		{
 			Simple = 0,//одиночная ссылка
-			ConIter,//итератор соединений
+			PortIter,//итератор соединений
 			GroupIter//итератор массива
 		};
 	}
@@ -237,4 +244,5 @@ namespace nechto
 			return false;
 		}
 	}
+	void pConList(nodePtr v1, std::wstring header = std::wstring(L"list of connections"));
 }

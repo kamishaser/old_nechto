@@ -33,11 +33,11 @@ namespace nechto::ide
 			aeh(gui),
 			fh(gui)
 		{
-			fh.load(u"autosave.nechto");
+			fh.load(L"autosave.nechto");
 		}
 		~nechtoIDE()
 		{
-			fh.save(u"autosave.nechto", gui.workBoard.vNodeGroup());
+			fh.save(L"autosave.nechto", gui.workBoard.vNodeGroup());
 		}
 		bool update()
 		{
@@ -50,27 +50,6 @@ namespace nechto::ide
 
 		}
 	private:
-		nodePtr example()
-		{
-			nodePtr descriptionText = newNode(node::Text);
-			text::set(descriptionText, std::u16string(u"Простейший алгоритм\n") +
-				u"для разработки и тестирования" +
-				u"системы базового отображения nechto");
-			
-			nodePtr vFirst= nullNodePtr;
-			nodePtr vLast = nullNodePtr;
-			for (int i = 0; i < 16; ++i)
-			{
-				nodePtr v1 = newNode(node::Variable, true);
-				v1->setData<i64>(i);
-				if (vLast.exist())
-					HubHubConnect(v1, vLast);
-				else
-					vFirst = v1;
-				vLast = v1;
-			}
-			return vFirst;
-		}
 		
 	};
 

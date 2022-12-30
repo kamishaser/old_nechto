@@ -23,7 +23,7 @@ namespace nechto::ide
 		
 		userH(GUI& g, editor& e)
 		:gui(g), ed(e), selectH(), mouse(g, keyboard, selectH),
-		testButton(u"testButton")
+		testButton(L"testButton")
 		{
 			gui.addButton(&testButton, &gui.bottomGroup);
 		}
@@ -33,10 +33,10 @@ namespace nechto::ide
 			if (testButton.bClickEvent())
 			{
 				if(gui.activeButton.contains(testButton.content()))
-					disconnect(gui.activeButton.getConnection(0), 
+					nearestDisconnect(gui.activeButton.node().connection(0), 
 						testButton.content());
 				else
-					gui.activeButton.addNode(testButton.getConnection(0));
+					gui.activeButton.addNodeToNearestPort(testButton.node().connection(0));
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace nechto::ide
 			if (mouse.rightButton.bClickEvent())
 			{
 				auto vNode1 =
-					visualNode::getByNode(mouse.rightButton.content());
+					getObject<visualNode>(mouse.rightButton.content());
 				if (vNode1)
 					editText(vNode1);
 				else
@@ -62,22 +62,23 @@ namespace nechto::ide
 				if (keyboard[sf::Keyboard::Delete].bClickEvent())//удаление
 					deleteAllSelected();
 				if (keyboard[sf::Keyboard::C].bClickEvent())//подключение
-					ed.connect(visualNode::getByNode(selectH.lastSelected()));
+					ed.connect(getObject<visualNode>(selectH.lastSelected()));
 				if (keyboard[sf::Keyboard::D].bClickEvent())//отключение
 					disconnectSelected();
 				if (keyboard[sf::Keyboard::A].bClickEvent())//выделение всех
 					selectH.selectGroup(gui.workBoard.vNodeGroup());
 				if (keyboard[sf::Keyboard::R].bClickEvent())//рандомное смещение всех
 					randomOfsetSelected();
-				if (keyboard[sf::Keyboard::S].bClickEvent())//рандомное смещение всех
-					operateLSelected();
+				//if (keyboard[sf::Keyboard::S].bClickEvent())//выполнение помледнего выделенного действия
+				//	operateLSelected();
 				if (keyboard[sf::Keyboard::Tab].isPressed())//описание соединений
 					if (mouse.cursored())
 						gui.cursoredParametrs.nodeText =
-						connectionsList(mouse.cursored()->getConnection(0));
+						connectionsList(mouse.cursored()->node().connection(0));
 					else;
 				else
-					gui.cursoredParametrs.nodeText = std::to_u16string(nodeStorage::terminal.numberOfNodes);
+					gui.cursoredParametrs.nodeText = 
+					std::to_wstring(nodeStorage::terminal.numberOfNodes);
 			}
 			else
 			{
@@ -96,7 +97,7 @@ namespace nechto::ide
 		}
 		void editText(visualNode* vNode1)
 		{
-			nodePtr v1 = vNode1->getConnection(0);
+			nodePtr v1 = vNode1->node().connection(0);
 			if (v1.exist())
 			{
 				gui.textBox.focus(vNode1);
@@ -109,9 +110,9 @@ namespace nechto::ide
 			{
 				if (gi.get().exist())
 				{
-					if (gi.get()->connection[0].load().exist())
-						deleteNode(gi.get()->connection[0]);
-					deleteNode(gi.get());
+					if (gi.get().connection(0).exist())
+						creator::deleteNode(gi.get().connection(0));
+					creator::deleteNode(gi.get());
 				}
 			} while (gi.stepForward());
 		}
@@ -123,22 +124,23 @@ namespace nechto::ide
 			groupIterator gi(selectH.selectedGroup());
 			do
 			{
-				auto vNode2 = visualNode::getByNode(gi.get());
+				auto vNode2 = getObject<visualNode>(gi.get());
 				if (vNode2)
 				{
-					nodePtr v1 = vNode1->getConnection(0);
-					nodePtr v2 = vNode2->getConnection(0);
+					nodePtr v1 = vNode1->node().connection(0);
+					nodePtr v2 = vNode2->node().connection(0);
 					if (v1 != v2)
 					{
 						if (v1.exist() && v2.exist() && !hasConnection(v1, v2))
 						{
 							HubHubConnect(v1, v2);
 						}
-						if (!gui.workBoard.connected(vNode1, vNode2))
+						if (!gui.workBoard.connected(getObjectPtr(vNode1), 
+							getObjectPtr(vNode2)))
 						{
-							auto vConnection = new visualConnection(
-								newExObjNode(), vNode1, vNode2);
-							gui.workBoard.addConnection(vConnection);
+							gui.workBoard.addConnection(visualConnection::create(
+								getObjectPtr(vNode1),
+								getObjectPtr(vNode2)));
 						}
 					}
 				}
@@ -153,10 +155,10 @@ namespace nechto::ide
 			{
 				if (gi.get().exist() && gi.get() != selectH.lastSelected())
 				{
-					nodePtr v1 = gi.get()->connection[0];
-					nodePtr v2 = selectH.lastSelected()->connection[0];
+					nodePtr v1 = gi.get().connection(0);
+					nodePtr v2 = selectH.lastSelected().connection(0);
 					if (v1.exist() && v2.exist())
-						disconnect(v1, v2);
+						nearestDisconnect(v1, v2);
 				}
 			} while (gi.stepForward());
 		}
@@ -165,17 +167,17 @@ namespace nechto::ide
 			groupIterator gi(selectH.selectedGroup());
 			do
 			{
-				auto vNode = visualNode::getByNode(gi.get());
+				auto vNode = getObject<visualNode>(gi.get());
 				if (vNode)
 					vNode->frame.position += randomOffset(100);
 			} while (gi.stepForward());
 		}
-		void operateLSelected()
+		/*void operateLSelected()
 		{
 			nodePtr lSelected = selectH.lastSelected();
 			if (!lSelected.exist())
 				return;
-			lSelected = lSelected->connection[0];
+			lSelected = lSelected.connection(0);
 			if (!lSelected.exist())
 				return;
 			if (!(isAction(lSelected) && check(lSelected)))
@@ -184,16 +186,16 @@ namespace nechto::ide
 			lSelected = step(lSelected);
 			if (!lSelected.exist())
 				return;
-			connectionIterator ci(lSelected);
+			portIterator ci(lSelected);
 			do
 			{
-				auto vNode = visualNode::getByNode(ci.get());
+				auto vNode = getObject<visualNode>(ci.get());
 				if (vNode)
 				{
 					selectH.select(vNode);
 					break;
 				}
 			} while (ci.stepForward());
-		}
+		}*/
 	};
 }

@@ -33,12 +33,12 @@ namespace nechto
 				return nullptr;
 			return object.get<TCon>();
 		}
-		const operation* getOperation() const
+		const operation* getMethod() const
 		{
 			auto obj = getObject();
 			if (obj == nullptr)
 				return nullptr;
-			return &obj->getOperation(subtype());
+			return &obj->getMethod(subtype());
 
 		}
 		const bool objectExist() const

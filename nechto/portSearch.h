@@ -116,4 +116,14 @@ namespace nechto
 		auto ci = findNearestNonGroupConnection(node, connection);
 		return ci;
 	}
+	bool hasConnection(existing<nodePtr> node0, existing<nodePtr> node1)
+	{
+		portIterator p1(node0);
+		do
+		{
+			if (p1.get() == node1)
+				return true;
+		} while (p1.stepForward());
+		return false;
+	}
 }

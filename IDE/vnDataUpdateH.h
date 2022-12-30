@@ -27,10 +27,10 @@ namespace nechto::ide
 			groupIterator i1(nBoard->vNodeGroup());
 			do
 			{
-				visualNode* vNode = visualNode::getByNode(i1.get());
+				visualNode* vNode = getObject<visualNode>(i1.get());
 				if (vNode)
 				{
-					if (i1.get()->connection[0].load().exist() && updateText)
+					if (i1.get().connection(0).exist() && updateText)
 					{
 						vnText::fill(vNode);
 						vnShape::fill(vNode);
@@ -45,16 +45,14 @@ namespace nechto::ide
 			groupIterator i1(nBoard->vConnectionGroup());
 			do
 			{
-				auto vConnection = visualConnection::getByNode(i1.get());
+				auto vConnection = getObject<visualConnection>(i1.get());
 				if (vConnection)
 				{
-					auto vNode0 = visualNode::getByNode(
-						vConnection->getConnection(0));
-					auto vNode1 = visualNode::getByNode(
-						vConnection->getConnection(1));
+					auto vNode0 = getObject<visualNode>(i1.get().connection(0));
+					auto vNode1 = getObject<visualNode>(i1.get().connection(1));
 					assert((vNode0) && (vNode1));
-					nodePtr v0 = vNode0->getConnection(0);
-					nodePtr v1 = vNode1->getConnection(0);
+					nodePtr v0 = vNode0->node().connection(0);
+					nodePtr v1 = vNode1->node().connection(0);
 					if (v0.exist() && v1.exist())
 					{
 						setConType(vConnection, 0, getConType(v0, v1));
@@ -68,33 +66,33 @@ namespace nechto::ide
 			groupIterator i1(nBoard->vGroupGroup());
 			do
 			{
-				auto vGroup = visualGroup::getByNode(i1.get());
+				auto vGroup = getObject<visualGroup>(i1.get());
 				if (vGroup)
 					vGroup->update();
 			} while (i1.stepForward());
 		}
 		void setConType(visualConnection* vConnection, int number, conType cType)
 		{
-			std::u16string& text = (number) ? vConnection->sText : vConnection->fText;
+			std::wstring& text = (number) ? vConnection->sText : vConnection->fText;
 			switch (cType)
 			{
-			case nechto::conType::Hub:
-				text = u"";
+			case conType::Hub:
+				text = L"";
 				break;
-			case nechto::conType::Group:
-				text = u"G";
+			case conType::Group:
+				text = L"G";
 				break;
-			case nechto::conType::N0:
-				text = u"N0";
+			case conType::N0:
+				text = L"N0";
 				break;
-			case nechto::conType::N1:
-				text = u"N1";
+			case conType::N1:
+				text = L"N1";
 				break;
-			case nechto::conType::N2:
-				text = u"N2";
+			case conType::N2:
+				text = L"N2";
 				break;
-			case nechto::conType::N3:
-				text = u"N3";
+			case conType::N3:
+				text = L"N3";
 				break;
 			default:
 				break;
@@ -103,10 +101,10 @@ namespace nechto::ide
 		conType getConType(nodePtr v1, nodePtr v2)
 		{
 			for (int i = 0; i < 4; ++i)
-				if (v1->connection[i] == v2)
+				if (v1.connection(i) == v2)
 					return static_cast<conType>(
 						static_cast<int>(conType::N0) + i);
-			if (typeCompare(v1, node::Group))
+			if (typeCompare(v1, nodeT::Group))
 			{
 				groupIterator gi(v1);
 				do

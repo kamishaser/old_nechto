@@ -19,36 +19,34 @@ namespace nechto::ide
 			expand();
 		}
 	private:
-		bool checkAndExpand(hubIterator expandAim, visualNode* vNode1)
+		bool checkAndExpand(iterator expandAim, visualNode* vNode1)
 		{
 			if (!expandAim.get().exist())
 				return false;
 			//visualNode и visualConnection отображать запрещено
-			auto vNode2 = visualNode::getByNode(expandAim.get());
+			auto vNode2 = getObject<visualNode>(expandAim.get());
 			if (vNode2 != nullptr &&
-				gui.workBoard.onThisBoard(vNode2))
+				gui.workBoard.onThisBoard(getObjectPtr(vNode2)))
 				return false;
 			auto vConnection =
-				visualConnection::getByNode(expandAim.get());
+				getObject<visualConnection>(expandAim.get());
 			if (vConnection != nullptr &&
-				gui.workBoard.onThisBoard(vConnection))
+				gui.workBoard.onThisBoard(objectPtr<visualConnection>(expandAim.get())))
 				return false;
-			vNode2 = gui.workBoard.visualized(expandAim.get());
+			vNode2 = getObject<visualNode>(gui.workBoard.visualized(expandAim.get()));
 			if (vNode2 != nullptr)
 			{//если нода визуализированна, надо проверить наличие соединения с ней 
-				if (!gui.workBoard.connected(vNode1, vNode2))
+				if (!gui.workBoard.connected(getObjectPtr(vNode1), getObjectPtr(vNode2)))
 				{//если нету - добавить
-					vConnection = new visualConnection(newExObjNode(), vNode1, vNode2);
-					gui.workBoard.addConnection(vConnection);
+					gui.workBoard.addConnection(visualConnection::create(getObjectPtr(vNode1), getObjectPtr(vNode2)));
 				}
 			}
 			else
 			{
 				//если нода не визуализированна, надо добавить visualNode 
-				vNode2 = new visualNode(newExObjNode(), expandAim.get());
-				gui.workBoard.addNode(vNode2);
-				vConnection = new visualConnection(newExObjNode(), vNode1, vNode2); 
-				gui.workBoard.addConnection(vConnection);
+				vNode2 = new visualNode(creator::createObject(1), expandAim.get());
+				gui.workBoard.addNode(getObjectPtr(vNode2));
+				gui.workBoard.addConnection(visualConnection::create(getObjectPtr(vNode1), getObjectPtr(vNode2)));
 			}
 			return true;
 		}
@@ -60,11 +58,11 @@ namespace nechto::ide
 				nodePtr v1 = gi.get();
 				if (v1.exist())
 				{
-					auto vNode = visualNode::getByNode(v1);
-					if (!v1->connection[0].load().exist() || vNode == nullptr)
+					auto vNode = getObject<visualNode>(v1);
+					if (!v1.connection(0).exist() || vNode == nullptr)
 					{
 						
-						deleteNode(v1);
+						creator::deleteNode(v1);
 					}
 				}
 			} while (gi.stepForward());
@@ -74,21 +72,21 @@ namespace nechto::ide
 			groupIterator gi(gui.workBoard.vConnectionGroup());
 			do
 			{
-				auto vConnection = visualConnection::getByNode(gi.get());
+				auto vConnection = getObject<visualConnection>(gi.get());
 				if (!vConnection)
 					continue;
-				auto vNode0 = visualNode::getByNode(vConnection->getConnection(0));
-				auto vNode1 = visualNode::getByNode(vConnection->getConnection(1));
+				auto vNode0 = getObject<visualNode>(gi.get().connection(0));
+				auto vNode1 = getObject<visualNode>(gi.get().connection(1));
 				if (vNode0 == nullptr || vNode1 == nullptr)
 				{
-					deleteNode(gi.get());
+					creator::deleteNode(gi.get());
 				}
 				else
 				{
-					nodePtr v0 = vNode0->getConnection(0);
-					nodePtr v1 = vNode1->getConnection(0);
+					nodePtr v0 = vNode0->node().connection(0);
+					nodePtr v1 = vNode1->node().connection(0);
 					if (v0.exist() && v1.exist() && !hasConnection(v0, v1))
-						deleteNode(gi.get());
+						creator::deleteNode(gi.get());
 				}
 			} while (gi.stepForward());
 		}
@@ -97,11 +95,11 @@ namespace nechto::ide
 			groupIterator gi(gui.workBoard.vNodeGroup());
 			do
 			{
-				if (!gi.get().exist() || !gi.get()->connection[0].load().exist())
+				if (!gi.get().exist() || !gi.get().connection(0).exist())
 					continue;//не существующие соединения интереса не представляют
-				auto vNode1 = visualNode::getByNode(gi.get());
-				nodePtr v1 = gi.get()->connection[0];
-				if (typeCompare(v1, node::Group))
+				auto vNode1 = getObject<visualNode>(gi.get());
+				nodePtr v1 = gi.get().connection(0);
+				if (groupPtr::match(v1))
 				{
 					groupIterator gi2(v1);
 					do

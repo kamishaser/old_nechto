@@ -2,35 +2,34 @@
 #include "typeNames.h"
 #include "text.h"
 #include "connectionIterator.h"
-#include "string_numberConverter.h"
 #include "variablePtr.h"
 
 namespace nechto
 {
-	const std::u16string to_string(nodePtr address)
+	const std::wstring to_string(nodePtr address)
 	{
-		return static_cast<std::u16string>(u"[") + 
-			snConverter::to_ustr((int)address.getFirst()) + u' ' + 
-			snConverter::to_ustr((int)address.getSecond()) + u']';
+		return static_cast<std::wstring>(L"[") + 
+			std::to_wstring(address.getFirst()) + L' ' + 
+			std::to_wstring(address.getSecond()) + L']';
 	}
-	const std::u16string to_string(hubPosPair hpp)
+	const std::wstring to_string(hubPosPair hpp)
 	{
-		return ustr(u"{") + to_string(hpp.hub) + ustr(u" ") +
-			snConverter::to_ustr((ui32)hpp.getGlobalPos()) + ustr(u" ") +
-			((hpp.hub.exist()) ? to_string(hpp.follow()) : ustr(u"___")) + ustr(u"}");
+		return std::wstring(L"{") + to_string(hpp.hub) + std::wstring(L" ") +
+			std::to_wstring(hpp.getGlobalPos()) + std::wstring(L" ") +
+			((hpp.hub.exist()) ? to_string(hpp.follow()) : std::wstring(L"___")) + std::wstring(L"}");
 	}
-	ustr getUstrObjectData(nonTypedObjectPtr objectNode); //реализация в namedExCon
-	const std::u16string nodeData(nodePtr v1)
+	std::wstring getUstrObjectData(nonTypedObjectPtr objectNode); //реализация в namedExCon
+	const std::wstring nodeData(nodePtr v1)
 	{
 		if (v1 == nullptr)
-			return u"nullptr";
+			return L"nullptr";
 		switch (v1.type())
 		{
 		case nodeT::Variable:
 			if (v1.subtype())
-				return snConverter::to_ustr(i64VariablePtr(v1).get());
+				return std::to_wstring(i64VariablePtr(v1).get());
 			else
-				return snConverter::to_ustr(f64VariablePtr(v1).get());
+				return std::to_wstring(f64VariablePtr(v1).get());
 		case nodeT::Pointer:
 			if (v1.subtype() != pointerT::Simple)
 				return to_string(v1.connection(0));
@@ -38,35 +37,35 @@ namespace nechto
 				return to_string(pointerPtr(v1).getHPPair());
 		case nodeT::Text:
 			if (textPtr(v1).textExist())
-				return *textPtr(v1);
+				return textPtr(v1);
 			else
-				return u"nullTextPtr";
+				return L"nullTextPtr";
 		case nodeT::Object:
 			return getUstrObjectData(v1);
 		default:
-			return u"";
+			return L"";
 		}
 	}
 
-	std::u16string nodeProperties(nodePtr v1)
+	std::wstring nodeProperties(nodePtr v1)
 	{
 		if (!v1.exist())
-			return u"nullNodePtr";
-		return ustr(to_string(v1) + u' ' + 
-			typeName::getTypeAndSubtypeName(v1.type(), v1.subtype()) + u' ' + 
+			return L"nullNodePtr";
+		return std::wstring(to_string(v1) + L' ' + 
+			typeName::getTypeAndSubtypeName(v1.type(), v1.subtype()) + L' ' + 
 			nodeData(v1));
 	}
-	std::u16string numConnectionsList(nodePtr v1)
+	std::wstring numConnectionsList(nodePtr v1)
 	{
 		assert(v1.exist());
-		std::u16string temp = nodeProperties(v1) + u"____________________________\n";
+		std::wstring temp = nodeProperties(v1) + L"____________________________\n";
 		for (int i = 0; i < 4; ++i)
-			temp += u"   " + nodeProperties(v1.connection(0)) + u'\n';
+			temp += L"   " + nodeProperties(v1.connection(i)) + L'\n';
 		return temp;
 	}
-	std::u16string connectionsList(nodePtr v1)
+	std::wstring connectionsList(nodePtr v1)
 	{
-		ustr temp = nodeProperties(v1) + u'\n';
+		std::wstring temp = nodeProperties(v1) + L'\n';
 		if (!v1.exist())
 			return temp;
 		if (v1.type() == nodeT::Group)
@@ -76,14 +75,25 @@ namespace nechto
 			do
 			{
 				//print(numConnectionsList(iter.hub));
-				temp += numConnectionsList(iter.hub) + u"\n";
+				temp += numConnectionsList(iter.hub) + L"\n";
 			} while (iter.goToNextHub());
-			temp += u"\n mainChain:\n";
+			temp += L"\n mainChain:\n";
 		}
 		portIterator iter(v1);
 		do {
-			temp += numConnectionsList(iter.hub) + u"\n";
+			temp += numConnectionsList(iter.hub) + L"\n";
 		} while (iter.goToNextHub());
 		return temp;
+	}
+	void pConList(nodePtr v1, std::wstring header)
+	{
+		std::wcout << header << std::endl;
+		if (!v1.exist())
+		{
+			std::wcout << L"ERROR nullNodePtr" << std::endl;
+			return;
+		}
+		for (int i = 0; i < 4; ++i)
+			std::wcout << to_string(v1.connection(i)) << std::endl;
 	}
 }

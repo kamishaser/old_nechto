@@ -17,13 +17,13 @@ namespace nechto::ide
 		selectHandler& sh;
 		keyboardHandler& keyboard;
 
-		namedExCon cursor{ u"mouseCursor" };
-		namedExCon lClicked{ u"lastClickedNode" };
+		namedExCon cursor{ L"mouseCursor" };
+		namedExCon lClicked{ L"lastClickedNode" };
 	public:
 		
-		sharedButton leftButton{ u"leftMouseButton" };
-		sharedButton middleButton{ u"middleMouseButton" };
-		sharedButton rightButton{ u"rightMouseButton" };
+		sharedButton leftButton{ L"leftMouseButton" };
+		sharedButton middleButton{ L"middleMouseButton" };
+		sharedButton rightButton{ L"rightMouseButton" };
 
 		mouseHandler(GUI& g, 
 			keyboardHandler& keyboardH, selectHandler& selectH)
@@ -35,23 +35,23 @@ namespace nechto::ide
 		}
 		visualNode* cursored() const
 		{
-			return visualNode::getByNode(cursor.getConnection(0));
+			return getObject<visualNode>(cursor.node().connection(0));
 		}
 		void setCursored(visualNode* cursoredNode)
 		{
-			numDisconnect(cursor.get(), 0);
+			nearestDisconnect(cursor.node(), 0);
 			if(cursoredNode)
-				NumHubConnect(cursor.get(), cursoredNode->get(), 0);
+				NumHubConnect(cursor.node(), cursoredNode->node(), 0);
 		}
 		visualNode* lastClicked() const
 		{
-			return visualNode::getByNode(lClicked.getConnection(0));
+			return getObject<visualNode>(lClicked.node().connection(0));
 		}
 		void click(visualNode* clickedNode)
 		{
-			numDisconnect(lClicked.get(), 0);
+			nearestDisconnect(lClicked.node(), 0);
 			if(clickedNode)
-				NumHubConnect(lClicked.get(), clickedNode->get(), 0);
+				NumHubConnect(lClicked.node(), clickedNode->node(), 0);
 		}
 		void update()
 		{
@@ -80,7 +80,7 @@ namespace nechto::ide
 			groupIterator i1(nBoard->vNodeGroup());
 			do
 			{
-				auto* vNode = visualNode::getByNode(i1.get());
+				auto* vNode = getObject<visualNode>(i1.get());
 				if (!vNode)
 					continue;
 				if (vNode->frame.contains(cursorPosition))
@@ -102,7 +102,7 @@ namespace nechto::ide
 		//обработка действий левой кнопкой мыши (в основном)
 		void updateLeftButton()
 		{
-			auto vNode = visualNode::getByNode(leftButton.content());
+			auto vNode = getObject<visualNode>(leftButton.content());
 			bool clicked = leftButton.bClickEvent();
 			if (vNode == nullptr)//если мышь ни на что не наведена
 			{
@@ -112,15 +112,15 @@ namespace nechto::ide
 			}
 			
 			
-			if (vNode->getNodeBoard() == gui.interfaceBoard.get())
+			if (vNode->getNodeBoard() == gui.interfaceBoard.node())
 			{
-				if (lastClicked() && (vNode->get() != lastClicked()->get()))
+				if (lastClicked() && (vNode->node() != lastClicked()->node()))
 				{
 					updateButtonByNode(lastClicked(), false);
 				}
 				updateButtonByNode(vNode, leftButton.isPressed());
 			}
-			else if (vNode->getNodeBoard() == gui.workBoard.get())
+			else if (vNode->getNodeBoard() == gui.workBoard.node())
 			{
 				updateWorkNode(vNode, clicked);
 				if (clicked)
@@ -165,7 +165,7 @@ namespace nechto::ide
 			groupIterator gi(sh.selectedGroup());
 			do
 			{
-				auto vNode = visualNode::getByNode(gi.get());
+				auto vNode = getObject<visualNode>(gi.get());
 				if (vNode)
 				{
 					vNode->frame.position += offset;
@@ -175,16 +175,17 @@ namespace nechto::ide
 		void updateButtonByNode(visualNode* vNode, bool status)
 		{
 			auto button =
-				sharedButton::getByNode(vNode->getConnection(0));
+				getObject<sharedButton>(vNode->node().connection(0));
 			if (button)
 			{
 				button->update(status);
-				auto bList = buttonList::getByNode(button->getList());
+				auto bList = getObject<buttonList>(button->getList());
 				if (bList && bList->choiseMode)
 					if (button->bClickEvent())
 					{
 						bList->click(button);
-						print(std::u16string(u"clickButton ") + to_string(button->get()));
+						std::wcout << (std::wstring(L"clickButton ") + 
+							to_string(button->node())) << std::endl;
 					}
 			}
 		}

@@ -10,6 +10,7 @@
 #include "object.h"
 #include "condition.h"
 #include "method.h"
+#include "text.h"
 
 namespace nechto
 {
@@ -17,11 +18,6 @@ namespace nechto
 	{
 		friend class hubManager;
 	public:
-		/*static existing<nodePtr> addNode(char type, char subtype)
-		{
-		
-		}*/
-		
 
 		static hubPtr createHub(bool groupHub)
 		{
@@ -40,14 +36,21 @@ namespace nechto
 			node.setData<f64>(0.);
 			return node;
 		}
+		static variablePtr createVariable(char subtype)
+		{
+			if (subtype)
+				return createI64();
+			else
+				return createF64();
+		}
 		static simplePointerPtr createSimplePointer()
 		{
 			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::Simple);
 			return simplePointerPtr(node);
 		}
-		static portIteratorPtr createConIterator()
+		static portIteratorPtr createPortIterator()
 		{
-			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::ConIter);
+			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::PortIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 			return portIteratorPtr(node);
 		}
@@ -56,6 +59,20 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::GroupIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 			return groupIteratorPtr(node);
+		}
+		static pointerPtr createPointer(char subtype)
+		{
+			switch (subtype)
+			{
+			case nechto::pointerT::Simple:
+				return createSimplePointer();
+			case nechto::pointerT::PortIter:
+				return createPortIterator();
+			case nechto::pointerT::GroupIter:
+				return createPortIterator();
+			default:
+				assert(false);
+			}
 		}
 		static mathOperatorPtr createMathOperator(char operationType)
 		{
@@ -72,17 +89,17 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::Condition);
 			return node;
 		}
-		static nonTypedObjectPtr createObject(char own,
+		static nonTypedObjectPtr createObject(char uniqueOwner,
 			object* object = nullptr)
 		{
-			existing<nodePtr> node = allocate(nodeT::Object, own);
+			existing<nodePtr> node = allocate(nodeT::Object, uniqueOwner);
 			nonTypedObjectPtr(node).setObjectPtr(object);
 			return node;
 		}
-		static nonTypedObjectPtr createText(char own)
+		static textPtr createText(char own)
 		{
 			existing<nodePtr> node = allocate(nodeT::Text, own);
-			textPtr(node).setData<ustr*>(nullptr);
+			textPtr(node).setData<std::wstring*>(nullptr);
 			return node;
 		}
 		static groupPtr createGroup(bool own = true)
@@ -112,7 +129,7 @@ namespace nechto
 			case nechto::nodeT::Variable:
 				break;
 			case nechto::nodeT::Object:
-				if (nonTypedObjectPtr(node).owner())
+				if (nonTypedObjectPtr(node).isUniqueOwner())
 					delete nonTypedObjectPtr(node).getObjectPtr();
 				break;
 			case nechto::nodeT::Text:
@@ -130,6 +147,30 @@ namespace nechto
 			node.node()->subtype = 0;
 			disconnectAll(node);
 			deleteAllHubs(node);
+		}
+		static nodePtr createNode(char type, char subtype)
+		{
+			switch (type)
+			{
+			case nechto::nodeT::Group:
+				return createGroup(subtype);
+			case nechto::nodeT::Pointer:
+				return createPointer(subtype);
+			case nechto::nodeT::Variable:
+				return createVariable(subtype);
+			case nechto::nodeT::Object:
+				return createObject(subtype);
+			case nechto::nodeT::Text:
+				return createText(subtype);
+			case nechto::nodeT::MathOperator:
+				return createMathOperator(subtype);
+			case nechto::nodeT::Condition:
+				return createCondition();
+			case nechto::nodeT::Method:
+				return createMethod(subtype);
+			default:
+				assert(false);
+			}
 		}
 	private:
 
@@ -165,13 +206,13 @@ namespace nechto
 		}
 		static void deleteAllHubs(existing<nodePtr> node)
 		{
-			nodePtr currentHub = node;
-			do
+			nodePtr currentHub = node.hub();
+			while (currentHub.exist())
 			{
 				nodePtr next = currentHub.hub();
 				deleteHub(currentHub);
 				currentHub = next;
-			} while (currentHub.exist());
+			} 
 		}
 	};
 }

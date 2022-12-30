@@ -16,33 +16,32 @@ namespace nechto::ide
 		display dp;
 
 		nodeBoard workBoard;
-		consistentGroup leftGroup{ newExObjNode(0), u"leftGroup" };
-		consistentGroup rightGroup{ newExObjNode(0), u"rightGroup" };
-		visualGroup center = { newExObjNode(0), u"center"};
+		consistentGroup leftGroup{ creator::createObject(0), L"leftGroup" };
+		consistentGroup rightGroup{ creator::createObject(0), L"rightGroup" };
+		visualGroup center = { creator::createObject(0), L"center"};
 
 		nodeBoard interfaceBoard;
-		consistentGroup topGroup{ newExObjNode(0), u"topGroup"};
-		consistentGroup bottomGroup{ newExObjNode(0), u"bottomGroup" };
+		consistentGroup topGroup{ creator::createObject(0), L"topGroup"};
+		consistentGroup bottomGroup{ creator::createObject(0), L"bottomGroup" };
 
-		visualNode cursoredParametrs{ newExObjNode(0) };
-		visualNode cursoredConnections{ newExObjNode(0) };
-		visualNode textBoxNode{ newExObjNode(0) };
-		visualNode consoleOut{ newExObjNode(0) };
+		visualNode cursoredParametrs{ creator::createObject(0)};
+		visualNode cursoredConnections{ creator::createObject(0)};
+		visualNode textBoxNode{ creator::createObject(0)};
 		textInputBox  textBox;
 
 
-		namedExConGroup activeButton{ newExObjNode(0), u"pressedButton" };
+		namedExConGroup activeButton{ creator::createObject(0), L"pressedButton" };
 
 		GUI()
-			:dp(), textBox(textBoxNode.get())
+			:dp(), textBox(textBoxNode.node())
 		{
 			//добавление групп на доски
-			workBoard.addGroup(&leftGroup);
-			workBoard.addGroup(&rightGroup);
-			workBoard.addGroup(&center);
+			workBoard.addGroup(getObjectPtr<visualGroup>(&leftGroup));
+			workBoard.addGroup(getObjectPtr<visualGroup>(&rightGroup));
+			workBoard.addGroup(getObjectPtr<visualGroup>(&center));
 
-			interfaceBoard.addGroup(&topGroup);
-			interfaceBoard.addGroup(&bottomGroup);
+			interfaceBoard.addGroup(getObjectPtr<visualGroup>(&topGroup));
+			interfaceBoard.addGroup(getObjectPtr<visualGroup>(&bottomGroup));
 			//установка режима позицианирования
 			rightGroup.mode.rightAlignment = true;
 			topGroup.mode.horisontal = true;
@@ -50,18 +49,15 @@ namespace nechto::ide
 			bottomGroup.mode.rightAlignment = true;
 			//bottomGroup.mode.rightAlignment = true;
 			//добавление элементов интерфейса
-			interfaceBoard.addNode(&cursoredParametrs);
-			interfaceBoard.addNode(&cursoredConnections);
-			interfaceBoard.addNode(&textBoxNode);
-			interfaceBoard.addNode(&consoleOut);
+			interfaceBoard.addNode(getObjectPtr<visualNode>(&cursoredParametrs));
+			interfaceBoard.addNode(getObjectPtr<visualNode>(&cursoredConnections));
+			interfaceBoard.addNode(getObjectPtr<visualNode>(&textBoxNode));
 
-			bottomGroup.addNode(&cursoredParametrs);
-			bottomGroup.addNode(&cursoredConnections);
-			bottomGroup.addNode(&textBoxNode);
-			bottomGroup.addNode(&consoleOut);
-			consoleText = &consoleOut.nodeText;
+			bottomGroup.addNode(getObjectPtr<visualNode>(&cursoredParametrs));
+			bottomGroup.addNode(getObjectPtr<visualNode>(&cursoredConnections));
+			bottomGroup.addNode(getObjectPtr<visualNode>(&textBoxNode));
 
-			cursoredParametrs.nodeText = u"наведи на ноду для получения данных";
+			cursoredParametrs.nodeText = L"наведи на ноду для получения данных";
 
 			setChainsPosition();
 		}
@@ -81,7 +77,7 @@ namespace nechto::ide
 			groupIterator gi(interfaceBoard.vNodeGroup());
 			do
 			{
-				auto vNode = visualNode::getByNode(gi.get());
+				auto vNode = getObject<visualNode>(gi.get());
 				if (vNode)
 					vNode->frame.size = glm::vec2(0, 0);
 			} while (gi.stepForward());
@@ -90,22 +86,22 @@ namespace nechto::ide
 		}
 		void addButton(sharedButton* button, visualGroup* group)
 		{
-			auto vNode = visualNode::getByNode(button->getConnection(0));
+			auto vNode = getObject<visualNode>(button->node().connection(0));
 			if (!vNode)
 			{
-				vNode = new visualNode(newExObjNode());
-				NumNumConnect(button->get(), vNode->get(), 0, 0);
+				vNode = new visualNode(creator::createObject(1));
+				NumNumConnect(button->node(), vNode->node(), 0, 0);
 			}
 			vNode->nodeText = button->name;
-			interfaceBoard.addNode(vNode);
-			group->addNode(vNode);
+			interfaceBoard.addNode(vNode->node());
+			group->addNode(vNode->node());
 			
 		}
 		void resetButton(sharedButton* button)
 		{
-			auto vNode = visualNode::getByNode(button->getConnection(0));
+			auto vNode = getObject<visualNode>(button->node().connection(0));
 			if (vNode)
-				deleteNode(vNode->get());
+				creator::deleteNode(vNode->node());
 		}
 	};
 }

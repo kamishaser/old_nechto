@@ -54,8 +54,8 @@ namespace nechto
 			if (type != nodeT::Pointer || subtype != pointerT::Simple)
 				return nullptr;
 			break;
-		case nechto::connectionRule::ConIterator_NoTransit:
-			if (type != nodeT::Pointer || subtype != pointerT::ConIter)
+		case nechto::connectionRule::PortIterator_NoTransit:
+			if (type != nodeT::Pointer || subtype != pointerT::PortIter)
 				return nullptr;
 			break;
 		case nechto::connectionRule::GroupIterator_NoTransit:

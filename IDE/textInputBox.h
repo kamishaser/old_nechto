@@ -22,22 +22,22 @@ namespace nechto::ide
 		{
 			nodePtr v1;
 			if (aim())
-				v1 = aim()->getConnection(0);
+				v1 = aim()->node().connection(0);
 			if (!v1.exist())
 				return false;
-			switch (v1->getType())
+			switch (v1.type())
 			{
-			case node::Variable:
+			case nodeT::Variable:
 				if ((iText.size() > 12) || iText.empty())
 					return false;
-				if (iText == u"-")
+				if (iText == L"-")
 					return false;
-				if (v1->getSubtype())//i64
+				if (v1.subtype())//i64
 					return isI64(iText);
 				else
 					return isF64(iText);
 				break;
-			case node::Text:
+			case nodeT::Text:
 				return true;
 			default:
 				return false;
@@ -45,21 +45,25 @@ namespace nechto::ide
 		}
 		
 		i64 limit = 1000;
-		std::u16string header = u"ввод текста";
-		std::u16string iText;
+		std::wstring header = L"ввод текста";
+		std::wstring iText;
 
-		textInputBox(nodePtr v1)
-			:namedExCon(u"TextInputBox")
+		textInputBox(objectPtr<visualNode> v1)
+			:namedExCon(L"TextInputBox")
 		{
-			NumHubConnect(get(), v1, 0);
+			NumHubConnect(node(), v1, 0);
 		}
 		visualNode* aim() const
 		{
-			return visualNode::getByNode(getConnection(1));
+			if (!objectPtr<visualNode>::match(node().connection(1)))
+				return nullptr;
+			return objectPtr<visualNode>(node().connection(1)).get();
 		}
 		visualNode* box() const
 		{
-			return visualNode::getByNode(getConnection(0));
+			if (!objectPtr<visualNode>::match(node().connection(0)))
+				return nullptr;
+			return objectPtr<visualNode>(node().connection(0)).get();
 		}
 		void update(int input)
 		{
@@ -90,25 +94,25 @@ namespace nechto::ide
 			reset();
 			Focus = true;
 			iText.clear();
-			nodePtr v1 = vNode->getConnection(0);
+			nodePtr v1 = vNode->node().connection(0);
 			if (vNode && v1.exist() && 
-				(typeCompare(v1, node::Text) || typeCompare(v1, node::Variable)))
+				(typeCompare(v1, nodeT::Text) || typeCompare(v1, nodeT::Variable)))
 			{
-				switch (v1->getType())
+				switch (v1.type())
 				{
-				case node::Text:
-					iText = text::get(v1);
+				case nodeT::Text:
+					iText = textPtr(v1);
 					break;
-				case node::Variable:
-					if (v1->getSubtype())
-						iText = std::to_u16string(v1->getData<i64>());
+				case nodeT::Variable:
+					if (v1.subtype())
+						iText = std::to_wstring((i64)i64VariablePtr(v1));
 					else
-						iText = std::to_u16string(v1->getData<f64>());
+						iText = std::to_wstring((f64)f64VariablePtr(v1));
 					break;
 				default:
 					return;
 				}
-				NumHubConnect(get(), vNode->get(), 1);
+				NumHubConnect(node(), vNode->node(), 1);
 			}
 		}
 		bool hasFocus()
@@ -126,7 +130,7 @@ namespace nechto::ide
 					return setAimData();
 				}
 			}
-			numDisconnect(get(), 1);
+			nearestDisconnect(node(), 1);
 			return false;
 		}
 		bool boxResetEvent()
@@ -142,7 +146,7 @@ namespace nechto::ide
 		void updateBox()
 		{
 			box()->nodeText = header +
-				std::u16string((hasFocus()) ? u" *\n" : u" -\n") +
+				std::wstring((hasFocus()) ? L" *\n" : L" -\n") +
 				iText;
 		}
 		void updateAim()
@@ -159,7 +163,7 @@ namespace nechto::ide
 			if (aim())
 			{
 				aim()->frame.size = glm::vec2(0, 0);
-				nodePtr v1 = aim()->getConnection(0);
+				nodePtr v1 = aim()->node().connection(0);
 				if (checkCorectness())
 				{
 					aim()->nodeText = iText;
@@ -169,7 +173,7 @@ namespace nechto::ide
 				}
 				else
 				{
-					aim()->nodeText = u"ERROR";
+					aim()->nodeText = L"ERROR";
 					if (!iText.empty() && !(isPoint(iText.back()) || isMinus(iText.back())))
 						backSpace();
 				}
@@ -178,18 +182,18 @@ namespace nechto::ide
 		}
 		void setNodeData(nodePtr v1)
 		{
-			switch (v1->getType())
+			switch (v1.type())
 			{
-			case node::Variable:
+			case nodeT::Variable:
 				if (iText.empty())
 					return;
-				if (v1->getSubtype())//i64
-					v1->setData<i64>(std::stoll(iText));
+				if (v1.subtype())//i64
+					i64VariablePtr(v1).set(std::stoll(iText));
 				else
-					v1->setData<f64>(std::stod(iText));
+					f64VariablePtr(v1).set(std::stod(iText));
 				break;
-			case node::Text:
-				text::set(v1, iText);
+			case nodeT::Text:
+				textPtr(v1).set(iText);
 				break;
 			}
 		}
@@ -207,7 +211,7 @@ namespace nechto::ide
 			return ch == L'-';
 		}
 		
-		static bool isI64(const std::u16string& text)
+		static bool isI64(const std::wstring& text)
 		{
 			if (text.empty())
 				return false;
@@ -220,7 +224,7 @@ namespace nechto::ide
 			return true;
 		}
 
-		static bool isF64(const std::u16string& text)
+		static bool isF64(const std::wstring& text)
 		{
 			if (text.empty())
 				return false;

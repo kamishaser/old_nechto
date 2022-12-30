@@ -21,9 +21,9 @@ namespace nechto::ide
 			nodePtr temp = ds.deserialize();
 			while (temp.exist())
 			{
-				auto vNode = new visualNode(newExObjNode(), temp);
+				auto vNode = new visualNode(creator::createObject(1), temp);
 				vNode->frame.position = glm::vec2(100.f, 100.f);
-				gui.workBoard.addNode(vNode);
+				gui.workBoard.addNode(getObjectPtr(vNode));
 				temp = ds.deserialize();
 			}
 			ds.close();
@@ -37,9 +37,9 @@ namespace nechto::ide
 			groupIterator gi(group);
 			do
 			{
-				auto vNode = visualNode::getByNode(gi.get());
-				if (vNode && vNode->getConnection(0).exist())
-					fs.serialize(vNode->getConnection(0));
+				auto vNode = getObject<visualNode>(gi.get());
+				if (vNode && vNode->node().connection(0).exist())
+					fs.serialize(vNode->node().connection(0));
 			} while (gi.stepForward());
 			fs.close();
 		}

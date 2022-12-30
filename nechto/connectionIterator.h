@@ -61,7 +61,7 @@ namespace nechto
 	{
 	public:
 		explicit portIterator(existing<nodePtr> Purpose, char pos = 0)
-			:iterator(Purpose, hubPosPair(Purpose, 0)) {}
+			:iterator(Purpose, hubPosPair(Purpose, pos)) {}
 		explicit portIterator(portIteratorPtr conIter)
 			:iterator(iteratorPtr(conIter)){}
 		portIterator(nodePtr Purpose, hubPosPair hpp)
@@ -128,7 +128,7 @@ namespace nechto
 		{
 			if (iter.exist())
 			{
-				assert(iter.getPurpose() == nodeT::Group);
+				assert(iter.getPurpose().type() == nodeT::Group);
 				assert(inGroup());
 			}
 		}
@@ -225,12 +225,12 @@ namespace nechto
 	const groupIterator nullGroupIterator = groupIterator(nullptr, hubPosPair());
 	/*bool pointer::set(nodePtr pointer, nodePtr v1)
 	{
-		if (pointer->getSubtype() == pointer::Simple)
+		if (pointer.subtype() == pointer::Simple)
 		{
 			if (v1.exist())
 				NumHubConnect(pointer, v1, 0);
 			else
-				numDisconnect(pointer, 0);
+				nearestDisconnect(pointer, 0);
 		}
 		else
 		{

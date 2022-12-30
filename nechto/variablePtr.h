@@ -69,7 +69,15 @@ namespace nechto
 		{
 			return getData<i64>();
 		}
+		void set(i64 value)
+		{
+			setData<i64>(value);
+		}
 		operator i64() const
+		{
+			return getData<i64>();
+		}
+		operator bool() const
 		{
 			return getData<i64>();
 		}
@@ -112,6 +120,10 @@ namespace nechto
 		f64 get() const
 		{
 			return getData<f64>();
+		}
+		void set(f64 value)
+		{
+			setData<f64>(value);
 		}
 		operator f64() const
 		{

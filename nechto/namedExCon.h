@@ -7,26 +7,31 @@ namespace nechto
 	{
 	protected:
 		nodePtr exConNode;
-		virtual void disconnect()
+		virtual void nodeDisconnect() override
 		{
-			resetNode(exConNode);
+			if(exConNode.exist())
+				resetNode(exConNode);
 			exConNode = nullptr;
 		}
 	public:
-		const std::u16string name;
-		namedExCon(objectNullPtr emptyExObj, const std::u16string& n)
-			:exConNode(emptyExObj), name(n) 
+		const std::wstring name;
+		namedExCon(nodePtr emptyObj, const std::wstring& n)
+			:name(n) 
 		{
-			emptyExObj.set(this);
+			if (objectNullPtr::match(emptyObj))
+			{
+				objectNullPtr(emptyObj).set(this);
+				exConNode = emptyObj;
+			}
 		}
-		namedExCon(const std::u16string& n)
-			:exConNode(creator::createObject(true, this)), name(n) {}
+		namedExCon(const std::wstring& n, bool nodeIsOwner = false)
+			:exConNode(creator::createObject(false, this)), name(n) {}
 		
 		//отключение namedExCon от ноды
 		
 		virtual ~namedExCon()
 		{
-			disconnect();
+			nodeDisconnect();
 		}
 		objectPtr<namedExCon> node() const
 		{//внимание!!! Данная функция не может быть вызвана после disconnect!!!
@@ -36,17 +41,13 @@ namespace nechto
 		{
 			return node();
 		}
-		virtual const ustr& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return name;
 		}
-		virtual const operation& getOperation(char number) const
-		{
-			return operation();
-		}
 	};
 
-	ustr getUstrObjectData(nonTypedObjectPtr objectNode)
+	std::wstring getUstrObjectData(nonTypedObjectPtr objectNode)
 	{
 		object* obj = obj = objectNode.getObjectPtr();
 		if (obj)
@@ -57,6 +58,11 @@ namespace nechto
 			return obj->getTypeName();
 		}
 		else
-			return u"nullObjectPtr";
+			return L"nullObjectPtr";
+	}
+	template <class TCon>
+	objectPtr<TCon> getObjectPtr(TCon* exCon)
+	{
+		return objectPtr<TCon>(exCon->node());
 	}
 }

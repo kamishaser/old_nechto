@@ -20,72 +20,68 @@ namespace nechto::ide
 			static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / max / 2)) - max
 		);
 	}
-	struct nodeBoard : public externalObject
+	struct nodeBoard : public namedExCon
 	{
 		nodeBoard()
-			:externalObject(newNode(node::ExternalObject, 0))
+			:namedExCon(L"nodeBoard")
 		{
-			NumNumConnect(get(), newNode(node::Group), 0, 0);
-			NumNumConnect(get(), newNode(node::Group), 1, 0);
-			NumNumConnect(get(), newNode(node::Group), 2, 0);
-			NumNumConnect(get(), newNode(node::Group), 3, 0);
+			for(int i = 0; i < 4; ++i)
+				NumNumConnect(node(), creator::createGroup(), i, 0);
 		}
 		nodePtr vNodeGroup() const
 		{
-			return exObj->connection[0];
+			return node().connection(0);
 		}
 		nodePtr vConnectionGroup() const
 		{
-			return exObj->connection[1];
+			return node().connection(1);
 		}
 		nodePtr vGroupGroup() const
 		{
-			return getConnection(3);
+			return node().connection(2);
 		}
 		//група различным образом помеченных нод и соединений
 		nodePtr taggedGroup() const 
 		{
-			return exObj->connection[2];
+			return node().connection(3);
 		}
 		
-		void addNode(visualNode* vNode)
+		void addNode(objectPtr<visualNode> vNode)
 		{
-			IterIterConnect(connectionIterator(vNode->get(), 3), 
-				group::firstEmptyPort(vNodeGroup()));
+			IterIterConnect(portIterator(vNode, 3), 
+				firstEmptyGroupPort(vNodeGroup()));
 		}
-		void addConnection(visualConnection* vConnection)
+		void addConnection(objectPtr<visualConnection> vConnection)
 		{
-			IterIterConnect(connectionIterator(vConnection->get(), 3),
-				group::firstEmptyPort(vConnectionGroup()));
+			IterIterConnect(portIterator(vConnection, 3),
+				firstEmptyGroupPort(vConnectionGroup()));
 		}
-		void addGroup(visualGroup* vGroup)
+		void addGroup(objectPtr<visualGroup> vGroup)
 		{
-			IterIterConnect(connectionIterator(vGroup->get(), 3),
-				group::firstEmptyPort(vGroupGroup()));
+			IterIterConnect(portIterator(vGroup, 3),
+				firstEmptyGroupPort(vGroupGroup()));
 		}
-		bool onThisBoard(visualNode* vNode)
+		bool onThisBoard(objectPtr<visualNode> vNode)
 		{
-			assert(vNode);
-			return vNodeGroup() == vNode->get()->connection[3];
+			return vNodeGroup() == vNode.connection(3);
 		}
-		bool onThisBoard(visualConnection* vCon)
+		bool onThisBoard(objectPtr<visualConnection> vCon)
 		{
-			assert(vCon);
-			return vConnectionGroup() == vCon->get()->connection[3];
+			return vConnectionGroup() == vCon.connection(3);
 			//внимание!!!! Надо переделать
 		}
-		bool connected(visualNode* vNode1, visualNode* vNode2)
+		bool connected(objectPtr<visualNode> vNode1, objectPtr<visualNode> vNode2)
 		{
 			if (!onThisBoard(vNode1) || !onThisBoard(vNode2))
 				return false;
-			connectionIterator i1(vNode1->get());
+			portIterator i1(vNode1);
 			do
 			{
-				visualConnection* vscon = visualConnection::getByNode(i1.get());
-				if (vscon)
+				if (objectPtr<visualConnection>::match(i1.get()))
 				{
-					if (i1.get()->connection[0] == vNode2->get() ||
-						i1.get()->connection[1] == vNode2->get())
+					objectPtr<visualConnection> vscon(i1.get());
+					if (vscon.connection(0) == vNode2 ||
+						vscon.connection(1) == vNode2)
 						return true;
 				}
 			} while (i1.stepForward());
@@ -94,30 +90,22 @@ namespace nechto::ide
 		/*возвращает nullptr (интерпретируется в false) если
 		на данной доске нет visualNode указывающей на эту ноду
 		//иначе возвращает указатель на visualNode*/
-		visualNode* visualized(nodePtr v1)
+		nodePtr visualized(nodePtr v1)
 		{
 			if (!v1.exist())
 				return nullptr;
 			groupIterator gi(vNodeGroup());
 			do
 			{
-				if(gi.get().exist() && (gi.get()->connection[0] == v1))
-					return gi.get()->getData<visualNode*>();
+				if(objectPtr<visualNode>::match(gi.get()) && (gi.get().connection(0) == v1))
+					return gi.get();
 			} while (gi.stepForward());
 			return nullptr;
 		}
-		static nodeBoard* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<nodeBoard*>(v1->getData<externalObject*>());
-		}
-		const static std::u16string typeName;
+		const static std::wstring typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::u16string& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -125,21 +113,12 @@ namespace nechto::ide
 		{
 			return methodSet.getOperation(number);
 		}
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
-		}
 
 	};
-	const std::u16string nodeBoard::typeName = u"nechtoIde.nodeBoard";
-	const connectionRule nodeBoard::cRule = connectionRule{
-		conRule::Group, conRule::In_Output, nullptr,
-		conRule::Group, conRule::In_Output, nullptr,
-		conRule::Group, conRule::In_Output, nullptr
-	};
+	const std::wstring nodeBoard::typeName = L"nechtoIde.nodeBoard";
 	const staticNodeOperationSet nodeBoard::methodSet
 	{
-		/*namedOperation(u"addNode", operation{
+		/*namedOperation(L"addNode", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input, [](nodePtr v1)
@@ -155,7 +134,7 @@ namespace nechto::ide
 				return true;
 			}
 			}),
-		namedOperation(u"addConnection", operation{
+		namedOperation(L"addConnection", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input, [](nodePtr v1)
@@ -179,25 +158,25 @@ namespace nechto::ide
 				auto vConnection = nBoard->addConnection(v1, vNode0, vNode1);
 				return true;
 			}}),
-		namedOperation(u"getAllVConnections", operation{
+		namedOperation(L"getAllVConnections", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input,
 					[](nodePtr v1)
 					{
-						return (visualNode::getByNode(v1) != nullptr);
+						return (getObject<visualNode>(v1) != nullptr);
 					},
 					conRule::Group, conRule::Output),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
-				if (v0 != visualNode::getByNode(v1)->getNodeBoard())
+				if (v0 != getObject<visualNode>(v1)->getNodeBoard())
 					return false;
 				group::clear(v2);
 				groupIterator gi(v2);
 				connectionIterator ci(v1);
 				do
 				{
-					auto vConnection = visualConnection::getByNode(ci.get());
+					auto vConnection = getObject<visualConnection>(ci.get());
 					if ((vConnection != nullptr)&&(vConnection->getNodeBoard() == v0))
 					{
 						gi.insert(hub::firstEmptyPort(ci.get()));
@@ -206,25 +185,25 @@ namespace nechto::ide
 				/////////////////////////////////////////////////////недоделано
 				return true;
 			}}),
-				namedOperation(u"getAllConnectedVNodes", operation{
+				namedOperation(L"getAllConnectedVNodes", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::ExternalObject, conRule::Input,
 					[](nodePtr v1)
 					{
-						return (visualNode::getByNode(v1) != nullptr);
+						return (getObject<visualNode>(v1) != nullptr);
 					},
 					conRule::Group, conRule::Output),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
-				if (v0 != visualNode::getByNode(v1)->getNodeBoard())
+				if (v0 != getObject<visualNode>(v1)->getNodeBoard())
 					return false;
 				group::clear(v2);
 				groupIterator gi(v2);
 				connectionIterator ci(v1);
 				do
 				{
-					auto vConnection = visualConnection::getByNode(ci.get());
+					auto vConnection = getObject<visualConnection>(ci.get());
 					if ((vConnection != nullptr) && (vConnection->getNodeBoard() == v0))
 					{
 						gi.insert(hub::firstEmptyPort(vConnection->getOtherEnd(v1)));
@@ -233,7 +212,7 @@ namespace nechto::ide
 				/////////////////////////////////////////////////////недоделано
 				return true;
 			}}),
-		namedOperation(u"visualized", operation{
+		namedOperation(L"visualized", operation{
 				connectionRule(
 					conRule::ExternalObject, conRule::Input, nullptr,
 					conRule::AnyPointer, conRule::Input, nullptr,

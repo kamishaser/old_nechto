@@ -147,7 +147,6 @@
     <ClInclude Include="hubManager.h" />
     <ClInclude Include="hubPosPair.h" />
     <ClInclude Include="portSearch.h" />
-    <ClInclude Include="string_numberConverter.h" />
     <ClInclude Include="typeDeclarations.h" />
     <ClInclude Include="fileSerializer.h" />
     <ClInclude Include="method.h" />

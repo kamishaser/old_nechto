@@ -84,16 +84,14 @@ namespace nechto::ide
 			groupIterator i1(nBoard->vConnectionGroup());
 			do
 			{
-				visualConnection* vscon = visualConnection::getByNode(i1.get());
-				if (vscon)
-					draw(vscon);
+				if(objectPtr<visualConnection>::match(i1.get()))
+					draw(objectPtr<visualConnection>(i1.get()));
 			} while (i1.stepForward());
 			groupIterator i2(nBoard->vNodeGroup());
 			do
 			{
-				visualNode* vNode = visualNode::getByNode(i2.get());
-				if (vNode)
-					draw(vNode);
+				if (objectPtr<visualNode>::match(i2.get()))
+					draw(objectPtr<visualNode>(i2.get()).get());
 			} while (i2.stepForward());
 
 		}
@@ -150,10 +148,11 @@ namespace nechto::ide
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////
-		void draw(visualConnection* vCon)
+		void draw(objectPtr<visualConnection> vCon)
 		{
-			visualNode* first = visualNode::getByNode(vCon->get()->connection[0]);
-			visualNode* second = visualNode::getByNode(vCon->get()->connection[1]);
+			visualNode* first = getObject<visualNode>(vCon.connection(0));
+			visualNode* second = getObject<visualNode>(vCon.connection(1));
+
 			assert((first) && (second));
 			////////////////////////////////////////////////////////////////////////
 			const glm::vec2 fpos = first->frame.center();
@@ -181,7 +180,7 @@ namespace nechto::ide
 
 			if (!vCon->fText.empty())
 			{
-				visualNode vNode1(newExObjNode());
+				visualNode vNode1(nullptr);
 				vNode1.frame.position = fpos + quarter
 					- glm::vec2(dSettings.characterSize, dSettings.characterSize);
 				vNode1.nodeText = vCon->fText;
@@ -190,7 +189,7 @@ namespace nechto::ide
 			}
 			if (!vCon->sText.empty())
 			{
-				visualNode vNode2(newExObjNode());
+				visualNode vNode2(nullptr);
 				vNode2.frame.position = spos - quarter;
 				vNode2.nodeText = vCon->sText;
 				vNode2.shapeColor = col::strong;

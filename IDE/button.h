@@ -63,13 +63,13 @@ namespace nechto::ide
 		//№0 - content
 		//№3 - список кнопок в котором она находится
 	public:
-		sharedButton(std::u16string name)
+		sharedButton(std::wstring name)
 			:namedExCon(name){}
-		sharedButton(nodePtr emptyExternalObject, std::u16string name)
+		sharedButton(nodePtr emptyExternalObject, std::wstring name)
 			:namedExCon(emptyExternalObject, name) {}
 		nodePtr content()
 		{
-			return getConnection(0);
+			return node().connection(0);
 		}
 		//обновление кнопки
 		bool update(bool newStatus, visualNode* vNode)
@@ -77,9 +77,9 @@ namespace nechto::ide
 			if (basicButton::update(newStatus))
 			{
 				if (vNode)
-					NumHubConnect(get(), vNode->get(), 0);
+					NumHubConnect(node(), vNode->node(), 0);
 				else
-					numDisconnect(get(), 0);
+					nearestDisconnect(node(), 0);
 				return true;
 			}
 			return false;
@@ -92,25 +92,17 @@ namespace nechto::ide
 			}
 			return false;
 		}
-		static sharedButton* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<sharedButton*>(v1->getData<externalObject*>());
-		}
 		nodePtr getList()
 		{
-			nodePtr temp = getConnection(3);
+			nodePtr temp = node().connection(3);
 			if (!temp.exist())
-				return nullNodePtr;
-			return temp->connection[0];
+				return nullptr;
+			return temp.connection(0);
 		}
 	};
-	sharedButton* createButton(const std::u16string& name)
+	sharedButton* createButton(const std::wstring& name)
 	{
-		return new sharedButton(newExObjNode(0), name);
+		return new sharedButton(creator::createObject(1), name);
 	}
 
 }

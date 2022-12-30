@@ -22,9 +22,9 @@ namespace nechto
 		{
 			assert(match(eptr));
 		}
-		ustr* getPtr() const
+		std::wstring* getPtr() const
 		{
-			return getData<ustr*>();
+			return getData<std::wstring*>();
 		}
 		bool textExist() const
 		{
@@ -40,22 +40,28 @@ namespace nechto
 			{
 				if (owner())
 					delete getPtr();
-				setData<ustr*>(nullptr);
+				setData<std::wstring*>(nullptr);
 			}
 		}
-		void set(ustr* text)
+		void set(std::wstring* text)
 		{
 			reset();
-			setData<ustr*>(text);
+			setData<std::wstring*>(text);
 		}
-		void set(const ustr& text)
+		void set(const std::wstring& text)
 		{
 			if (textExist())
 				*getPtr() = text;
 			else
-				set(new ustr(text));
+				set(new std::wstring(text));
 		}
-		ustr& operator=(const ustr& text)
+		operator std::wstring& ()
+		{
+			if (getPtr() == nullptr)
+				set(std::wstring());
+			return *getPtr();
+		}
+		std::wstring& operator=(const std::wstring& text)
 		{
 			set(text);
 			return *getPtr();
@@ -66,18 +72,10 @@ namespace nechto
 				return 0;
 			return getPtr()->size();
 		}
-		ustr& operator*() const
-		{
-			return *getPtr();
-		}
-		ustr& operator->() const
-		{
-			return *getPtr();
-		}
 
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return eptr.type() == nodeT::Group;
+			return eptr.type() == nodeT::Text;
 		}
 		static bool match(const nodePtr& ptr)
 		{

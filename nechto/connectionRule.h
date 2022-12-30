@@ -31,7 +31,7 @@ namespace nechto
 			AnyPointer,
 			AnyPointer_NoTransit,
 			SimplePointer_NoTransit,
-			ConIterator_NoTransit,
+			PortIterator_NoTransit,
 			GroupIterator_NoTransit,
 			AnyIterator_NoTransit,
 			Text,
@@ -107,7 +107,7 @@ namespace nechto
 			if constexpr (std::is_same<conType, iteratorPtr>())
 				return conRule::conType::AnyIterator_NoTransit;
 			if constexpr (std::is_same<conType, portIteratorPtr>())
-				return conRule::conType::ConIterator_NoTransit;
+				return conRule::conType::PortIterator_NoTransit;
 			if constexpr (std::is_same<conType, groupIteratorPtr>())
 				return conRule::conType::GroupIterator_NoTransit;
 			if constexpr (std::is_same<conType, groupPtr>())

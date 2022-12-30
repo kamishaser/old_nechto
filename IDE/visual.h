@@ -4,7 +4,10 @@
 #include "connectionRule.h"
 #include "nodeOperationSet.h"
 #include "connectionIterator.h"
-#include "graphOperations.h"
+#include "namedExConGroup.h"
+
+#include <codecvt>
+#include <locale>
 
 namespace nechto::ide
 {
@@ -18,15 +21,23 @@ namespace nechto::ide
 	{
 		return glm::vec2(v.x, v.y);
 	}
-	std::u16string to_string(glm::vec2 vec)
+	std::wstring to_string(glm::vec2 vec)
 	{
-		return static_cast<std::u16string>(u"[") +
-			std::to_u16string(vec.x) + L' ' +
-			std::to_u16string(vec.y) + L']';
+		return static_cast<std::wstring>(L"[") +
+			std::to_wstring(vec.x) + L' ' +
+			std::to_wstring(vec.y) + L']';
 	}
 	using color = sf::Color;
 	using geometricShape = std::vector<glm::vec2>;
-
+	enum conType
+	{
+		Hub,
+		Group,
+		N0,
+		N1,
+		N2,
+		N3
+	};
 	namespace col
 	{
 		color sel[]

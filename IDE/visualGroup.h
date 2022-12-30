@@ -2,6 +2,7 @@
 #include "namedExConGroup.h"
 #include "visualNode.h"
 #include "rect.h"
+#include "group.h"
 namespace nechto::ide
 {
 
@@ -13,44 +14,44 @@ namespace nechto::ide
 	struct visualGroup :public namedExConGroup
 	{
 		rect frame;
-		visualGroup(nodePtr emptyExternalObject, const std::u16string& name,
+		visualGroup(nodePtr emptyExternalObject, const std::wstring& name,
 			glm::vec2 startPoint = glm::vec2{ 0,0 })
 			:namedExConGroup(emptyExternalObject, name),
 			frame(startPoint, glm::vec2{ 1.f, 1.f }) {}
 		nodePtr vNodeGroup() const
 		{
-			return getConnection(0);
+			return getGroup();
 		}
 		nodePtr getNodeBoard() const
 		{
-			nodePtr temp = getConnection(3);
+			nodePtr temp = node().connection(3);
 			if (!temp.exist())
-				return nullNodePtr;
-			return temp->connection[0];
+				return nullptr;
+			return temp.connection(0);
 		}
-		bool contains(visualNode* vNode) const
+		bool contains(objectPtr<visualNode> vNode) const
 		{
-			return (vNodeGroup() == vNode->getConnection(0));
+			return (vNodeGroup() == vNode.connection(0));
 		}
 		//обновить группу
 		virtual void update() {}
 		//добавл€ет ноду в первый свободный порт
-		void addNode(visualNode* vNode) const
+		void addNode(objectPtr<visualNode> vNode) const
 		{
 			//vNodeGroup может содержать ноды только из одного nodeBoard
 			assert(vNode->getNodeBoard() == getNodeBoard());
-			IterIterConnect(connectionIterator(vNode->get(), 1),
-				group::firstEmptyPort(vNodeGroup()));
+			IterIterConnect(portIterator(vNode, 1),
+				firstEmptyGroupPort(getGroup()));
 		}
-		void addGroup(visualGroup* vGroup) const
+		void addGroup(objectPtr<visualGroup> vGroup) const
 		{
 			//vNodeGroup может содержать ноды только из одного nodeBoard
 			assert(vGroup->getNodeBoard() == getNodeBoard());
-			IterHubConnect(group::firstEmptyPort(vNodeGroup()), vGroup->get());
+			IterHubConnect(firstEmptyGroupPort(vNodeGroup()), vGroup);
 		}
 		i64 numberOfVNodes() const
 		{
-			return group::numberOfMembers(vNodeGroup());
+			return groupOperations::numberOfMembers(vNodeGroup());
 		}
 		bool allNodeOnOneNodeBoard() const
 		{
@@ -58,7 +59,7 @@ namespace nechto::ide
 			groupIterator gi(vNodeGroup());
 			do
 			{
-				auto vNode = visualNode::getByNode(gi.get());
+				auto vNode = getObject<visualNode>(gi.get());
 				if (vNode)
 				{
 					if (vNode->getNodeBoard() != nBoardNode)
@@ -71,39 +72,16 @@ namespace nechto::ide
 		//получение рамки ноды или группы
 		static rect* getRect(nodePtr v1)
 		{
-			if (!v1.exist())
-				return nullptr;
-			if (!typeCompare(v1, node::ExternalObject))
-				return nullptr;
-			auto vNode = visualNode::getByNode(v1);
-			if (vNode)
-				return &vNode->frame;
-			auto vGroup = visualGroup::getByNode(v1);
-			if (vGroup)
-				return &vGroup->frame;
+			if (objectPtr<visualNode>::match(v1))
+				return &objectPtr<visualNode>(v1)->frame;
+			if (objectPtr<visualGroup>::match(v1))
+				return &objectPtr<visualGroup>(v1)->frame;
 			return nullptr;
 		}
-
-		//////////////////////////////////////////////////////////////
-		virtual ~visualGroup()
-		{
-			if (vNodeGroup().exist())
-				deleteNode(vNodeGroup());
-		}
-		/*получение указател€ на visualGroup по объекту.
-		¬озвращает nullptr при несоответствии*/
-		static visualGroup* getByNode(nodePtr v1)
-		{
-			if (!v1.exist())
-				return nullptr;
-			if (v1->getType() != node::ExternalObject)
-				return nullptr;
-			return dynamic_cast<visualGroup*>(v1->getData<externalObject*>());
-		}
-		const static std::u16string typeName;
+		const static std::wstring typeName;
 		const static staticNodeOperationSet methodSet;
 		const static connectionRule cRule;
-		virtual const std::u16string& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
 		}
@@ -111,16 +89,11 @@ namespace nechto::ide
 		{
 			return methodSet.getOperation(number);
 		}
-		virtual const conRule& getConnectionRule()const override
-		{
-			return cRule;
-		}
 	};
-	const std::u16string visualGroup::typeName = u"nechtoIde.visualGroup";
-	const connectionRule visualGroup::cRule = connectionRule{};
+	const std::wstring visualGroup::typeName = L"nechtoIde.visualGroup";
 	const staticNodeOperationSet visualGroup::methodSet
 	{
-		/*namedOperation(u"nothing", operation{
+		/*namedOperation(L"nothing", operation{
 				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{

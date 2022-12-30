@@ -22,6 +22,7 @@ namespace nechto
 		nodeEnd,
 
 	};
+	static_assert(sizeof(wchar_t) == 2);
 	class serializer
 	{
 		//основна€ проблема сериализации нечто заключаетс€ в сохранении всех св€зей
@@ -55,7 +56,7 @@ namespace nechto
 				writeByValue(v1.node()->data);
 				break;
 			case nodeT::Text:
-				writeu16string(*textPtr(v1).getPtr());
+				writeWstring(*textPtr(v1).getPtr());
 				break;
 			case nodeT::Group:
 				writeGroup(v1);
@@ -84,7 +85,7 @@ namespace nechto
 				writeByValue<nodePtr>(hi.get());
 			}
 		}
-		void writeu16string(const std::u16string& string)
+		void writeWstring(const std::wstring& string)
 		{
 			int32_t size = string.size();
 			writeByPointer(&size);
@@ -107,7 +108,7 @@ namespace nechto
 		{
 			if (obj.dataExist())
 			{
-				writeu16string(obj.getObjectPtr()->getTypeName());
+				writeWstring(obj.getObjectPtr()->getTypeName());
 				buffer.clear();
 				obj.getObjectPtr()->serialize(buffer, obj);
 				writeByValue<ui32>(buffer.size());
@@ -115,7 +116,7 @@ namespace nechto
 			}
 			else
 			{
-				writeu16string(ustr());
+				writeWstring(std::wstring());
 				writeByValue<ui32>(0);
 			}
 		}
@@ -146,16 +147,16 @@ namespace nechto
 	{
 	public:
 		//убрать typeDefinition и заменить их на кучу виртуальных функций, как было раньше
-		ustr name;
+		std::wstring name;
 		std::vector<char> buffer;
-		deserializedObject(const ustr& n, ui32 size)
+		deserializedObject(const std::wstring& n, ui32 size)
 			:name(n), buffer(size) {}
 
 		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const override
 		{
 			buffer = objectPtr<deserializedObject>(obj)->buffer;
 		}
-		virtual const ustr& getTypeName() const override
+		virtual const std::wstring& getTypeName() const override
 		{
 			return name;
 		}
@@ -203,12 +204,14 @@ namespace nechto
 				v1.setData<i64>(readByValue<i64>());
 				break;
 			case nodeT::Text:
-				textPtr(v1).set(readu16string());
+				textPtr(v1).set(readWstring());
 				break;
 			case nodeT::Group:
 				readGroup(conMap, v1, old);
+				break;
 			case nodeT::Object:
 				readObject(nonTypedObjectPtr(v1));
+				break;
 			default:
 				break;
 			}
@@ -228,45 +231,7 @@ namespace nechto
 			char subtype;
 			read(&type, 1);
 			read(&subtype, 1);
-			switch (type)
-			{
-			case nechto::nodeT::Group:
-				return creator::createGroup();
-			case nechto::nodeT::Pointer:
-				switch (subtype)
-				{
-				case nechto::pointerT::Simple:
-					return creator::createSimplePointer();
-				case nechto::pointerT::ConIter:
-					return creator::createConIterator();
-				case nechto::pointerT::GroupIter:
-					return creator::createGroupIterator();
-				default:
-					assert(false);
-				}
-			case nechto::nodeT::Variable:
-				switch (subtype)
-				{
-				case nechto::variableT::F64:
-					return creator::createI64();
-				case nechto::variableT::I64:
-					return creator::createF64();
-				default:
-					assert(false);
-				}
-			case nechto::nodeT::Object:
-				return creator::createObject(subtype);
-			case nechto::nodeT::Text:
-				return creator::createText(subtype);
-			case nechto::nodeT::MathOperator:
-				return creator::createMathOperator(subtype);
-			case nechto::nodeT::Condition:
-				return creator::createCondition();
-			case nechto::nodeT::Method:
-				return creator::createMethod(subtype);
-			default:
-				assert(false);
-			}
+			return creator::createNode(type, subtype);
 		}
 		/*считать нумерованные соединени€ ноды или хаба*/
 		void readNumConnections(conMapType& conMap, iterator hi, nodePtr v1old)
@@ -300,11 +265,11 @@ namespace nechto
 			read(reinterpret_cast<char*>(&temp), sizeof(temp));
 			return temp;
 		}
-		std::u16string readu16string()
+		std::wstring readWstring()
 		{
 			int32_t size;
 			read(reinterpret_cast<char*>(&size), sizeof(size));
-			std::u16string string;
+			std::wstring string;
 			string.resize(size);
 			for (int32_t i = 0; i < size; ++i)
 				read(reinterpret_cast<char*>(&string[i]), sizeof(wchar_t));
@@ -327,7 +292,7 @@ namespace nechto
 		}
 		void readObject(nonTypedObjectPtr obj)
 		{
-			ustr name = readu16string();
+			std::wstring name = readWstring();
 			ui32 dataSize = readByValue<ui32>();
 			if (name.empty() && dataSize == 0)
 				return;

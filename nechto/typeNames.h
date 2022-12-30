@@ -1,199 +1,200 @@
 #pragma once
 #include "typeDeclarations.h"
+#include <functional>
 
 namespace nechto::typeName
 {
-	const ustr getTypeName(char type)
+	const std::wstring getTypeName(char type)
 	{
 		switch (type)
 		{
 		case nechto::nodeT::Deleted:
-			return u"Deleted";
+			return L"Deleted";
 		case nechto::nodeT::Hub:
-			return u"Hub";
+			return L"Hub";
 		case nechto::nodeT::Group:
-			return u"Group";
+			return L"Group";
 		case nechto::nodeT::Pointer:
-			return u"Pointer";
+			return L"Pointer";
 		case nechto::nodeT::Variable:
-			return u"Variable";
+			return L"Variable";
 		case nechto::nodeT::Object:
-			return u"Object";
+			return L"Object";
 		case nechto::nodeT::Text:
-			return u"Text";
+			return L"Text";
 		case nechto::nodeT::MathOperator:
-			return u"MathOperator";
+			return L"MathOperator";
 		case nechto::nodeT::Condition:
-			return u"Condition";
+			return L"Condition";
 		case nechto::nodeT::Method:
-			return u"Method";
+			return L"Method";
 		case nechto::nodeT::NodeOperator:
-			return u"NodeOperator";
+			return L"NodeOperator";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getGroupSubtypeName(char subtype)
+	std::wstring getGroupSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::groupT::weak:
-			return u"weak";
+			return L"weak";
 		case nechto::groupT::strong:
-			return u"strong";
+			return L"strong";
 		default:
-			return u"error";
+			return L"error";
 		}		
 	}
-	ustr getPointerSubtypeName(char subtype)
+	std::wstring getPointerSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::pointerT::Simple:
-			return u"Simple";
-		case nechto::pointerT::ConIter:
-			return u"ConIter";
+			return L"Simple";
+		case nechto::pointerT::PortIter:
+			return L"PortIter";
 		case nechto::pointerT::GroupIter:
-			return u"GroupIter";
+			return L"GroupIter";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getVariableSubtypeName(char subtype)
+	std::wstring getVariableSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::variableT::F64:
-			return u"F64";
+			return L"F64";
 		case nechto::variableT::I64:
-			return u"I64";
+			return L"I64";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getObjectSubtypeName(char subtype)
+	std::wstring getObjectSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::objectT::NotOwning:
-			return u"NotOwning";
+			return L"NotOwning";
 		case nechto::objectT::Owning:
-			return u"Owning";
+			return L"Owning";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getTextSubtypeName(char subtype)
+	std::wstring getTextSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::textT::NotOwning:
-			return u"NotOwning";
+			return L"NotOwning";
 		case nechto::textT::Owning:
-			return u"Owning";
+			return L"Owning";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getMathOperatorSubtypeName(char subtype)
+	std::wstring getMathOperatorSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::mathOperatorT::Assigment:
-			return u"Assigment";
+			return L"Assigment";
 		case nechto::mathOperatorT::UnaryMinus:
-			return u"UnaryMinus";
+			return L"UnaryMinus";
 		case nechto::mathOperatorT::Addition:
-			return u"Addition";
+			return L"Addition";
 		case nechto::mathOperatorT::Subtraction:
-			return u"Subtraction";
+			return L"Subtraction";
 		case nechto::mathOperatorT::Multiplication:
-			return u"Multiplication";
+			return L"Multiplication";
 		case nechto::mathOperatorT::Division:
-			return u"Division";
+			return L"Division";
 		case nechto::mathOperatorT::Equal:
-			return u"Equal";
+			return L"Equal";
 		case nechto::mathOperatorT::NotEqual:
-			return u"NotEqual";
+			return L"NotEqual";
 		case nechto::mathOperatorT::Less:
-			return u"Less";
+			return L"Less";
 		case nechto::mathOperatorT::Greater:
-			return u"Greater";
+			return L"Greater";
 		case nechto::mathOperatorT::LessOrEqual:
-			return u"LessOrEqual";
+			return L"LessOrEqual";
 		case nechto::mathOperatorT::GreaterOrEqual:
-			return u"GreaterOrEqual";
+			return L"GreaterOrEqual";
 		case nechto::mathOperatorT::LogicNegation:
-			return u"LogicNegation";
+			return L"LogicNegation";
 		case nechto::mathOperatorT::LogicAnd:
-			return u"LogicAnd";
+			return L"LogicAnd";
 		case nechto::mathOperatorT::LogicOr:
-			return u"LogicOr";
+			return L"LogicOr";
 		case nechto::mathOperatorT::Increment:
-			return u"Increment";
+			return L"Increment";
 		case nechto::mathOperatorT::Decrement:
-			return u"Decrement";
+			return L"Decrement";
 		default:
-			return u"Error";
-			//return u"";
+			return L"Error";
+			//return L"";
 		}
 	}
-	ustr getMathOperatorShortSubtypeName(char subtype)
+	std::wstring getMathOperatorShortSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
 		case nechto::mathOperatorT::Assigment:
-			return u"=";
+			return L"=";
 		case nechto::mathOperatorT::UnaryMinus:
-			return u"-";
+			return L"-";
 		case nechto::mathOperatorT::Addition:
-			return u"+";
+			return L"+";
 		case nechto::mathOperatorT::Subtraction:
-			return u"-";
+			return L"-";
 		case nechto::mathOperatorT::Multiplication:
-			return u"*";
+			return L"*";
 		case nechto::mathOperatorT::Division:
-			return u"/";
+			return L"/";
 		case nechto::mathOperatorT::Equal:
-			return u"==";
+			return L"==";
 		case nechto::mathOperatorT::NotEqual:
-			return u"!=";
+			return L"!=";
 		case nechto::mathOperatorT::Less:
-			return u"<";
+			return L"<";
 		case nechto::mathOperatorT::Greater:
-			return u">";
+			return L">";
 		case nechto::mathOperatorT::LessOrEqual:
-			return u"<=";
+			return L"<=";
 		case nechto::mathOperatorT::GreaterOrEqual:
-			return u">=";
+			return L">=";
 		case nechto::mathOperatorT::LogicNegation:
-			return u"!";
+			return L"!";
 		case nechto::mathOperatorT::LogicAnd:
-			return u"&&";
+			return L"&&";
 		case nechto::mathOperatorT::LogicOr:
-			return u"||";
+			return L"||";
 		case nechto::mathOperatorT::Increment:
-			return u"++";
+			return L"++";
 		case nechto::mathOperatorT::Decrement:
-			return u"--";
+			return L"--";
 		default:
-			return u"Err";
-			//return u"";
+			return L"Err";
+			//return L"";
 		}
 	}
-	ustr getSubtypeName(char type, char subtype)
+	std::wstring getSubtypeName(char type, char subtype)
 	{
 		switch (type)
 		{
 		case nechto::nodeT::Deleted:
-			return u"";
+			return L"";
 		case nechto::nodeT::Hub:
-			return u"";
+			return L"";
 		case nechto::nodeT::Group:
 			return getGroupSubtypeName(subtype);
 		case nechto::nodeT::Pointer:
@@ -207,17 +208,24 @@ namespace nechto::typeName
 		case nechto::nodeT::MathOperator:
 			return getMathOperatorSubtypeName(subtype);
 		case nechto::nodeT::Condition:
-			return u"";
+			return L"";
 		case nechto::nodeT::Method:
-			return u"";
+			return L"";
 		case nechto::nodeT::NodeOperator:
-			return u"";
+			return L"";
 		default:
-			return u"???";
+			return L"???";
 		}
 	}
-	ustr getTypeAndSubtypeName(char type, char subtype, ustr separator = u" ")
+	std::wstring getTypeAndSubtypeName(char type, char subtype, std::wstring separator = L" ")
 	{
 		return getTypeName(type) + separator + getSubtypeName(type, subtype);
+	}
+	std::vector<std::wstring> getTypeNameList(const std::function<std::wstring(char)>& func, char max)
+	{
+		std::vector<std::wstring> list;
+		for (char i = 0; i < max; ++i)
+			list.push_back(func(i));
+		return list;
 	}
 }

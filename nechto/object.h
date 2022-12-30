@@ -12,11 +12,11 @@ namespace nechto
 	public:
 		friend class creator;
 		virtual ~object() {}
-		virtual const ustr& getTypeName() const
+		virtual const std::wstring& getTypeName() const
 		{
-			return u"nonTypedObject";
+			return L"nonTypedObject";
 		}
-		virtual const operation& getOperation(char number) const
+		virtual const operation& getMethod(char number) const
 		{
 			return operation();
 		}
@@ -28,10 +28,11 @@ namespace nechto
 		//действия при отключении от ноды. Обычно ничего делать не надо
 	protected:
 		static void resetNode(existing<nodePtr> objectNode);//определено после nonTypedObjectPtr
-		virtual void disconnect() {}
+		virtual void nodeDisconnect() {}
 	private:
-		void connect(objectNullPtr object);
+		void nodeConnect(objectNullPtr object);
 	};
+	
 
 	class nonTypedObjectPtr : public existing<nodePtr>
 	{
@@ -67,7 +68,7 @@ namespace nechto
 			return getObjectPtr() != nullptr;
 		}
 		//единоличное владение указателем (объектом)
-		bool owner() const
+		bool isUniqueOwner() const
 		{
 			return subtype();
 		}
@@ -84,7 +85,7 @@ namespace nechto
 		{
 			if (getObjectPtr() != nullptr)
 			{
-				if(owner())
+				if(isUniqueOwner())
 					delete getObjectPtr();
 				setObjectPtr(nullptr);
 			}
@@ -103,7 +104,7 @@ namespace nechto
 			return *getObjectPtr();
 		}
 	};
-
+	using ntObj = nonTypedObjectPtr;
 	void object::resetNode(existing<nodePtr> objectNode)
 	{
 		nonTypedObjectPtr(objectNode).setObjectPtr(nullptr);
@@ -167,23 +168,35 @@ namespace nechto
 		}
 		const TCon* operator->() const
 		{
-			return getObjectPtr();
+			return dynamic_cast<TCon*>(getObjectPtr());
 		}
 		TCon* operator->()
 		{
 			return dynamic_cast<TCon*>(getObjectPtr());
 		}
+		TCon* get()
+		{
+			return dynamic_cast<TCon*>(getObjectPtr());
+		}
 	};
-	void object::connect(objectNullPtr object)
+	void object::nodeConnect(objectNullPtr object)
 	{
 		object.setObjectPtr(this);
 	}
+	template <class TCon>
+	TCon* getObject(nodePtr node)
+	{
+		if (!objectPtr<TCon>::match(node))
+			return nullptr;
+		return objectPtr<TCon>(node).get();
+	}
+
 #ifdef OBJECT_template
 	class OBJECT :public object
 	{
 	public:
-		const static ustr typeName;
-		virtual const ustr& getName() const
+		const static std::wstring typeName;
+		virtual const std::wstring& getName() const
 		{
 			return typeName;
 		}
@@ -196,7 +209,7 @@ namespace nechto
 			buffer.clear();
 		}
 	};
-	const ustr OBJECT::typeName(u"OBJECT");
+	const std::wstring OBJECT::typeName(L"OBJECT");
 
 #endif // 
 }
