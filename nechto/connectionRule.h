@@ -8,8 +8,6 @@ namespace nechto
 	using ntV = variablePtr;
 	using ntI64 = i64VariablePtr;
 	using ntF64 = f64VariablePtr;
-	using ntPo = pointerPtr;
-	using ntSP = simplePointerPtr;
 	using ntPI = portIteratorPtr;
 	using ntGI = groupIteratorPtr;
 	using ntI = iteratorPtr;
@@ -28,12 +26,10 @@ namespace nechto
 			I64Variable,
 			F64Variable,
 			AnyVariable,
-			AnyPointer,
-			AnyPointer_NoTransit,
-			SimplePointer_NoTransit,
+			AnyIterator,
+			AnyIterator_NoTransit,
 			PortIterator_NoTransit,
 			GroupIterator_NoTransit,
-			AnyIterator_NoTransit,
 			Text,
 			Group,
 			Object,
@@ -57,7 +53,7 @@ namespace nechto
 
 		static bool transit(conType type)
 		{
-			return (type < AnyPointer_NoTransit) || (type > AnyIterator_NoTransit);
+			return (type < AnyIterator_NoTransit) || (type > GroupIterator_NoTransit);
 		}
 
 		connectionRule(
@@ -100,10 +96,6 @@ namespace nechto
 				return conRule::conType::F64Variable;
 			if constexpr (std::is_same<conType, variablePtr>())
 				return conRule::conType::AnyVariable;
-			if constexpr (std::is_same<conType, pointerPtr>())
-				return conRule::conType::AnyPointer_NoTransit;
-			if constexpr (std::is_same<conType, simplePointerPtr>())
-				return conRule::conType::SimplePointer_NoTransit;
 			if constexpr (std::is_same<conType, iteratorPtr>())
 				return conRule::conType::AnyIterator_NoTransit;
 			if constexpr (std::is_same<conType, portIteratorPtr>())

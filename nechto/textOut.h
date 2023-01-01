@@ -30,11 +30,9 @@ namespace nechto
 				return std::to_wstring(i64VariablePtr(v1).get());
 			else
 				return std::to_wstring(f64VariablePtr(v1).get());
-		case nodeT::Pointer:
-			if (v1.subtype() != pointerT::Simple)
-				return to_string(v1.connection(0));
-			else
-				return to_string(pointerPtr(v1).getHPPair());
+		case nodeT::Iterator:
+			return to_string(v1.connection(0)) + L"\n" + 
+				std::to_wstring(iteratorPtr(v1).getHPPair().getGlobalPos());
 		case nodeT::Text:
 			if (textPtr(v1).textExist())
 				return textPtr(v1);
@@ -95,5 +93,23 @@ namespace nechto
 		}
 		for (int i = 0; i < 4; ++i)
 			std::wcout << to_string(v1.connection(i)) << std::endl;
+	}
+	std::wstring getStringNumberOfNodes(char type)
+	{
+		return typeName::getTypeName(type) + L": " + std::to_wstring(creator::numberOfTypedNodes[type]) + L"\n";
+	}
+	std::wstring getStringNumberOfNodesOfAllTypes()
+	{
+		std::wstring buffer;
+		buffer += getStringNumberOfNodes(nodeT::Hub);
+		buffer += getStringNumberOfNodes(nodeT::Group);
+		buffer += getStringNumberOfNodes(nodeT::Iterator);
+		buffer += getStringNumberOfNodes(nodeT::Variable);
+		buffer += getStringNumberOfNodes(nodeT::Object);
+		buffer += getStringNumberOfNodes(nodeT::Text);
+		buffer += getStringNumberOfNodes(nodeT::MathOperator);
+		buffer += getStringNumberOfNodes(nodeT::Condition);
+		buffer += getStringNumberOfNodes(nodeT::Method);
+		return buffer;
 	}
 }

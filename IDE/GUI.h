@@ -7,11 +7,13 @@
 #include "textOut.h"
 #include "button.h"
 #include "namedExConGroup.h"
+#include "buttonList.h"
 
 namespace nechto::ide
 {
 	class GUI
 	{
+		namedExConGroup activeButtonList{ creator::createObject(0), L"pressedButton" };
 	public:
 		display dp;
 
@@ -30,7 +32,8 @@ namespace nechto::ide
 		textInputBox  textBox;
 
 
-		namedExConGroup activeButton{ creator::createObject(0), L"pressedButton" };
+		
+		namedExConGroup dropListGroup{ creator::createObject(0), L"dropList" };
 
 		GUI()
 			:dp(), textBox(textBoxNode.node())
@@ -97,11 +100,72 @@ namespace nechto::ide
 			group->addNode(vNode->node());
 			
 		}
-		void resetButton(sharedButton* button)
+		void deleteButton(sharedButton* button)
 		{
 			auto vNode = getObject<visualNode>(button->node().connection(0));
 			if (vNode)
 				creator::deleteNode(vNode->node());
+		}
+		void hideAllActiveDropLists()
+		{
+			groupIterator gi(dropListGroup.getGroup());
+			do
+			{
+				if (objectPtr<buttonList>::match(gi.get()))
+				{
+					objectPtr<buttonList>(gi.get())->hide();
+				}
+			} while (gi.stepForward());
+		}
+		void setbList(buttonList& list,
+			buttonList::clickEventT clickEvent = nullptr)
+		{
+			auto vGroup = list.vNodeGroup();
+
+			interfaceBoard.addGroup(getObjectPtr<visualGroup>(vGroup));
+			topGroup.addGroup(getObjectPtr<visualGroup>(vGroup));
+			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
+			if (cGroup)
+				cGroup->mode.horisontal = true;
+			list.clickEvent = clickEvent;
+			list.show(&interfaceBoard);
+		}
+		void setDropList(buttonList& list,
+			buttonList::clickEventT clickEvent = nullptr, bool closeAfterClick = true)
+		{
+			auto vGroup = list.vNodeGroup();
+			interfaceBoard.addGroup(getObjectPtr(vGroup));
+			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
+			if (cGroup)
+			{
+				cGroup->distance = 5;
+			}
+			if (closeAfterClick)
+			{
+				list.clickEvent = [clickEvent](buttonList* list)
+				{
+					clickEvent(list);
+					list->hide();
+				};
+			}
+			else
+				list.clickEvent = clickEvent;
+			IterHubConnect(firstEmptyGroupPort(dropListGroup.getGroup()), list.node());
+		}
+		bool isButtonActive(sharedButton* button)
+		{
+			if (button == nullptr)
+				return false;
+			return activeButtonList.contains(button->content());
+		}
+		void activeButton(sharedButton* button)
+		{
+			activeButtonList.addNodeToNearestPort(button->node().connection(0));
+		}
+		void resetButton(sharedButton* button)
+		{
+			nearestDisconnect(activeButtonList.node().connection(0),
+				button->content());
 		}
 	};
 }

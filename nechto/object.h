@@ -11,7 +11,15 @@ namespace nechto
 	{
 	public:
 		friend class creator;
-		virtual ~object() {}
+		static i64 numberOfObjects;
+		object()
+		{
+			++numberOfObjects;
+		}
+		virtual ~object() 
+		{
+			--numberOfObjects;
+		}
 		virtual const std::wstring& getTypeName() const
 		{
 			return L"nonTypedObject";
@@ -32,7 +40,7 @@ namespace nechto
 	private:
 		void nodeConnect(objectNullPtr object);
 	};
-	
+	i64 object::numberOfObjects = 0;
 
 	class nonTypedObjectPtr : public existing<nodePtr>
 	{

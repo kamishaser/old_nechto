@@ -1,5 +1,5 @@
 #pragma once
-#include "pointerPtr.h"
+#include "iteratorPtr.h"
 #include "hubPtr.h"
 #include "groupPtr.h"
 
@@ -156,7 +156,7 @@ namespace nechto
 			bool result = hub != firstHub();
 			hub = hubPtr(hub).previous();
 			if (!result)
-				setHubNumber(groupPtr(getPurpose()).getSize() - 1);
+				setHubNumber(groupPtr(getPurpose()).getNumberOfHubs() - 1);
 			return result;
 		}
 	public:
@@ -223,24 +223,4 @@ namespace nechto
 	};
 	const portIterator nullPortIterator = portIterator(nullptr, hubPosPair());
 	const groupIterator nullGroupIterator = groupIterator(nullptr, hubPosPair());
-	/*bool pointer::set(nodePtr pointer, nodePtr v1)
-	{
-		if (pointer.subtype() == pointer::Simple)
-		{
-			if (v1.exist())
-				NumHubConnect(pointer, v1, 0);
-			else
-				nearestDisconnect(pointer, 0);
-		}
-		else
-		{
-			hubIterator i0(pointer->connection[0],
-				pointer->getData<pointer::hubPosPair>());
-			if (v1.exist())
-				i0.set(v1);
-			else
-				i0.oneSideDisconnect();
-		}
-		return true;
-	}*/
 }

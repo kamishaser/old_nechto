@@ -4,7 +4,7 @@
 
 #include "hubPtr.h"
 #include "variablePtr.h"
-#include "pointerPtr.h"
+#include "iteratorPtr.h"
 #include "groupPtr.h"
 #include "mathOperator.h"
 #include "object.h"
@@ -18,12 +18,7 @@ namespace nechto
 	{
 		friend class hubManager;
 	public:
-
-		static hubPtr createHub(bool groupHub)
-		{
-			existing<nodePtr> node = allocate(nodeT::Hub, groupHub);
-			return node;
-		}
+		static std::array<i64, 255> numberOfTypedNodes;
 		static i64VariablePtr createI64()
 		{
 			existing<nodePtr> node = allocate(nodeT::Variable, 1);
@@ -43,33 +38,26 @@ namespace nechto
 			else
 				return createF64();
 		}
-		static simplePointerPtr createSimplePointer()
-		{
-			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::Simple);
-			return simplePointerPtr(node);
-		}
 		static portIteratorPtr createPortIterator()
 		{
-			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::PortIter);
+			existing<nodePtr> node = allocate(nodeT::Iterator, iteratorT::PortIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 			return portIteratorPtr(node);
 		}
 		static groupIteratorPtr createGroupIterator()
 		{
-			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::GroupIter);
+			existing<nodePtr> node = allocate(nodeT::Iterator, iteratorT::GroupIter);
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 			return groupIteratorPtr(node);
 		}
-		static pointerPtr createPointer(char subtype)
+		static iteratorPtr createIterator(char subtype)
 		{
 			switch (subtype)
 			{
-			case nechto::pointerT::Simple:
-				return createSimplePointer();
-			case nechto::pointerT::PortIter:
+			case nechto::iteratorT::PortIter:
 				return createPortIterator();
-			case nechto::pointerT::GroupIter:
-				return createPortIterator();
+			case nechto::iteratorT::GroupIter:
+				return createGroupIterator();
 			default:
 				assert(false);
 			}
@@ -108,6 +96,7 @@ namespace nechto
 			hubPtr hub = createHub(1);
 			hub.connect(hub);
 			groupPtr(node).setFirstGroupHub(hub);
+			groupPtr(node).setSize(1);
 			return node;
 		}
 		
@@ -124,7 +113,7 @@ namespace nechto
 				disconnectAllGroup(node);
 				deleteAllGroupHubs(node);
 				break;
-			case nechto::nodeT::Pointer:
+			case nechto::nodeT::Iterator:
 				break;
 			case nechto::nodeT::Variable:
 				break;
@@ -142,11 +131,9 @@ namespace nechto
 			default:
 				break;
 			}
-			node.node()->data = 0;
-			node.node()->type = 0;
-			node.node()->subtype = 0;
 			disconnectAll(node);
 			deleteAllHubs(node);
+			deallocate(node);
 		}
 		static nodePtr createNode(char type, char subtype)
 		{
@@ -154,8 +141,8 @@ namespace nechto
 			{
 			case nechto::nodeT::Group:
 				return createGroup(subtype);
-			case nechto::nodeT::Pointer:
-				return createPointer(subtype);
+			case nechto::nodeT::Iterator:
+				return createIterator(subtype);
 			case nechto::nodeT::Variable:
 				return createVariable(subtype);
 			case nechto::nodeT::Object:
@@ -179,12 +166,17 @@ namespace nechto
 		static existing<nodePtr> allocate(char type, char subtype = 0)
 		{
 			nodePtr node = nodeStorage::terminal.allocate();
+			++(numberOfTypedNodes[static_cast<int>(type)]);
 			node.node()->type = type;
 			node.node()->subtype = subtype;
 			return node;
 		}
 		static void deallocate(existing<nodePtr> node)
 		{
+			--(numberOfTypedNodes[static_cast<int>(node.type())]);
+			node.node()->data = 0;
+			node.node()->type = 0;
+			node.node()->subtype = 0;
 			for (int i = 0; i < 4; ++i)
 				assert(!node.connection(i).exist());
 			nodeStorage::terminal.deallocate(node);
@@ -192,6 +184,11 @@ namespace nechto
 		static void deleteHub(hubPtr hub)
 		{
 			deallocate(hub);
+		}
+		static hubPtr createHub(bool groupHub)
+		{
+			existing<nodePtr> node = allocate(nodeT::Hub, groupHub);
+			return node;
 		}
 		static void deleteAllGroupHubs(groupPtr group)
 		{
@@ -215,4 +212,5 @@ namespace nechto
 			} 
 		}
 	};
+	std::array<i64, 255> creator::numberOfTypedNodes{ 0 };
 }

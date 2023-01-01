@@ -38,7 +38,7 @@ namespace nechto
 		nodePtr()
 			:nodeId() {}
 
-		nodePtr connection(int number) const
+		const nodePtr connection(int number) const
 		{
 			return node()->port[number];
 		}

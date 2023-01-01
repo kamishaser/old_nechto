@@ -89,7 +89,7 @@
     <ClInclude Include="nodePtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="pointerPtr.h">
+    <ClInclude Include="iteratorPtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="namedExCon.h">

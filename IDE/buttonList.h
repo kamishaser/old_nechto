@@ -2,7 +2,7 @@
 #include "button.h"
 #include "namedExConGroup.h"
 #include "visualGroup.h"
-#include "GUI.h"
+//#include "GUI.h"
 
 namespace nechto::ide
 {
@@ -14,24 +14,20 @@ namespace nechto::ide
 		//є2 - последн€€ нажата€ нода
 		//є3 - где используетс€
 	public:
-		//режим выбора. —обыти€ кнопки перехватывает mouseHandler и ставит lClicked
-		bool choiseMode;
 		using clickEventT = std::function<void(buttonList*)>;
 		clickEventT clickEvent = nullptr;
 		
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name,
-			bool choise = false)
-			:namedExConGroup(emptyExternalObject, name), 
-			choiseMode(choise)
+			const std::wstring& name)
+			:namedExConGroup(emptyExternalObject, name)
 		{
 			NumNumConnect(node(), vGroup->node(), 1, 1);
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name, bool choise,
+			const std::wstring& name,
 			std::initializer_list<std::wstring> ilist, 
 			std::wstring firstActive = std::wstring())
-			:buttonList(emptyExternalObject, vGroup, name, choise)			
+			:buttonList(emptyExternalObject, vGroup, name)			
 		{
 			assert(ilist.size() > 0);
 			bool active = false;
@@ -47,10 +43,10 @@ namespace nechto::ide
 			}
 		}
 		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
-			const std::wstring& name, bool choise,
+			const std::wstring& name,
 			const std::vector<std::wstring>& ilist,
 			std::wstring firstActive = std::wstring())
-			:buttonList(emptyExternalObject, vGroup, name, choise)
+			:buttonList(emptyExternalObject, vGroup, name)
 		{
 			assert(ilist.size() > 0);
 			bool active = false;
@@ -65,11 +61,24 @@ namespace nechto::ide
 				}
 			}
 		}
+		buttonList(nodePtr emptyExternalObject, visualGroup* vGroup,
+			const std::wstring& name,
+			std::initializer_list<sharedButton*> ilist)
+			:buttonList(emptyExternalObject, vGroup, name)
+		{
+			assert(ilist.size() > 0);
+			bool active = false;
+			for (auto& button : ilist)
+				addButton(button);
+		}
+		
 		bool visible() const
 		{
-			if (!vNodeGroup())
+			if (vNodeGroup() == nullptr)
 				return false;
-			return vNodeGroup()->node().connection(3).exist();
+			if (!groupPtr::match(vNodeGroup()->getGroup()))
+				return false;
+			return groupOperations::numberOfMembers(groupPtr(vNodeGroup()->getGroup())) > 0;
 		}
 		void hide()
 		{
@@ -82,6 +91,7 @@ namespace nechto::ide
 					hideButton(button);
 			} while (gi.stepForward());
 			nearestDisconnect(vNodeGroup()->node(), 3);
+			std::wcout << vNodeGroup()->numberOfVNodes() << std::endl;
 		}
 		visualGroup* vNodeGroup() const
 		{
@@ -170,4 +180,5 @@ namespace nechto::ide
 		}
 	};
 	const std::wstring buttonList::typeName = L"nechtoIde.buttonList";
+	
 }

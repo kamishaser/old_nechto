@@ -14,8 +14,8 @@ namespace nechto::typeName
 			return L"Hub";
 		case nechto::nodeT::Group:
 			return L"Group";
-		case nechto::nodeT::Pointer:
-			return L"Pointer";
+		case nechto::nodeT::Iterator:
+			return L"Iterator";
 		case nechto::nodeT::Variable:
 			return L"Variable";
 		case nechto::nodeT::Object:
@@ -47,15 +47,13 @@ namespace nechto::typeName
 			return L"error";
 		}		
 	}
-	std::wstring getPointerSubtypeName(char subtype)
+	std::wstring getIteratorSubtypeName(char subtype)
 	{
 		switch (subtype)
 		{
-		case nechto::pointerT::Simple:
-			return L"Simple";
-		case nechto::pointerT::PortIter:
+		case nechto::iteratorT::PortIter:
 			return L"PortIter";
-		case nechto::pointerT::GroupIter:
+		case nechto::iteratorT::GroupIter:
 			return L"GroupIter";
 		default:
 			return L"Error";
@@ -197,8 +195,8 @@ namespace nechto::typeName
 			return L"";
 		case nechto::nodeT::Group:
 			return getGroupSubtypeName(subtype);
-		case nechto::nodeT::Pointer:
-			return getPointerSubtypeName(subtype);
+		case nechto::nodeT::Iterator:
+			return getIteratorSubtypeName(subtype);
 		case nechto::nodeT::Variable:
 			return getVariableSubtypeName(subtype);
 		case nechto::nodeT::Object:

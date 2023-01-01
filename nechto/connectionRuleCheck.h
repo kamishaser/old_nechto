@@ -1,6 +1,6 @@
 #pragma once
 #include "connectionRule.h"
-#include "pointerPtr.h"
+#include "iteratorPtr.h"
 #include "variablePtr.h"
 #include "mathOperator.h"
 #include "text.h"
@@ -17,9 +17,9 @@ namespace nechto
 		bool transited = false;
 		if (!vCon.exist())
 			return nullptr;
-		if (type == nodeT::Pointer && transit(cType[number]))
+		if (type == nodeT::Iterator && transit(cType[number]))
 		{
-			vCon = pointerPtr(vCon).follow();
+			vCon = iteratorPtr(vCon).follow();
 			transited = true;
 			if (!vCon.exist())
 				return nullptr;
@@ -42,29 +42,20 @@ namespace nechto
 			if (type != nodeT::Variable)
 				return nullptr;
 			break;
-		case nechto::connectionRule::AnyPointer:
+		case nechto::connectionRule::AnyIterator:
 			if (!transited)
 				return nullptr;
 			break;
-		case nechto::connectionRule::AnyPointer_NoTransit:
-			if (type != nodeT::Pointer)
-				return nullptr;
-			break;
-		case nechto::connectionRule::SimplePointer_NoTransit:
-			if (type != nodeT::Pointer || subtype != pointerT::Simple)
+		case nechto::connectionRule::AnyIterator_NoTransit:
+			if (type != nodeT::Iterator)
 				return nullptr;
 			break;
 		case nechto::connectionRule::PortIterator_NoTransit:
-			if (type != nodeT::Pointer || subtype != pointerT::PortIter)
+			if (type != nodeT::Iterator || subtype != iteratorT::PortIter)
 				return nullptr;
 			break;
 		case nechto::connectionRule::GroupIterator_NoTransit:
-			if (type != nodeT::Pointer || subtype != pointerT::GroupIter)
-				return nullptr;
-			break;
-		case nechto::connectionRule::AnyIterator_NoTransit:
-			if (type != nodeT::Pointer ||
-				subtype == pointerT::Simple)
+			if (type != nodeT::Iterator || subtype != iteratorT::GroupIter)
 				return nullptr;
 			break;
 		case nechto::connectionRule::Text:

@@ -6,6 +6,8 @@
 #include "keyboardHandler.h"
 #include "selectHandler.h"
 #include "editor.h"
+#include "settingList.h"
+
 
 namespace nechto::ide
 {
@@ -15,14 +17,15 @@ namespace nechto::ide
 	public:
 		GUI& gui;
 		editor& ed;
+		settingList& settings;
 		keyboardHandler keyboard;
 		selectHandler selectH;
 		mouseHandler mouse;
 
 		sharedButton testButton;
 		
-		userH(GUI& g, editor& e)
-		:gui(g), ed(e), selectH(), mouse(g, keyboard, selectH),
+		userH(GUI& g, editor& e, settingList& sl)
+		:gui(g), ed(e), selectH(), mouse(g, keyboard, selectH), settings(sl),
 		testButton(L"testButton")
 		{
 			gui.addButton(&testButton, &gui.bottomGroup);
@@ -32,11 +35,10 @@ namespace nechto::ide
 		{
 			if (testButton.bClickEvent())
 			{
-				if(gui.activeButton.contains(testButton.content()))
-					nearestDisconnect(gui.activeButton.node().connection(0), 
-						testButton.content());
+				if (gui.isButtonActive(&testButton))
+					gui.resetButton(&testButton);
 				else
-					gui.activeButton.addNodeToNearestPort(testButton.node().connection(0));
+					gui.activeButton(&testButton);
 			}
 		}
 
@@ -76,9 +78,12 @@ namespace nechto::ide
 						gui.cursoredParametrs.nodeText =
 						connectionsList(mouse.cursored()->node().connection(0));
 					else;
+				else if (settings.testButton.test())
+					gui.cursoredParametrs.nodeText = getStringNumberOfNodesOfAllTypes();
 				else
-					gui.cursoredParametrs.nodeText = 
-					std::to_wstring(nodeStorage::terminal.numberOfNodes);
+					gui.cursoredParametrs.nodeText =
+					std::to_wstring(nodeStorage::terminal.numberOfNodes) + L"\n" +
+					std::to_wstring(object::numberOfObjects);
 			}
 			else
 			{

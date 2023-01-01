@@ -6,6 +6,7 @@
 #include "vnDataUpdateH.h"
 #include "fileHandler.h"
 #include "editor.h"
+#include "settingList.h"
 #include <iostream>
 
 namespace nechto::ide
@@ -23,15 +24,17 @@ namespace nechto::ide
 		autoExpandHandler aeh;
 		fileHandler fh;
 		userH uh;
+		settingList sl;
 		
 
 		
 
 		nechtoIDE()
 			:vduh(gui), ed(gui, uh.selectH),
-			uh(gui, ed),
+			uh(gui, ed, sl),
 			aeh(gui),
-			fh(gui)
+			fh(gui),
+			sl(gui)
 		{
 			fh.load(L"autosave.nechto");
 		}

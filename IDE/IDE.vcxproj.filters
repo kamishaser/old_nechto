@@ -24,6 +24,9 @@
     <Filter Include="Исходные файлы\visual\visualGroup">
       <UniqueIdentifier>{9e21a627-55ca-4d1f-9840-8b9bd169ec6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\display\button">
+      <UniqueIdentifier>{a4e601cc-19e0-41a9-a332-248670b7a1c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
@@ -68,9 +71,6 @@
     <ClInclude Include="selectHandler.h">
       <Filter>Исходные файлы\handler\userH</Filter>
     </ClInclude>
-    <ClInclude Include="button.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
     <ClInclude Include="display.h">
       <Filter>Исходные файлы\display</Filter>
     </ClInclude>
@@ -101,8 +101,17 @@
     <ClInclude Include="editor.h">
       <Filter>Исходные файлы\handler\userH</Filter>
     </ClInclude>
+    <ClInclude Include="settingList.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
     <ClInclude Include="buttonList.h">
-      <Filter>Исходные файлы\display</Filter>
+      <Filter>Исходные файлы\display\button</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>Исходные файлы\display\button</Filter>
+    </ClInclude>
+    <ClInclude Include="dipSwitch.h">
+      <Filter>Исходные файлы\display\button</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

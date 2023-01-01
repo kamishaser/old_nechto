@@ -65,8 +65,7 @@ namespace nechto::ide
 					if (i != 3)
 					{
 						for (int i1 = i; i1 < 3; ++i1)
-							vls.connection(i1) = vls.connection(i1 + 1);
-						vls.connection(3) = nullptr;
+							connecter::swap(portIterator(vls, i1 + 1), portIterator(vls, i1));
 					}
 					if (numberOfLastSelected >= i)
 						--numberOfLastSelected;
@@ -110,19 +109,15 @@ namespace nechto::ide
 		void lsForwardShift()
 		{
 			nodePtr vls = lastSelectedNode.node();
-			nodePtr temp = vls.connection(3);
 			for (int i = 2; i >= 0; --i)
-				vls.connection(i + 1) = vls.connection(i);
-			vls.connection(0) = temp;
+				connecter::swap(portIterator(vls, i + 1), portIterator(vls, i));
 		}
 		//сдвиг последних выделенных назад
 		void lsBackShift()
 		{
 			nodePtr vls = lastSelectedNode.node();
-			nodePtr temp = vls.connection(0);
 			for (int i = 0; i < 3; ++i)
-				vls.connection(i) = vls.connection(i + 1);
-			vls.connection(3) = temp;
+				connecter::swap(portIterator(vls, i + 1), portIterator(vls, i));
 		}
 	};
 }

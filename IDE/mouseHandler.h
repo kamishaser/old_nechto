@@ -180,7 +180,7 @@ namespace nechto::ide
 			{
 				button->update(status);
 				auto bList = getObject<buttonList>(button->getList());
-				if (bList && bList->choiseMode)
+				if (bList)
 					if (button->bClickEvent())
 					{
 						bList->click(button);

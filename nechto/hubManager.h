@@ -47,6 +47,8 @@ namespace nechto
 			hubPtr previous = begin.getHPPair().hub;
 			hubPtr next = previous.hub();
 			ui32 hubNumber = begin.getHubNumber();
+			groupPtr group(begin.getPurpose());
+			group.setSize(group.getNumberOfHubs() + quantity);
 			//цикл создания и вставки хабов
 			for (int i = 0; i < quantity; ++i)
 			{
@@ -214,6 +216,8 @@ namespace nechto
 					return false;
 				bool result = erase();
 				close(result);
+				groupPtr group(begin.getPurpose());
+				group.setSize(group.getNumberOfHubs() - quantity);
 				return result;
 			}
 			bool eraseWithNotification()
@@ -222,6 +226,8 @@ namespace nechto
 					return false;
 				bool result = erase();
 				close(result);
+				groupPtr group(begin.getPurpose());
+				group.setSize(group.getNumberOfHubs() - quantity);
 				notify();
 				return result;
 			}

@@ -149,6 +149,7 @@
     <ClInclude Include="autoExpandHandler.h" />
     <ClInclude Include="button.h" />
     <ClInclude Include="buttonList.h" />
+    <ClInclude Include="dipSwitch.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="fileHandler.h" />
     <ClInclude Include="GUI.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="display.h" />
     <ClInclude Include="rect.h" />
     <ClInclude Include="selectHandler.h" />
+    <ClInclude Include="settingList.h" />
     <ClInclude Include="textInputBox.h" />
     <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />

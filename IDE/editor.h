@@ -13,7 +13,6 @@ namespace nechto::ide
 		
 		GUI& gui;
 		selectHandler& sh;
-		namedExCon eCon{ L"editor" };
 		//№0 bList
 		char creatingType = nodeT::Text;
 		char creatingSubtype = 0;
@@ -26,7 +25,7 @@ namespace nechto::ide
 		buttonList nList{ creator::createObject(1), 
 			new consistentGroup(creator::createObject(1),
 				L"тип создаваемой ноды", glm::vec2(100.f, 10.f)),
-				L"тип создаваемой ноды", true, {
+				L"тип создаваемой ноды", {
 				L"Text",
 				L"I64",
 				L"F64",
@@ -36,7 +35,7 @@ namespace nechto::ide
 		buttonList c1List{ creator::createObject(1),
 			new consistentGroup(creator::createObject(1),
 				L"тип создаваемого соединения 1", glm::vec2(100.f, 30.f)),
-			L"тип создаваемого соединения 1", true, {
+			L"тип создаваемого соединения 1", {
 				L"Hub",
 				L"Group",
 				L"N0",
@@ -46,7 +45,7 @@ namespace nechto::ide
 		buttonList c2List{ creator::createObject(1),
 			new consistentGroup(creator::createObject(1),
 				L"тип создаваемого соединения 2", glm::vec2(100.f, 30.f)),
-			L"тип создаваемого соединения 2", true, {
+			L"тип создаваемого соединения 2", {
 				L"Hub",
 				L"Group",
 				L"N0",
@@ -56,42 +55,47 @@ namespace nechto::ide
 
 		buttonList mathOperatorList{ creator::createObject(1),
 			new consistentGroup(creator::createObject(1),
-				L"математический оператор", glm::vec2(100.f, 30.f)),
-			L"математический оператор", true, 
+				L"математический оператор", glm::vec2(100.f, 60.f)),
+			L"математический оператор", 
 			typeName::getTypeNameList(typeName::getMathOperatorShortSubtypeName, 
 				mathOperatorT::Decrement+1) };
 		editor(GUI& g, selectHandler& shandler)
 			:gui(g), sh(shandler)
 		{
-			setbList(nList, [&](buttonList* bList)
+			gui.setbList(nList, [&](buttonList* bList)
 				{
 					auto vNode = getObject<visualNode>(
 						bList->lClicked()->node().connection(0));
 
 					const std::wstring& name = bList->lClicked()->name;
-					if (name == L"Text")
-						setActiveTypeAndSubtype(nodeT::Text);
-					else if (name == L"I64")
-						setActiveTypeAndSubtype(nodeT::Variable, 1);
-					else if (name == L"F64")
-						setActiveTypeAndSubtype(nodeT::Variable, 0);
-					else if (name == L"If")
-						setActiveTypeAndSubtype(nodeT::Condition);
-					else if (name == L"Group")
-						setActiveTypeAndSubtype(nodeT::Group);
-					else if (name == L"MathOperator")
+					if (name == L"MathOperator")
 					{
 						setActiveTypeAndSubtype(nodeT::MathOperator, 
 							creatingMathOperatorSubtype);
-						mathOperatorList.show(&gui.interfaceBoard);
+						if(!mathOperatorList.visible())
+							mathOperatorList.show(&gui.interfaceBoard);
 						auto vGroup = getObject<visualGroup>(mathOperatorList.getGroup());
 						if (vGroup)
 						{
 							vGroup->frame.size = vNode->frame.size + glm::vec2(0.f, 30.f);
 						}
 					}
+					else
+					{
+						gui.hideAllActiveDropLists();
+						if (name == L"Text")
+							setActiveTypeAndSubtype(nodeT::Text);
+						else if (name == L"I64")
+							setActiveTypeAndSubtype(nodeT::Variable, 1);
+						else if (name == L"F64")
+							setActiveTypeAndSubtype(nodeT::Variable, 0);
+						else if (name == L"If")
+							setActiveTypeAndSubtype(nodeT::Condition);
+						else if (name == L"Group")
+							setActiveTypeAndSubtype(nodeT::Group);
+					}
 				});
-			setbList(c2List, [&](buttonList* bList)
+			gui.setbList(c2List, [&](buttonList* bList)
 			{
 					const std::wstring& name = bList->lClicked()->name;
 					if (name == L"Hub")
@@ -107,7 +111,7 @@ namespace nechto::ide
 					else if (name == L"N3")
 						con2Type = conType::N3;
 			});
-			setbList(c1List, [&](buttonList* bList)
+			gui.setbList(c1List, [&](buttonList* bList)
 				{
 					const std::wstring& name = bList->lClicked()->name;
 					if (name == L"Hub")
@@ -124,7 +128,7 @@ namespace nechto::ide
 						con1Type = conType::N3;
 				});
 
-			setDropList(mathOperatorList, [&](buttonList* bList)
+			gui.setDropList(mathOperatorList, [&](buttonList* bList)
 				{
 					const std::wstring& name = bList->lClicked()->name;
 					for (int i = 0; i < (mathOperatorT::Decrement + 1); ++i)
@@ -185,43 +189,15 @@ namespace nechto::ide
 
 		}
 		private:
-		void setbList(buttonList& list, 
-			buttonList::clickEventT clickEvent = nullptr)
-		{
-			auto vGroup = list.vNodeGroup();
-
-			gui.interfaceBoard.addGroup(getObjectPtr<visualGroup>(vGroup));
-			gui.topGroup.addGroup(getObjectPtr<visualGroup>(vGroup));
-			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
-			if (cGroup)
-				cGroup->mode.horisontal = true;
-			NumHubConnect(list.node(), eCon.node(), 3);
-			list.clickEvent = clickEvent;
-			list.show(&gui.interfaceBoard);
-		}
-		void setDropList(buttonList& list,
-			buttonList::clickEventT clickEvent = nullptr)
-		{
-			auto vGroup = list.vNodeGroup();
-			gui.interfaceBoard.addGroup(getObjectPtr(vGroup));
-			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
-			if (cGroup)
-			{
-				cGroup->distance = 5;
-			}
-			NumHubConnect(list.node(), eCon.node(), 3);
-			list.clickEvent = [clickEvent](buttonList* list)
-			{
-				clickEvent(list);
-				list->hide();
-			};
-		}
+		
 		void setActiveTypeAndSubtype(char type, char subtype = 0)
 		{
 			creatingType = type;
 			creatingSubtype = subtype;
 		}
-		void hideActiveDropList()
-		{}
+		void hideAllActiveDropLists()
+		{
+			mathOperatorList.hide();
+		}
 	};	
 }

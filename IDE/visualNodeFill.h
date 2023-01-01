@@ -43,10 +43,8 @@ namespace nechto::ide
 				break;
 			case nodeT::Method:
 				vn1->nodeText = L"не доделал имена методов";
-			case nodeT::Pointer:
-				if(subtype == pointerT::Simple)
-					vn1->nodeText = L"*s";
-				else if (subtype == pointerT::PortIter)
+			case nodeT::Iterator:
+				if (subtype == iteratorT::PortIter)
 					vn1->nodeText = L"*p";
 				else
 					vn1->nodeText = L"*g";
@@ -83,7 +81,7 @@ namespace nechto::ide
 				vn->nShape = circle();
 				break;
 			case nodeT::Variable:
-			case nodeT::Pointer:
+			case nodeT::Iterator:
 				vn->nShape = octagon();
 				break;
 			default:

@@ -32,7 +32,7 @@ namespace nechto
 		{
 			return existing<nodePtr>(getData<hubPosPair>().hub);
 		}
-		int32_t getSize() const
+		int32_t getNumberOfHubs() const
 		{
 			return getData<hubPosPair>().getGlobalPos();
 		}

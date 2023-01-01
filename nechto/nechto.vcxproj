@@ -161,7 +161,7 @@
     <ClInclude Include="nodeOperationSet.h" />
     <ClInclude Include="nodePtr.h" />
     <ClInclude Include="nodeStorage.h" />
-    <ClInclude Include="pointerPtr.h" />
+    <ClInclude Include="iteratorPtr.h" />
     <ClInclude Include="serializer.h" />
     <ClInclude Include="text.h" />
     <ClInclude Include="textOut.h" />

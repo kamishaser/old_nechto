@@ -1,7 +1,7 @@
 #pragma once
 #include "typeDeclarations.h"
 #include "nodePtr.h"
-#include "pointerPtr.h"
+#include "iteratorPtr.h"
 #include "connectionIterator.h"
 
 #include "creator.h"
@@ -55,13 +55,13 @@ namespace nechto
 		static void resetIterator(existing<iterator> iter)
 		{
 			existing<nodePtr> node = iter.getHPPair().hub;
-			if (node.type() == nodeT::Pointer &&
+			if (node.type() == nodeT::Iterator &&
 				(iter.getLocalPos() == 0) && (node.subtype() > 0))
-				pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
+				iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 		}
 		static bool groupConnectProhibition(groupIterator gi, iterator iter)
 		{
-			if (iter.hub.type() == nodeT::Pointer)
+			if (iter.hub.type() == nodeT::Iterator)
 				if (iter.getGlobalPos() == 0)
 					return true;
 			return false;

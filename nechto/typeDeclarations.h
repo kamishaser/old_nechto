@@ -116,7 +116,7 @@ namespace nechto
 			Deleted,
 			Hub = 1,				//разветвитель
 			Group = 2,				//группа объектов
-			Pointer = 3,			//указатель на объект
+			Iterator = 3,			//указатель на объект
 			Variable = 4,			//объект-переменная базового типа
 			Object = 5,		//внешний объект
 			Text = 6,				//текст
@@ -134,8 +134,6 @@ namespace nechto
 	class i64VariablePtr;
 	class f64VariablePtr;
 	class variablePtr;
-	class pointerPtr;
-	class simplePointerPtr;
 	class iteratorPtr;
 	class portIteratorPtr;
 	class groupIteratorPtr;
@@ -210,11 +208,10 @@ namespace nechto
 			Decrement,		// --
 		};
 	}
-	namespace pointerT
+	namespace iteratorT
 	{
 		enum Type :char
 		{
-			Simple = 0,//одиночная ссылка
 			PortIter,//итератор соединений
 			GroupIter//итератор массива
 		};
@@ -238,7 +235,7 @@ namespace nechto
 		case nodeT::Variable:
 		case nodeT::Text:
 		case nodeT::Group:
-		case nodeT::Pointer:
+		case nodeT::Iterator:
 			return true;
 		default:
 			return false;

@@ -51,7 +51,7 @@ namespace nechto
 		}
 		i64 size() const
 		{
-			return groupPtr(getGroup()).getSize();
+			return groupOperations::numberOfMembers(groupPtr(getGroup()));
 		}
 	};
 }
