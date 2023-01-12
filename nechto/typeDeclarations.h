@@ -25,6 +25,8 @@ namespace nechto
 	class portIterator;
 	class groupIterator;
 
+	class garbageCollector;
+
 	class serializer;
 	class deserializer;
 
@@ -59,6 +61,7 @@ namespace nechto
 		friend class nodeStorage::threadLocalAllocator;
 		friend class nodeStorage::nodeAllocator;
 		friend class nodePtr;
+		friend class garbageCollector;
 		friend struct nodeData;
 
 		void operator=(std::nullptr_t)
@@ -93,11 +96,11 @@ namespace nechto
 	struct nodeData
 	{
 		i64 data = 0;
+		ushort bottomLevel = 0;
 		char type = 0;
 		char subtype = 0;
-
-		nodeId port[4];
 		nodeId hubPort;
+		nodeId port[4];
 	};
 
 	template <class TCon>

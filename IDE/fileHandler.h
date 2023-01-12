@@ -6,10 +6,11 @@
 
 namespace nechto::ide
 {
-	class fileHandler//нярнпнфмн, йсвю йняршкеи!!
+	class fileHandler//нярнпнфмн, пняяшох йняршкеи!!
 	{
 		GUI& gui;
-		periodLimiter plim{ 6000ms };
+		periodLimiter plim{ 60000ms };
+
 	public:
 		fileHandler(GUI& g)
 			:gui(g) {}

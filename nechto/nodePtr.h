@@ -7,6 +7,9 @@ namespace nechto
 	class hubPtr;
 	class nodePtr : public nodeId
 	{		
+		nodePtr(ushort f, ushort s)
+			:nodeId(f, s)
+		{}
 	protected:
 		auto* node() const
 		{
@@ -33,6 +36,7 @@ namespace nechto
 		friend class serializer;
 		friend class deserializer;
 		friend class nodeOperator;
+		friend class garbageCollector;
 	public:
 		nodePtr(nodeId id)
 			:nodeId(id) {}
