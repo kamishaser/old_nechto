@@ -19,6 +19,7 @@ namespace nechto
 	class creator;
 	class hubManager;
 	class compressor;
+	class nodeOperator;
 
 	struct iterator;
 	class portIterator;
@@ -111,22 +112,45 @@ namespace nechto
 	};
 	namespace nodeT
 	{
-		enum Type :char//список типов нод
+		
+		enum Type //список типов нод
 		{
-			Deleted,
-			Hub = 1,				//разветвитель
-			Group = 2,				//группа объектов
-			Iterator = 3,			//указатель на объект
-			Variable = 4,			//объект-переменная базового типа
-			Object = 5,		//внешний объект
-			Text = 6,				//текст
+			Deleted
+			= 0,	//удалённый, несуществующий объект
+			Hub 
+			= 1,	//разветвитель
+			Group 
+			= 2,	//группа объектов
+			Iterator 
+			= 3,	//указатель на объект
+			Struct 
+			= 4,	//структурная нода
+			Variable 
+			= 5,	//объект-переменная базового типа
 
-			MathOperator = 65,		//математический оператор
-			Condition = 66,			//if
-			Method = 67,			//метод Object
-			
-			NodeOperator,			//узловой оператор
-		};
+			Object 
+			= 6,	//внешний объект
+			Text 
+			= 7,	//текст
+
+			MathOperator
+			= 128,	//математический оператор
+			Condition 
+			= 129,	//if
+			Method 
+			= 130,	//метод Object
+			ConnectionOperation
+			= 131,	//операция подключения
+			CreationOperation
+			= 132,	//операция создания
+			IterationOperation
+			= 133,	//операция перемещения итератора
+			HubManagementOperation
+			= 134,	//операции с хабами
+			readingOperation
+			= 135,	//операция считывание информации
+
+		};//до 127 - объекты, после - операции
 	}
 
 	class nullNodePtrT;
@@ -149,7 +173,7 @@ namespace nechto
 
 	namespace variableT
 	{
-		enum Type :char
+		enum Type 
 		{
 			F64 = 0,//false
 			I64 = 1 //true
@@ -157,7 +181,7 @@ namespace nechto
 	}
 	namespace objectT
 	{
-		enum Type :char
+		enum Type 
 		{
 			NotOwning = 0,//false
 			Owning = 1 //true
@@ -165,7 +189,7 @@ namespace nechto
 	}
 	namespace textT
 	{
-		enum Type :char
+		enum Type
 		{
 			NotOwning = 0,//false
 			Owning = 1 //true
@@ -173,7 +197,7 @@ namespace nechto
 	}
 	namespace groupT
 	{
-		enum Type :char
+		enum Type
 		{
 			weak = 0,//false
 			strong = 1 //true
@@ -181,7 +205,7 @@ namespace nechto
 	}
 	namespace mathOperatorT
 	{
-		enum Type :char
+		enum Type
 		{
 			Assigment,		// =
 			UnaryMinus,		// 0-
@@ -210,7 +234,7 @@ namespace nechto
 	}
 	namespace iteratorT
 	{
-		enum Type :char
+		enum Type
 		{
 			PortIter,//итератор соединений
 			GroupIter//итератор массива
@@ -240,6 +264,10 @@ namespace nechto
 		default:
 			return false;
 		}
+	}
+	bool isOperation(char type)
+	{
+		return(type > 127);
 	}
 	void pConList(nodePtr v1, std::wstring header = std::wstring(L"list of connections"));
 }

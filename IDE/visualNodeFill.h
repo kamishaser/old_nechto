@@ -77,7 +77,6 @@ namespace nechto::ide
 				vn->nShape = rhombe();
 				break;
 			case nodeT::MathOperator:
-			case nodeT::NodeOperator:
 				vn->nShape = circle();
 				break;
 			case nodeT::Variable:

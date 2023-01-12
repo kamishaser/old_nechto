@@ -30,8 +30,8 @@ namespace nechto::ide
 		visualNode cursoredConnections{ creator::createObject(0)};
 		visualNode textBoxNode{ creator::createObject(0)};
 		textInputBox  textBox;
-
-
+		
+		std::map<std::wstring, namedExCon> parameterSet;//список параметров nechto
 		
 		namedExConGroup dropListGroup{ creator::createObject(0), L"dropList" };
 

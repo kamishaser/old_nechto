@@ -10,11 +10,11 @@ namespace nechto::ide
 	//к третьему подключается vCon из nodeBoard
 	class visualConnection :public object
 	{
-		visualConnection() :object() {}
+		
 	public:
 		std::wstring fText = L"h";
 		std::wstring sText = L"h";
-
+		visualConnection() :object() {}
 		static objectPtr<visualConnection> create(
 			objectPtr<visualNode> vn0, objectPtr<visualNode> vn1)
 		{
@@ -47,6 +47,10 @@ namespace nechto::ide
 		virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
+		}
+		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
+		{
+			buffer.clear();
 		}
 	};
 	const std::wstring visualConnection::typeName = L"nechtoIde.visualConnection";

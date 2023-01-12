@@ -20,7 +20,7 @@ namespace nechto
 			return *static_cast<TCon*>(static_cast<void*>(&temp));
 		}
 		template <class TCon>
-		void setData(TCon Data) //запись данных в формате TCon
+		void setData(TCon Data) const //запись данных в формате TCon
 		{
 			assert(sizeof(TCon) <= sizeof(i64));
 			i64 temp = *static_cast<i64*>(static_cast<void*>(&Data));
@@ -32,6 +32,7 @@ namespace nechto
 		friend class hubPtr;
 		friend class serializer;
 		friend class deserializer;
+		friend class nodeOperator;
 	public:
 		nodePtr(nodeId id)
 			:nodeId(id) {}

@@ -45,6 +45,8 @@ namespace nechto
 
 		void serialize(nodePtr v1)
 		{
+			if (!v1.exist())
+				return;
 			serialezeStage stage = serialezeStage::nodeBegin;
 			writeByPointer(&stage);
 			writeByValue(v1);//запись адреса
@@ -60,6 +62,10 @@ namespace nechto
 				break;
 			case nodeT::Group:
 				writeGroup(v1);
+				break;
+			case nodeT::Object:
+				writeObject(v1);
+				break;
 			default:
 				break;
 			}

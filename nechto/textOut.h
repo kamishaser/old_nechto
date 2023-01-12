@@ -94,7 +94,7 @@ namespace nechto
 		for (int i = 0; i < 4; ++i)
 			std::wcout << to_string(v1.connection(i)) << std::endl;
 	}
-	std::wstring getStringNumberOfNodes(char type)
+	std::wstring getStringNumberOfNodes(int type)
 	{
 		return typeName::getTypeName(type) + L": " + std::to_wstring(creator::numberOfTypedNodes[type]) + L"\n";
 	}

@@ -28,8 +28,6 @@ namespace nechto::typeName
 			return L"Condition";
 		case nechto::nodeT::Method:
 			return L"Method";
-		case nechto::nodeT::NodeOperator:
-			return L"NodeOperator";
 		default:
 			return L"Error";
 			//return L"";
@@ -208,8 +206,6 @@ namespace nechto::typeName
 		case nechto::nodeT::Condition:
 			return L"";
 		case nechto::nodeT::Method:
-			return L"";
-		case nechto::nodeT::NodeOperator:
 			return L"";
 		default:
 			return L"???";

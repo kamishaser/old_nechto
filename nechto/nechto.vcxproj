@@ -143,6 +143,7 @@
     <ClInclude Include="connectionRule.h" />
     <ClInclude Include="connectionRuleCheck.h" />
     <ClInclude Include="creator.h" />
+    <ClInclude Include="garbageCollector.h" />
     <ClInclude Include="group.h" />
     <ClInclude Include="hubManager.h" />
     <ClInclude Include="hubPosPair.h" />

@@ -126,8 +126,6 @@ namespace nechto
 				break;
 			case nechto::nodeT::Method:
 				break;
-			case nechto::nodeT::NodeOperator:
-				break;
 			default:
 				break;
 			}

@@ -46,7 +46,7 @@ namespace nechto
 	{
 	protected:
 		
-		void setObjectPtr(object* obj)
+		void setObjectPtr(object* obj) const
 		{
 			setData<object*>(obj);
 		}
@@ -110,6 +110,13 @@ namespace nechto
 		object& operator->() const
 		{
 			return *getObjectPtr();
+		}
+		void swapData(const nonTypedObjectPtr& node)
+		{
+			assert(isUniqueOwner() == node.isUniqueOwner());
+			object* temp = getObjectPtr();
+			setObjectPtr(node.getObjectPtr());
+			node.setObjectPtr(temp);
 		}
 	};
 	using ntObj = nonTypedObjectPtr;

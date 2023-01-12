@@ -107,6 +107,9 @@
     <ClInclude Include="hubPtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
+    <ClInclude Include="garbageCollector.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="список задач.txt" />

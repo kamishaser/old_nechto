@@ -45,11 +45,6 @@ namespace nechto::ide
 			temp = temp.connection(0);
 			return temp;
 		}
-		virtual ~visualNode()
-		{
-			std::wcout << L"vNode deleted" << std::endl;
-			
-		}
 		const static std::wstring typeName;
 		const static staticNodeOperationSet methodSet;
 		virtual const std::wstring& getTypeName() const override
@@ -60,6 +55,22 @@ namespace nechto::ide
 		{
 			return methodSet.getOperation(number);
 		}
+		
+		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
+		{
+			frect temp{ frame.position.x, frame.position.y, frame.size.x, frame.size.y };
+			buffer.resize(sizeof(frect));
+			char* t = reinterpret_cast<char*>(&temp);
+			for (int i = 0; i < sizeof(frect); ++i)
+				buffer[i] = t[i];
+		}
+		struct frect
+		{
+			float posx;
+			float posy;
+			float sizex;
+			float sizey;
+		};
 	};
 	const std::wstring visualNode::typeName = L"nechtoIde.visualNode";
 	const staticNodeOperationSet visualNode::methodSet{};

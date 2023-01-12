@@ -45,6 +45,19 @@ namespace nechto
 		{
 			return name;
 		}
+		void reconnect(nonTypedObjectPtr node)
+		{
+			if (!exConNode.exist())
+			{
+				assert(!node.isUniqueOwner());
+				node.set(this);
+			}
+			else
+			{
+				node.swapData(nonTypedObjectPtr(exConNode));
+			}
+			exConNode = node;
+		}
 	};
 
 	std::wstring getUstrObjectData(nonTypedObjectPtr objectNode)

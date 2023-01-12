@@ -113,7 +113,10 @@ namespace nechto::ide
 		{
 			return methodSet.getOperation(number);
 		}
-
+		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
+		{
+			buffer.clear();
+		}
 	};
 	const std::wstring nodeBoard::typeName = L"nechtoIde.nodeBoard";
 	const staticNodeOperationSet nodeBoard::methodSet

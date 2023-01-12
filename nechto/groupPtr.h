@@ -44,5 +44,11 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
+		bool isStrong()
+		{
+			if (subtype() == groupT::strong)
+				return true;
+			return false;
+		}
 	};
 }

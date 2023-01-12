@@ -40,7 +40,7 @@ namespace nechto::ide
 		}
 		~nechtoIDE()
 		{
-			fh.save(L"autosave.nechto", gui.workBoard.vNodeGroup());
+			fh.save(L"autosave.nechto");
 		}
 		bool update()
 		{
@@ -48,6 +48,7 @@ namespace nechto::ide
 			ed.update();
 			aeh.update();
 			vduh.update();
+			fh.update();
 			
 			return gui.update();
 

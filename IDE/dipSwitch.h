@@ -9,6 +9,7 @@ namespace nechto::ide
 		GUI& gui;
 		sharedButton button;
 		bool status = false;
+		
 	public:
 		dipSwitch(GUI& g, const std::wstring& name)
 			:gui(g), button(name)
