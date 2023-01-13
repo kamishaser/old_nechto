@@ -107,7 +107,7 @@ namespace nechto
 		buffer += getStringNumberOfNodes(nodeT::Variable);
 		buffer += getStringNumberOfNodes(nodeT::Object);
 		buffer += getStringNumberOfNodes(nodeT::Text);
-		buffer += getStringNumberOfNodes(nodeT::MathOperator);
+		buffer += getStringNumberOfNodes(nodeT::MathOperation);
 		buffer += getStringNumberOfNodes(nodeT::Condition);
 		buffer += getStringNumberOfNodes(nodeT::Method);
 		return buffer;

@@ -14,6 +14,8 @@ namespace nechto
 		{
 			if (node.type() == nodeT::Deleted)
 				return false;
+			if (node.type() == nodeT::Hub)
+				return false;
 			ushort level = getNodeLevel(node);
 			if (level == 0)
 			{

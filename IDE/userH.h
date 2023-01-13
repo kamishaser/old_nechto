@@ -71,6 +71,8 @@ namespace nechto::ide
 					selectH.selectGroup(gui.workBoard.vNodeGroup());
 				if (keyboard[sf::Keyboard::R].bClickEvent())//рандомное смещение всех
 					randomOfsetSelected();
+				if (keyboard[sf::Keyboard::T].bClickEvent())//ввод текста для команды
+					gui.textBox.focus(L"введите текст", nullptr);
 				//if (keyboard[sf::Keyboard::S].bClickEvent())//выполнение помледнего выделенного действия
 				//	operateLSelected();
 				if (keyboard[sf::Keyboard::Tab].isPressed())//описание соединений
@@ -105,7 +107,7 @@ namespace nechto::ide
 			nodePtr v1 = vNode1->node().connection(0);
 			if (v1.exist())
 			{
-				gui.textBox.focus(vNode1);
+				gui.textBox.focus(L"введите данные ноды", vNode1);
 			}
 		}
 		void deleteAllSelected()

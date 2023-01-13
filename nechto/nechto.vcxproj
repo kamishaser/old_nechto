@@ -157,7 +157,7 @@
     <ClInclude Include="connectionIterator.h" />
     <ClInclude Include="hubPtr.h" />
     <ClInclude Include="namedExCon.h" />
-    <ClInclude Include="mathOperator.h" />
+    <ClInclude Include="mathOperation.h" />
     <ClInclude Include="namedExConGroup.h" />
     <ClInclude Include="nodeOperationSet.h" />
     <ClInclude Include="nodePtr.h" />

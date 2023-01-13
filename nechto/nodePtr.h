@@ -47,12 +47,12 @@ namespace nechto
 		{
 			return node()->port[number];
 		}
-		char type() const
+		unsigned char type() const
 		{
 			return node()->type;
 		}
 
-		char subtype() const
+		unsigned char subtype() const
 		{
 			return node()->subtype;
 		}
@@ -79,19 +79,19 @@ namespace nechto
 	{
 		{node}->std::convertible_to<nodePtr>;
 	};
-	bool typeCompare(nodePtr v1, char type)
+	bool typeCompare(nodePtr v1, unsigned char type)
 	{
 		if (!v1.exist())
 			return false;
 		return (v1.type() == type);
 	}
-	bool subtypeCompare(nodePtr v1, char subtype)
+	bool subtypeCompare(nodePtr v1, unsigned char subtype)
 	{
 		if (!v1.exist())
 			return false;
 		return (v1.subtype() == subtype);
 	}
-	bool typeSubtypeCompare(nodePtr v1, char type, char subtype)
+	bool typeSubtypeCompare(nodePtr v1, unsigned char type, unsigned char subtype)
 	{
 		if (!v1.exist())
 			return false;

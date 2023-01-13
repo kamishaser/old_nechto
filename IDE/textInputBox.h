@@ -45,7 +45,7 @@ namespace nechto::ide
 		}
 		
 		i64 limit = 1000;
-		std::wstring header = L"ввод текста";
+		std::wstring header = L"_____";
 		std::wstring iText;
 
 		textInputBox(objectPtr<visualNode> v1)
@@ -89,31 +89,37 @@ namespace nechto::ide
 			updateBox();
 			updateAim();
 		}
-		void focus(visualNode* vNode)
+		void focus(const std::wstring& explanation, visualNode* vNode = nullptr)
 		{
 			reset();
 			Focus = true;
 			iText.clear();
-			nodePtr v1 = vNode->node().connection(0);
-			if (vNode && v1.exist() && 
-				(typeCompare(v1, nodeT::Text) || typeCompare(v1, nodeT::Variable)))
+			header = explanation;
+			if (vNode != nullptr)
 			{
-				switch (v1.type())
+				nodePtr v1 = vNode->node().connection(0);
+				if (vNode && v1.exist() &&
+					(typeCompare(v1, nodeT::Text) || typeCompare(v1, nodeT::Variable)))
 				{
-				case nodeT::Text:
-					iText = textPtr(v1);
-					break;
-				case nodeT::Variable:
-					if (v1.subtype())
-						iText = std::to_wstring((i64)i64VariablePtr(v1));
-					else
-						iText = std::to_wstring((f64)f64VariablePtr(v1));
-					break;
-				default:
-					return;
+					switch (v1.type())
+					{
+					case nodeT::Text:
+						iText = textPtr(v1);
+						break;
+					case nodeT::Variable:
+						if (v1.subtype())
+							iText = std::to_wstring((i64)i64VariablePtr(v1));
+						else
+							iText = std::to_wstring((f64)f64VariablePtr(v1));
+						break;
+					default:
+						return;
+					}
+					NumHubConnect(node(), vNode->node(), 1);
 				}
-				NumHubConnect(node(), vNode->node(), 1);
 			}
+			updateBox();
+			updateAim();
 		}
 		bool hasFocus()
 		{
@@ -121,6 +127,7 @@ namespace nechto::ide
 		}
 		bool reset()
 		{
+			header = L"_____";
 			if (hasFocus())
 			{
 				Focus = false;
@@ -145,9 +152,7 @@ namespace nechto::ide
 	private:
 		void updateBox()
 		{
-			box()->nodeText = header +
-				std::wstring((hasFocus()) ? L" *\n" : L" -\n") +
-				iText;
+			box()->nodeText = header + L"\n" + iText;
 		}
 		void updateAim()
 		{

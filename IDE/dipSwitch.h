@@ -1,6 +1,7 @@
 #pragma once
 #include "buttonList.h"
 #include "GUI.h"
+#include <functional>
 
 namespace nechto::ide
 {
@@ -9,10 +10,12 @@ namespace nechto::ide
 		GUI& gui;
 		sharedButton button;
 		bool status = false;
-		
+		using clickEvent = std::function<void(objectPtr<sharedButton>)>;
+		clickEvent bclickEvent;
+		clickEvent eclickEvent;
 	public:
-		dipSwitch(GUI& g, const std::wstring& name)
-			:gui(g), button(name)
+		dipSwitch(GUI& g, const std::wstring& name, clickEvent bce = nullptr, clickEvent ece = nullptr)
+			:gui(g), button(name), bclickEvent(bce), eclickEvent(ece)
 		{}
 		sharedButton* getButton()
 		{
@@ -55,9 +58,17 @@ namespace nechto::ide
 		bool updateStatus()//обновление статуса кнопки
 		{//позволяет синзранизировать status и связь при некоректном переключении
 			if (gui.isButtonActive(&button))
+			{
 				status = true;
+				if (bclickEvent != nullptr)
+					bclickEvent(button.node());
+			}
 			else
+			{
 				status = false;
+				if (eclickEvent != nullptr)
+					eclickEvent(button.node());
+			}
 		}
 	};
 }

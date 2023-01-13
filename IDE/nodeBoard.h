@@ -109,7 +109,7 @@ namespace nechto::ide
 		{
 			return typeName;
 		}
-		virtual const operation& getMethod(char number)const override
+		virtual const operation& getMethod(unsigned char number)const override
 		{
 			return methodSet.getOperation(number);
 		}

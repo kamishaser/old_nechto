@@ -2,7 +2,7 @@
 #include "connectionRule.h"
 #include "iteratorPtr.h"
 #include "variablePtr.h"
-#include "mathOperator.h"
+#include "MathOperation.h"
 #include "text.h"
 #include "group.h"
 #include "method.h"

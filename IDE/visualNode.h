@@ -37,6 +37,10 @@ namespace nechto::ide
 			if(v1.exist())
 				NumHubConnect(exConNode, v1, 0);
 		}
+		visualNode(const std::wstring& text)
+			:namedExCon( L"visualNode"), nodeText(text), 
+			frame(glm::vec2{ 0.f, 0.f }, glm::vec2{ 1.f, 1.f })
+		{}
 		nodePtr getNodeBoard()
 		{
 			nodePtr temp = node().connection(3);
@@ -51,7 +55,7 @@ namespace nechto::ide
 		{
 			return typeName;
 		}
-		virtual const operation& getMethod(char number)const override
+		virtual const operation& getMethod(unsigned char number)const override
 		{
 			return methodSet.getOperation(number);
 		}

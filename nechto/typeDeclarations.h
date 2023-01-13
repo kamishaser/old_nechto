@@ -97,8 +97,8 @@ namespace nechto
 	{
 		i64 data = 0;
 		ushort bottomLevel = 0;
-		char type = 0;
-		char subtype = 0;
+		unsigned char type = 0;
+		unsigned char subtype = 0;
 		nodeId hubPort;
 		nodeId port[4];
 	};
@@ -116,7 +116,7 @@ namespace nechto
 	namespace nodeT
 	{
 		
-		enum Type //список типов нод
+		enum Type : unsigned char//список типов нод
 		{
 			Deleted
 			= 0,	//удалённый, несуществующий объект
@@ -130,28 +130,37 @@ namespace nechto
 			= 4,	//структурная нода
 			Variable 
 			= 5,	//объект-переменная базового типа
-
+			Vector
+			= 6,	//вектор<subtype>
 			Object 
-			= 6,	//внешний объект
+			= 7,	//внешний объект
 			Text 
-			= 7,	//текст
+			= 8,	//текст
+			Operator
+			= 9,	//оператор
 
-			MathOperator
-			= 128,	//математический оператор
+			MathOperation
+			= 128,	//математическая операция
+			VectorOperation
+			= 129,	//векторная операция
 			Condition 
-			= 129,	//if
+			= 130,	//if
 			Method 
-			= 130,	//метод Object
+			= 131,	//метод Object
 			ConnectionOperation
-			= 131,	//операция подключения
+			= 132,	//операция подключения
 			CreationOperation
-			= 132,	//операция создания
+			= 133,	//операция создания
 			IterationOperation
-			= 133,	//операция перемещения итератора
-			HubManagementOperation
-			= 134,	//операции с хабами
-			readingOperation
-			= 135,	//операция считывание информации
+			= 134,	//операция перемещения итератора
+			HubManagement
+			= 135,	//операции с хабами
+			OperatorManagement
+			= 136,	//управление оператором
+			ReadingOperation
+			= 137,	//операция считывание информации
+			TextOperation
+			= 138	//операция с текстом
 
 		};//до 127 - объекты, после - операции
 	}
@@ -167,7 +176,7 @@ namespace nechto
 	class textPtr;
 	class groupPtr;
 	class methodPtr;
-	class mathOperatorPtr;
+	class MathOperationPtr;
 	class nonTypedObjectPtr;
 	class objectNullPtr;
 
@@ -176,7 +185,7 @@ namespace nechto
 
 	namespace variableT
 	{
-		enum Type 
+		enum Type
 		{
 			F64 = 0,//false
 			I64 = 1 //true
@@ -206,7 +215,7 @@ namespace nechto
 			strong = 1 //true
 		};
 	}
-	namespace mathOperatorT
+	namespace MathOperationT
 	{
 		enum Type
 		{
@@ -243,7 +252,7 @@ namespace nechto
 			GroupIter//итератор массива
 		};
 	}
-	bool hasSubType(char type)
+	bool hasSubType(unsigned char type)
 	{
 		switch (type)
 		{
@@ -255,7 +264,7 @@ namespace nechto
 			return true;
 		}
 	}
-	bool hasData(char type)
+	bool hasData(unsigned char type)
 	{
 		switch (type)
 		{
@@ -268,7 +277,7 @@ namespace nechto
 			return false;
 		}
 	}
-	bool isOperation(char type)
+	bool isOperation(unsigned char type)
 	{
 		return(type > 127);
 	}

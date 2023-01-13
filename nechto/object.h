@@ -24,7 +24,7 @@ namespace nechto
 		{
 			return L"nonTypedObject";
 		}
-		virtual const operation& getMethod(char number) const
+		virtual const operation& getMethod(unsigned char number) const
 		{
 			return operation();
 		}

@@ -6,7 +6,7 @@
 #include "variablePtr.h"
 #include "iteratorPtr.h"
 #include "groupPtr.h"
-#include "mathOperator.h"
+#include "MathOperation.h"
 #include "object.h"
 #include "condition.h"
 #include "method.h"
@@ -31,7 +31,7 @@ namespace nechto
 			node.setData<f64>(0.);
 			return node;
 		}
-		static variablePtr createVariable(char subtype)
+		static variablePtr createVariable(unsigned char subtype)
 		{
 			if (subtype)
 				return createI64();
@@ -50,7 +50,7 @@ namespace nechto
 			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
 			return groupIteratorPtr(node);
 		}
-		static iteratorPtr createIterator(char subtype)
+		static iteratorPtr createIterator(unsigned char subtype)
 		{
 			switch (subtype)
 			{
@@ -62,12 +62,12 @@ namespace nechto
 				assert(false);
 			}
 		}
-		static mathOperatorPtr createMathOperator(char operationType)
+		static MathOperationPtr createMathOperation(unsigned char operationType)
 		{
-			existing<nodePtr> node = allocate(nodeT::MathOperator, operationType);
+			existing<nodePtr> node = allocate(nodeT::MathOperation, operationType);
 			return node;
 		}
-		static methodPtr createMethod(char operationType)
+		static methodPtr createMethod(unsigned char operationType)
 		{
 			existing<nodePtr> node = allocate(nodeT::Method, operationType);
 			return node;
@@ -77,14 +77,14 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::Condition);
 			return node;
 		}
-		static nonTypedObjectPtr createObject(char uniqueOwner,
+		static nonTypedObjectPtr createObject(unsigned char uniqueOwner,
 			object* object = nullptr)
 		{
 			existing<nodePtr> node = allocate(nodeT::Object, uniqueOwner);
 			nonTypedObjectPtr(node).setObjectPtr(object);
 			return node;
 		}
-		static textPtr createText(char own)
+		static textPtr createText(bool own)
 		{
 			existing<nodePtr> node = allocate(nodeT::Text, own);
 			textPtr(node).setData<std::wstring*>(nullptr);
@@ -133,7 +133,7 @@ namespace nechto
 			deleteAllHubs(node);
 			deallocate(node);
 		}
-		static nodePtr createNode(char type, char subtype)
+		static nodePtr createNode(unsigned char type, unsigned char subtype)
 		{
 			switch (type)
 			{
@@ -147,12 +147,12 @@ namespace nechto
 				return createObject(subtype);
 			case nechto::nodeT::Text:
 				return createText(subtype);
-			case nechto::nodeT::MathOperator:
-				return createMathOperator(subtype);
+			case nechto::nodeT::MathOperation:
+				return createMathOperation(subtype);
 			case nechto::nodeT::Condition:
 				return createCondition();
-			case nechto::nodeT::Method:
-				return createMethod(subtype);
+			//case nechto::nodeT::Method:
+			//	return createMethod(subtype);
 			default:
 				assert(false);
 			}
@@ -161,7 +161,7 @@ namespace nechto
 
 		static void disconnectAll(existing<nodePtr> node);
 		static void disconnectAllGroup(groupPtr group);
-		static existing<nodePtr> allocate(char type, char subtype = 0)
+		static existing<nodePtr> allocate(unsigned char type, unsigned char subtype = 0)
 		{
 			nodePtr node = nodeStorage::terminal.allocate();
 			++(numberOfTypedNodes[static_cast<int>(type)]);
@@ -171,7 +171,7 @@ namespace nechto
 		}
 		static void deallocate(existing<nodePtr> node)
 		{
-			--(numberOfTypedNodes[static_cast<int>(node.type())]);
+			--(numberOfTypedNodes[node.type()]);
 			node.node()->data = 0;
 			node.node()->type = 0;
 			node.node()->subtype = 0;

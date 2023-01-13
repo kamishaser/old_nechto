@@ -1,7 +1,7 @@
 #pragma once
 #include "visualNode.h"
 #include "textOut.h"
-#include "mathOperator.h"
+#include "MathOperation.h"
 #include "Object.h"
 #include "text.h"
 #include "method.h"
@@ -31,9 +31,9 @@ namespace nechto::ide
 				else
 					vn1->nodeText = std::to_wstring(f64VariablePtr(n1).get());
 				break;
-			case nodeT::MathOperator:
+			case nodeT::MathOperation:
 				vn1->nodeText = 
-					typeName::getMathOperatorShortSubtypeName(n1.subtype());
+					typeName::getMathOperationShortSubtypeName(n1.subtype());
 				break;
 			case nodeT::Text:
 				vn1->nodeText = textPtr(n1);
@@ -76,7 +76,7 @@ namespace nechto::ide
 			case nodeT::Group:
 				vn->nShape = rhombe();
 				break;
-			case nodeT::MathOperator:
+			case nodeT::MathOperation:
 				vn->nShape = circle();
 				break;
 			case nodeT::Variable:

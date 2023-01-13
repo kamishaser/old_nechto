@@ -80,7 +80,7 @@
     <ClInclude Include="groupPtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="mathOperator.h">
+    <ClInclude Include="mathOperation.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="method.h">

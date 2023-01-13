@@ -123,7 +123,7 @@ namespace nechto::ide
 			auto vGroup = list.vNodeGroup();
 
 			interfaceBoard.addGroup(getObjectPtr<visualGroup>(vGroup));
-			topGroup.addGroup(getObjectPtr<visualGroup>(vGroup));
+			//topGroup.addGroup(getObjectPtr<visualGroup>(vGroup));
 			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
 			if (cGroup)
 				cGroup->mode.horisontal = true;

@@ -10,7 +10,7 @@ namespace nechto
 	public:
 		std::array<operation, 256> opSet;
 		std::array<std::wstring, 256> nameSet;
-		char size;
+		unsigned char size;
 		//массив всех операций
 
 		//инициализация по initializer_list
@@ -33,10 +33,10 @@ namespace nechto
 		staticNodeOperationSet(
 			const staticNodeOperationSet& snoSet,
 			std::initializer_list<namedOperation> ilist)
-			:size(static_cast<char>(snoSet.size + ilist.size()))
+			:size(snoSet.size + ilist.size())
 		{
 			assert((ilist.size() + snoSet.size) < 256);
-			char number = 0;
+			unsigned char number = 0;
 			for (; number < snoSet.size; ++number)
 			{
 				nameSet[number] = snoSet.nameSet[number];
@@ -50,7 +50,7 @@ namespace nechto
 			}
 		}
 
-		constexpr const std::wstring& getName(char number) const
+		constexpr const std::wstring& getName(unsigned char number) const
 		{
 			return nameSet[number];
 		}
@@ -60,12 +60,12 @@ namespace nechto
 				if (nameSet[i] == name)
 					return i;
 		}
-		const operation& getOperation(char number) const
+		const operation& getOperation(unsigned char number) const
 		{
 			return opSet[number];
 		}
 
-		bool operate(nodePtr v1, char number) const
+		bool operate(nodePtr v1, unsigned char number) const
 		{
 			return opSet[number].operate(v1);
 		}

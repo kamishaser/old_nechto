@@ -14,7 +14,7 @@ namespace nechto
 	using ntT = textPtr;
 	using ntG = groupPtr;
 	using ntO = nonTypedObjectPtr;
-	using ntMa = mathOperatorPtr;
+	using ntMa = MathOperationPtr;
 	using ntMe = methodPtr;
 
 	struct connectionRule
@@ -106,7 +106,7 @@ namespace nechto
 				return conRule::conType::Group;
 			if constexpr (std::is_same<conType, methodPtr>())
 				return conRule::conType::Method;
-			if constexpr (std::is_same<conType, mathOperatorPtr>())
+			if constexpr (std::is_same<conType, MathOperationPtr>())
 				return conRule::conType::Math;
 			if constexpr (std::is_same<conType, nonTypedObjectPtr>())
 				return conRule::conType::Object;

@@ -2,6 +2,7 @@
 #include "GUI.h"
 #include "fileSerializer.h"
 #include "periodLimiter.h"
+#include "button.h"
 #include <filesystem>
 
 namespace nechto::ide
@@ -10,10 +11,22 @@ namespace nechto::ide
 	{
 		GUI& gui;
 		periodLimiter plim{ 60000ms };
-
+		sharedButton saveButton{ L"save", [this](auto button) {this->tryToSave(); } };
+		sharedButton loadButton{ L"load", [this](auto button) {this->tryToLoad(); } };
+		visualNode saveButtonVNode{ L"save" };
+		visualNode loadButtonVNode{ L"load" };
+		const std::filesystem::path fileName;
 	public:
 		fileHandler(GUI& g)
-			:gui(g) {}
+			:gui(g) 
+		{
+			NumNumConnect(saveButton.node(), saveButtonVNode.node(), 0, 0);
+			NumNumConnect(loadButton.node(), loadButtonVNode.node(), 0, 0);
+			gui.interfaceBoard.addNode(saveButtonVNode.node());
+			gui.interfaceBoard.addNode(loadButtonVNode.node());
+			gui.topGroup.addNode(saveButtonVNode.node());
+			gui.topGroup.addNode(loadButtonVNode.node());
+		}
 
 		bool load(std::filesystem::path path)
 		{
@@ -53,8 +66,8 @@ namespace nechto::ide
 			ds.close();
 			groupPtr vng = board.connection(0);
 			groupPtr vcg = board.connection(1);
-			NumNumConnect(gui.workBoard.node(), vng, 0, 0);
-			NumNumConnect(gui.workBoard.node(), vcg, 1, 0);
+			changeVNodeGroup(vng);
+			changeVConnectionGroup(vcg);
 			return true;
 		}
 		bool save(std::filesystem::path path)
@@ -71,6 +84,71 @@ namespace nechto::ide
 			std::wcout << L"saved at " << path << std::endl;
 			return true;
 		}
+
+		void update()
+		{
+			if (plim.moreThanMin())
+			{
+				plim.reset();
+				save(L"autosave.nechto");
+			}
+		}
+		void tryToSave()
+		{
+			try
+			{
+				std::filesystem::path path;
+				if (!gui.textBox.iText.empty())
+				{
+					path = gui.textBox.iText;
+					gui.textBox.reset();
+				}
+				else if (!fileName.empty())
+					path = fileName;
+				else
+				{
+					std::wcout << L"введите имя файла" << std::endl;
+					return;
+				}
+				if (save(path))
+					std::wcout << L"сохранено успешно" << std::endl;
+				return;
+			}
+			catch (std::exception exc)
+			{
+				std::cout << exc.what() << std::endl;
+			}
+			std::wcout << L"сохранить не удалось" << std::endl;
+		}
+		void tryToLoad()
+		{
+			try
+			{
+				std::filesystem::path path;
+				if (!gui.textBox.iText.empty())
+				{
+					path = gui.textBox.iText;
+					gui.textBox.reset();
+				}
+				else if (!fileName.empty())
+					path = fileName;
+				else
+				{
+					std::wcout << L"введите имя файла" << std::endl;
+					return;
+				}
+				if (load(path))
+					std::wcout << L"загружено успешно" << std::endl;
+				return;
+
+			}
+			catch (std::exception exc)
+			{
+				std::cout << exc.what() << std::endl;
+			}
+			std::wcout << L"загрузить не удалось" << std::endl;
+		}
+	private:
 		void saveVNodeGroup(fileSerializer& fs)
 		{
 			groupIterator gi(gui.workBoard.vNodeGroup());
@@ -125,13 +203,25 @@ namespace nechto::ide
 			if (!node.isUniqueOwner())
 				delete node.getObjectPtr();
 		}
-		void update()
+		void changeVNodeGroup(groupPtr group)
 		{
-			if (plim.moreThanMin())
+			groupIterator gi(group);
+			do
 			{
-				plim.reset();
-				save(L"autosave.nechto");
-			}
+				if(objectPtr<visualNode>::match(gi.get()))
+					gui.workBoard.addNode(gi.get());
+			} while (gi.stepForward());
 		}
+		void changeVConnectionGroup(groupPtr group)
+		{
+			groupIterator gi(group);
+			do
+			{
+				if (objectPtr<visualConnection>::match(gi.get()))
+					gui.workBoard.addConnection(gi.get());
+			} while (gi.stepForward());
+		}
+
+		
 	};
 }

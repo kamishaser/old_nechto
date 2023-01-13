@@ -233,10 +233,8 @@ namespace nechto
 		}
 		nodePtr readTypeSubtypeAndCreate()
 		{
-			char type;
-			char subtype;
-			read(&type, 1);
-			read(&subtype, 1);
+			unsigned char type = readByValue<unsigned char>();
+			unsigned char subtype = readByValue<unsigned char>();
 			return creator::createNode(type, subtype);
 		}
 		/*считать нумерованные соединения ноды или хаба*/

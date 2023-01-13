@@ -180,7 +180,7 @@ namespace nechto::ide
 
 			if (!vCon->fText.empty())
 			{
-				visualNode vNode1(nullptr);
+				visualNode vNode1(nullptr, nullptr);
 				vNode1.frame.position = fpos + quarter
 					- glm::vec2(dSettings.characterSize, dSettings.characterSize);
 				vNode1.nodeText = vCon->fText;
@@ -189,7 +189,7 @@ namespace nechto::ide
 			}
 			if (!vCon->sText.empty())
 			{
-				visualNode vNode2(nullptr);
+				visualNode vNode2(nullptr, nullptr);
 				vNode2.frame.position = spos - quarter;
 				vNode2.nodeText = vCon->sText;
 				vNode2.shapeColor = col::strong;

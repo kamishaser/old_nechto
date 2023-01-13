@@ -60,13 +60,18 @@ namespace nechto::ide
 	};
 	class sharedButton : public namedExCon, public basicButton
 	{
+		using clickEvent = std::function<void(objectPtr<sharedButton>)>;
 		//№0 - content
 		//№3 - список кнопок в котором она находится
+		clickEvent bcEvent;
 	public:
-		sharedButton(std::wstring name)
-			:namedExCon(name){}
-		sharedButton(nodePtr emptyExternalObject, std::wstring name)
-			:namedExCon(emptyExternalObject, name) {}
+		sharedButton(std::wstring name, 
+			clickEvent bce = nullptr, clickEvent ece = nullptr)
+			:namedExCon(name), bcEvent(bce) {}
+		sharedButton(nodePtr emptyExternalObject, std::wstring name, 
+			clickEvent bce = nullptr)
+			:namedExCon(emptyExternalObject, name), 
+			bcEvent(bce){}
 		nodePtr content()
 		{
 			return node().connection(0);
@@ -88,6 +93,8 @@ namespace nechto::ide
 		{
 			if (basicButton::update(newStatus))
 			{
+				if (bcEvent)
+					bcEvent(node());
 				return true;
 			}
 			return false;
@@ -104,5 +111,5 @@ namespace nechto::ide
 	{
 		return new sharedButton(creator::createObject(1), name);
 	}
-
+	using clickEvent = std::function<void(objectPtr<sharedButton>)>;
 }

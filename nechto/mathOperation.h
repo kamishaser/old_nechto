@@ -145,18 +145,18 @@ namespace nechto
 			return true;
 		}
 	}
-	class mathOperatorPtr : public existing<nodePtr>
+	class MathOperationPtr : public existing<nodePtr>
 	{
 	public:
 		static const staticNodeOperationSet operSet;
-		mathOperatorPtr(const existing<nodePtr>& eptr)
+		MathOperationPtr(const existing<nodePtr>& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return eptr.type() == nodeT::MathOperator;
+			return eptr.type() == nodeT::MathOperation;
 		}
 		static bool match(const nodePtr& ptr)
 		{
@@ -167,7 +167,7 @@ namespace nechto
 			return &operSet.getOperation(subtype());
 		}
 	};
-	const staticNodeOperationSet mathOperatorPtr::operSet
+	const staticNodeOperationSet MathOperationPtr::operSet
 	{
 		{L"assigment", operation::wrap<ntV, const ntV, mathOperationF::assigmentF>()},
 		{L"unaryMinus", operation::wrap<ntV, const ntV, mathOperationF::unaryMinusF>()},
