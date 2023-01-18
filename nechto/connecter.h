@@ -82,8 +82,10 @@ namespace nechto
 	}
 	void nearestDisconnect(existing<nodePtr> node1, existing<nodePtr> node2)
 	{
-		connecter::disconnect(
-			findNearestConnection(node1, node2), findNearestConnection(node2, node1));
+		iterator iter1 = findNearestConnection(node1, node2);
+		iterator iter2 = findNearestConnection(node2, node1);
+		if(iter1.exist() && iter2.exist())
+			connecter::disconnect(iter1, iter2);
 	}
 
 	void NumNumConnect(

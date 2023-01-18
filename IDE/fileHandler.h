@@ -10,15 +10,17 @@ namespace nechto::ide
 	class fileHandler//ОСТОРОЖНО, РОССЫПИ КОСТЫЛЕЙ!!
 	{
 		GUI& gui;
-		periodLimiter plim{ 60000ms };
+		periodLimiter plim{ 60s };
 		sharedButton saveButton{ L"save", [this](auto button) {this->tryToSave(); } };
 		sharedButton loadButton{ L"load", [this](auto button) {this->tryToLoad(); } };
 		visualNode saveButtonVNode{ L"save" };
 		visualNode loadButtonVNode{ L"load" };
-		const std::filesystem::path fileName;
+		std::filesystem::path fileName;
+		std::filesystem::path userDirectory{ L"C:/Users/kamis/Documents/файлы nechto" };
+		std::filesystem::path programDirectory;
 	public:
-		fileHandler(GUI& g)
-			:gui(g) 
+		fileHandler(GUI& g, const std::filesystem::path& prd)
+			:gui(g), programDirectory(prd)
 		{
 			NumNumConnect(saveButton.node(), saveButtonVNode.node(), 0, 0);
 			NumNumConnect(loadButton.node(), loadButtonVNode.node(), 0, 0);
@@ -81,7 +83,6 @@ namespace nechto::ide
 			saveVConnectionGroup(fs);
 			assert(gui.workBoard.vNodeGroup().exist());
 			fs.close();
-			std::wcout << L"saved at " << path << std::endl;
 			return true;
 		}
 
@@ -89,6 +90,7 @@ namespace nechto::ide
 		{
 			if (plim.moreThanMin())
 			{
+				std::wcout << L"autosave" << std::endl;
 				plim.reset();
 				save(L"autosave.nechto");
 			}
@@ -110,7 +112,7 @@ namespace nechto::ide
 					std::wcout << L"введите имя файла" << std::endl;
 					return;
 				}
-				if (save(path))
+				if (save(userDirectory / path))
 					std::wcout << L"сохранено успешно" << std::endl;
 				return;
 			}
@@ -137,7 +139,7 @@ namespace nechto::ide
 					std::wcout << L"введите имя файла" << std::endl;
 					return;
 				}
-				if (load(path))
+				if (load(userDirectory / path))
 					std::wcout << L"загружено успешно" << std::endl;
 				return;
 

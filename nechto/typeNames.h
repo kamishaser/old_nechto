@@ -183,6 +183,61 @@ namespace nechto::typeName
 			//return L"";
 		}
 	}
+	std::wstring getVectorSubtypeName(unsigned char subtype)
+	{
+		//VectorT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getOperatorSubtypeName(unsigned char subtype)
+	{
+		//OperatorT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getVectorOperationSubtypeName(unsigned char subtype)
+	{
+		//VectorOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getConnectionOperationSubtypeName(unsigned char subtype)
+	{
+		//ConnectionOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getCreationOperationSubtypeName(unsigned char subtype)
+	{
+		//CreationOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getIterationOperationSubtypeName(unsigned char subtype)
+	{
+		//IterationOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getHubManagementSubtypeName(unsigned char subtype)
+	{
+		//HubManagementT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getOperatorManagementSubtypeName(unsigned char subtype)
+	{
+		//OperatorManagementT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getReadingOperationSubtypeName(unsigned char subtype)
+	{
+		//ReadingOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getTextOperationSubtypeName(unsigned char subtype)
+	{
+		//TextOperationT::Type type = subtype;
+		return L"error";
+	}
+	std::wstring getStructSubtypeName(unsigned char subtype)
+	{
+		//TextOperationT::Type type = subtype;
+		return L"error";
+	}
 	std::wstring getSubtypeName(unsigned char type, unsigned char subtype)
 	{
 		switch (type)
@@ -207,6 +262,28 @@ namespace nechto::typeName
 			return L"";
 		case nechto::nodeT::Method:
 			return L"";
+		case nodeT::Vector:
+			return getVectorSubtypeName(subtype);
+		case nodeT::VectorOperation:
+			return getVectorOperationSubtypeName(subtype);
+		case nodeT::ConnectionOperation:
+			return getConnectionOperationSubtypeName(subtype);
+		case nodeT::CreationOperation:
+			return getCreationOperationSubtypeName(subtype);
+		case nodeT::IterationOperation:
+			return getIterationOperationSubtypeName(subtype);
+		case nodeT::ReadingOperation:
+			return getReadingOperationSubtypeName(subtype);
+		case nodeT::TextOperation:
+			return getTextOperationSubtypeName(subtype);
+		case nodeT::HubManagement:
+			return getHubManagementSubtypeName(subtype);
+		case nodeT::OperatorManagement:
+			return getOperatorManagementSubtypeName(subtype);
+		case nodeT::Operator:
+			return getOperatorSubtypeName(subtype);
+		case nodeT::Struct:
+			return getStructSubtypeName(subtype);
 		default:
 			return L"???";
 		}

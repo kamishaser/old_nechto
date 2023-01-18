@@ -11,6 +11,17 @@
 #include "condition.h"
 #include "method.h"
 #include "text.h"
+#include "textOperation.h"
+#include "operatorManagement.h"
+#include "hubManagement.h"
+#include "iterationOperation.h"
+#include "operator.h"
+#include "readingOperation.h"
+#include "creationOperation.h"
+#include "connectionOperation.h"
+#include "vectorOperation.h"
+#include "vector.h"
+#include "struct.h"
 
 namespace nechto
 {
@@ -99,6 +110,67 @@ namespace nechto
 			groupPtr(node).setSize(1);
 			return node;
 		}
+		/////////////////////////////////////////////
+		static structPtr createStruct(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::Struct, subtype);
+			return node;
+		}
+		static vectorPtr createVector(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::Vector, subtype);
+			return node;
+		}
+		static operatorPtr createOperator(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::Operator, subtype);
+			return node;
+		}
+		static vectorOperationPtr createVectorOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::VectorOperation, subtype);
+			return node;
+		}
+		static connectionOperationPtr createConnectionOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::ConnectionOperation, subtype);
+			return node;
+		}
+		static creationOperationPtr createCreationOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::CreationOperation, subtype);
+			return node;
+		}
+		static iterationOperationPtr createIterationOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::IterationOperation, subtype);
+			return node;
+		}
+		static readingOperationPtr createReadingOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::ReadingOperation, subtype);
+			return node;
+		}
+		static textOperationPtr createTextOperation(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::TextOperation, subtype);
+			return node;
+		}
+		static hubManagementPtr createHubManagement(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::HubManagement, subtype);
+			return node;
+		}
+		static operatorManagementPtr createOperatorManagement(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::OperatorManagement, subtype);
+			return node;
+		}
+		/*static TYPENAMEPtr createTYPENAME(unsigned char subtype)
+		{
+			existing<nodePtr> node = allocate(nodeT::TYPENAME, subtype);
+			return node;
+		}*/
 		
 		static void deleteNode(existing<nodePtr> node)
 		{
@@ -125,6 +197,12 @@ namespace nechto
 				textPtr(node).reset();
 				break;
 			case nechto::nodeT::Method:
+				break;
+			case nodeT::Struct:
+				assert(false);
+				break;
+			case nodeT::Operator:
+				assert(false);
 				break;
 			default:
 				break;

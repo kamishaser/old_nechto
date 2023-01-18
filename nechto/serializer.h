@@ -55,6 +55,7 @@ namespace nechto
 			switch (v1.type())
 			{
 			case nodeT::Variable:
+			case nodeT::Vector:
 				writeByValue(v1.node()->data);
 				break;
 			case nodeT::Text:
@@ -65,6 +66,10 @@ namespace nechto
 				break;
 			case nodeT::Object:
 				writeObject(v1);
+				break;
+			case nodeT::Operator:
+			case nodeT::Struct:
+				assert(false);
 				break;
 			default:
 				break;
@@ -207,6 +212,7 @@ namespace nechto
 			switch (v1.type())
 			{
 			case nodeT::Variable:
+			case nodeT::Vector:
 				v1.setData<i64>(readByValue<i64>());
 				break;
 			case nodeT::Text:
@@ -217,6 +223,10 @@ namespace nechto
 				break;
 			case nodeT::Object:
 				readObject(nonTypedObjectPtr(v1));
+				break;
+			case nodeT::Operator:
+			case nodeT::Struct:
+				assert(false);
 				break;
 			default:
 				break;

@@ -128,17 +128,20 @@ namespace nechto::ide
 		bool reset()
 		{
 			header = L"_____";
+			bool result = false;
 			if (hasFocus())
 			{
 				Focus = false;
 				reseted = true;
 				if (aim())
 				{
-					return setAimData();
+					result = setAimData();
 				}
 			}
 			nearestDisconnect(node(), 1);
-			return false;
+			iText.clear();
+			updateBox();
+			return result;
 		}
 		bool boxResetEvent()
 		{

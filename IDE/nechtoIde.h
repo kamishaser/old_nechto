@@ -29,14 +29,14 @@ namespace nechto::ide
 
 		
 
-		nechtoIDE()
-			:vduh(gui), ed(gui, uh.selectH),
+		nechtoIDE(const std::filesystem::path& path, const std::filesystem::path& directory)
+			:gui(directory), vduh(gui), ed(gui, uh.selectH),
 			uh(gui, ed, sl),
 			aeh(gui),
-			fh(gui),
+			fh(gui, directory),
 			sl(gui)
 		{
-			fh.load(L"autosave.nechto");
+			fh.load(path);
 		}
 		~nechtoIDE()
 		{

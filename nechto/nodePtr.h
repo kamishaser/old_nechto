@@ -29,6 +29,11 @@ namespace nechto
 			i64 temp = *static_cast<i64*>(static_cast<void*>(&Data));
 			node()->data = temp;
 		}
+		template <class TCon>
+		TCon* getDataPtr()
+		{
+			return node()->getDataPtr<TCon>();
+		}
 		friend class connecter;
 		friend class creator;
 		friend class hubManager;

@@ -55,8 +55,15 @@ namespace nechto::ide
 					nodePtr v1 = vNode1->node().connection(0);
 					if (v0.exist() && v1.exist())
 					{
-						setConType(vConnection, 0, getConType(v0, v1));
-						setConType(vConnection, 1, getConType(v1, v0));
+						iterator iter0 = findNearestConnection(v0, v1);
+						iterator iter1 = findNearestConnection(v1, v0);
+						if (iter0.exist() && iter1.exist())
+						{
+							setConType(vConnection, 0, 
+								iter0.getGlobalPos(), iter0.inGroup());
+							setConType(vConnection, 1,
+								iter1.getGlobalPos(), iter1.inGroup());
+						}
 					}
 				}
 			} while (i1.stepForward());
@@ -71,49 +78,16 @@ namespace nechto::ide
 					vGroup->update();
 			} while (i1.stepForward());
 		}
-		void setConType(visualConnection* vConnection, int number, conType cType)
+		void setConType(visualConnection* vConnection, int sideNumber, 
+			int portNumber, bool groupPort = false)
 		{
-			std::wstring& text = (number) ? vConnection->sText : vConnection->fText;
-			switch (cType)
-			{
-			case conType::Hub:
-				text = L"";
-				break;
-			case conType::Group:
-				text = L"G";
-				break;
-			case conType::N0:
-				text = L"N0";
-				break;
-			case conType::N1:
-				text = L"N1";
-				break;
-			case conType::N2:
-				text = L"N2";
-				break;
-			case conType::N3:
-				text = L"N3";
-				break;
-			default:
-				break;
-			}
-		}
-		conType getConType(nodePtr v1, nodePtr v2)
-		{
-			for (int i = 0; i < 4; ++i)
-				if (v1.connection(i) == v2)
-					return static_cast<conType>(
-						static_cast<int>(conType::N0) + i);
-			if (typeCompare(v1, nodeT::Group))
-			{
-				groupIterator gi(v1);
-				do
-				{
-					if (gi.get() == v2)
-						return conType::Group;
-				} while (gi.stepForward());
-			}
-			return conType::Hub;
+			std::wstring& text = (sideNumber) ? vConnection->sText : vConnection->fText;
+			if (groupPort)
+				text = std::wstring(L"G") + std::to_wstring(portNumber);
+			else if (portNumber < 4)
+				text = std::wstring(L"N") + std::to_wstring(portNumber);
+			else
+				text = L"";//std::wstring(L"H") + std::to_wstring(portNumber);
 		}
 	};
 }

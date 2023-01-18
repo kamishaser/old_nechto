@@ -140,14 +140,27 @@
   <ItemGroup>
     <ClInclude Include="compressor.h" />
     <ClInclude Include="connecter.h" />
+    <ClInclude Include="connectionOperation.h" />
     <ClInclude Include="connectionRule.h" />
     <ClInclude Include="connectionRuleCheck.h" />
+    <ClInclude Include="conRuleInterface.h" />
+    <ClInclude Include="creationOperation.h" />
     <ClInclude Include="creator.h" />
+    <ClInclude Include="enums.h" />
     <ClInclude Include="garbageCollector.h" />
     <ClInclude Include="group.h" />
+    <ClInclude Include="hubManagement.h" />
     <ClInclude Include="hubManager.h" />
     <ClInclude Include="hubPosPair.h" />
+    <ClInclude Include="iterationOperation.h" />
+    <ClInclude Include="entity.h" />
+    <ClInclude Include="operator.h" />
+    <ClInclude Include="operatorManagement.h" />
     <ClInclude Include="portSearch.h" />
+    <ClInclude Include="readingOperation.h" />
+    <ClInclude Include="standartConRule.h" />
+    <ClInclude Include="struct.h" />
+    <ClInclude Include="textOperation.h" />
     <ClInclude Include="typeDeclarations.h" />
     <ClInclude Include="fileSerializer.h" />
     <ClInclude Include="method.h" />
@@ -168,6 +181,8 @@
     <ClInclude Include="textOut.h" />
     <ClInclude Include="typeNames.h" />
     <ClInclude Include="variablePtr.h" />
+    <ClInclude Include="vector.h" />
+    <ClInclude Include="vectorOperation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mainFail.cpp" />

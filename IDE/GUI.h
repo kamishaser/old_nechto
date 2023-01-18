@@ -35,8 +35,8 @@ namespace nechto::ide
 		
 		namedExConGroup dropListGroup{ creator::createObject(0), L"dropList" };
 
-		GUI()
-			:dp(), textBox(textBoxNode.node())
+		GUI(const std::filesystem::path& path)
+			:dp(path), textBox(textBoxNode.node())
 		{
 			//добавление групп на доски
 			workBoard.addGroup(getObjectPtr<visualGroup>(&leftGroup));

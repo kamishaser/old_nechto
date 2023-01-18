@@ -7,6 +7,7 @@
 #include "nodeBoard.h"
 #include "visualGroup.h"
 #include <memory>
+#include <filesystem>
 
 namespace nechto::ide
 {
@@ -26,11 +27,11 @@ namespace nechto::ide
 
 
 
-		display()
+		display(const std::filesystem::path& path)
 			:window(sf::VideoMode(1000, 1000), "nechtoIDE")
 		{
 			//загрузка базового шрифта
-			assert(vnFont.loadFromFile("Fonts/arial.ttf"));
+			assert(vnFont.loadFromFile((path / L"Fonts/arial.ttf").generic_string()));
 			//добавление групп на доски
 		}
 		rect windowRect() const
@@ -160,7 +161,7 @@ namespace nechto::ide
 			////////////////////////////////////////////////////////////////////////
 			sf::ConvexShape line(4);
 			glm::vec2 temp = spos - fpos;
-			glm::vec2 quarter = temp / 2.2f;
+			glm::vec2 quarter = temp / 4.2f;
 			glm::vec3 normal(temp.x, temp.y, 0);
 			normal = glm::rotateZ(normal, 3.14f / 2);
 			temp = glm::vec2(normal.x, normal.y);

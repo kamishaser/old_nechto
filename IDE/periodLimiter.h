@@ -12,10 +12,10 @@ namespace nechto::ide
 	class periodLimiter
 	{
 	public:
-		milliseconds min;
+		const milliseconds min;
 		milliseconds lastUp;
 
-		periodLimiter(milliseconds minPeriod, milliseconds maxPeriod = 0ms)
+		periodLimiter(milliseconds minPeriod)
 			:min(minPeriod), lastUp(currentTime()) {}
 
 		void reset()

@@ -2,128 +2,46 @@
 #include "nodePtr.h"
 #include "connectionRule.h"
 #include "nodeOperationSet.h"
+#include "entity.h"
 #include <functional>
 
 namespace nechto
 {
-	//объект осуществл€ющий св€зь с nechto
-	class object
-	{
-	public:
-		friend class creator;
-		static i64 numberOfObjects;
-		object()
-		{
-			++numberOfObjects;
-		}
-		virtual ~object() 
-		{
-			--numberOfObjects;
-		}
-		virtual const std::wstring& getTypeName() const
-		{
-			return L"nonTypedObject";
-		}
-		virtual const operation& getMethod(unsigned char number) const
-		{
-			return operation();
-		}
-		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
-		{
-			buffer.clear();
-		}
-
-		//действи€ при отключении от ноды. ќбычно ничего делать не надо
-	protected:
-		static void resetNode(existing<nodePtr> objectNode);//определено после nonTypedObjectPtr
-		virtual void nodeDisconnect() {}
-	private:
-		void nodeConnect(objectNullPtr object);
-	};
-	i64 object::numberOfObjects = 0;
-
-	class nonTypedObjectPtr : public existing<nodePtr>
+	class nonTypedObjectPtr : public entityPtr
 	{
 	protected:
-		
-		void setObjectPtr(object* obj) const
-		{
-			setData<object*>(obj);
-		}
 		friend class object;
 		friend class creator;
 	public:
+		nonTypedObjectPtr(const entityPtr& eptr)
+			:entityPtr(eptr)
+		{
+			assert(match(eptr));
+		}
 		nonTypedObjectPtr(const existing<nodePtr>& eptr)
-			:existing<nodePtr>(eptr)
+			:entityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
 		nonTypedObjectPtr(nodePtr eptr)
-			:existing<nodePtr>(eptr)
+			:entityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		static bool match(const existing<nodePtr>& eptr)
+		static bool match(const entityPtr& eptr)
 		{
 			return eptr.type() == nodeT::Object;
+		}
+		static bool match(const existing<nodePtr>& eptr)
+		{
+			return entityPtr::match(eptr) && (eptr.type() == nodeT::Object);
 		}
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		bool dataExist() const
-		{
-			return getObjectPtr() != nullptr;
-		}
-		//единоличное владение указателем (объектом)
-		bool isUniqueOwner() const
-		{
-			return subtype();
-		}
-		object* getObjectPtr() const
-		{
-			return getData<object*>();
-		}
-		template<class TCon = object>
-		TCon* get()
-		{
-			return dynamic_cast<TCon*>(getObjectPtr());
-		}
-		void reset()
-		{
-			if (getObjectPtr() != nullptr)
-			{
-				if(isUniqueOwner())
-					delete getObjectPtr();
-				setObjectPtr(nullptr);
-			}
-		}
-		void set(object* object)
-		{
-			reset();
-			setObjectPtr(object);
-		}
-		object& operator*() const
-		{
-			return *getObjectPtr();
-		}
-		object& operator->() const
-		{
-			return *getObjectPtr();
-		}
-		void swapData(const nonTypedObjectPtr& node)
-		{
-			assert(isUniqueOwner() == node.isUniqueOwner());
-			object* temp = getObjectPtr();
-			setObjectPtr(node.getObjectPtr());
-			node.setObjectPtr(temp);
-		}
 	};
 	using ntObj = nonTypedObjectPtr;
-	void object::resetNode(existing<nodePtr> objectNode)
-	{
-		nonTypedObjectPtr(objectNode).setObjectPtr(nullptr);
-	}
 
 
 	class objectNullPtr : public nonTypedObjectPtr
@@ -136,7 +54,7 @@ namespace nechto
 		}
 		static bool match(const nonTypedObjectPtr& ptr)
 		{
-			return !ptr.dataExist();
+			return !ptr.entityExist();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
@@ -179,7 +97,7 @@ namespace nechto
 		}
 		static bool match(const nodePtr& ptr)
 		{
-			return ptr.exist() && match(existing<nodePtr>(ptr));
+			return nonTypedObjectPtr::match(ptr) && match(nonTypedObjectPtr(ptr));
 		}
 		const TCon* operator->() const
 		{
@@ -194,10 +112,6 @@ namespace nechto
 			return dynamic_cast<TCon*>(getObjectPtr());
 		}
 	};
-	void object::nodeConnect(objectNullPtr object)
-	{
-		object.setObjectPtr(this);
-	}
 	template <class TCon>
 	TCon* getObject(nodePtr node)
 	{
