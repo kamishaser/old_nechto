@@ -1,6 +1,5 @@
 #pragma once
 #include "nodePtr.h"
-#include "connectionRule.h"
 
 namespace nechto
 {
@@ -20,9 +19,10 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		const static connectionRule cRule;
+		operationData* opDataPtr()
+		{
+			return getDataPtr<operationData>();
+		}
 		
 	};
-	const connectionRule conditionPtr::cRule
-	{conRule::conType::I64Variable, conRule::useType::readOnly};
 }

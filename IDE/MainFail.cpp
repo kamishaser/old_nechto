@@ -1,6 +1,5 @@
 #include "nechtoIde.h"
 #include "nodeBoard.h"
-#include "connectionRule.h"
 #include "MainFail.h"
 #include <entity.h>
 using namespace nechto;

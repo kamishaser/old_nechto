@@ -27,14 +27,14 @@ namespace nechto
 			Operator
 			= 9,	//оператор
 
-			MathOperation
-			= 128,	//математическая операция
-			VectorOperation
-			= 129,	//векторная операция
-			Condition
-			= 130,	//if
 			Method
-			= 131,	//метод Object
+			= 128,	//метод Object
+			Condition
+			= 129,	//if
+			MathOperation
+			= 130,	//математическая операция
+			VectorOperation
+			= 131,	//векторная операция
 			ConnectionOperation
 			= 132,	//операция подключения
 			CreationOperation
@@ -207,4 +207,12 @@ namespace nechto
 			multipleConnection
 		};
 	}
+
+
+	enum class contentRule
+	{
+		Any,
+		Empty,
+		NonEmpty
+	};
 }

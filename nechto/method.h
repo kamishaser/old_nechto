@@ -44,6 +44,10 @@ namespace nechto
 		const bool objectExist() const
 		{
 			return getObjectNode().exist();
-		}
+		
+			operationData* opDataPtr()
+			{
+				return getDataPtr<operationData>();
+			}
 	};
 }

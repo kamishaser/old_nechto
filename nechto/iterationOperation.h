@@ -24,5 +24,9 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
+		operationData* opDataPtr()
+		{
+			return getDataPtr<operationData>();
+		}
 	};
 }

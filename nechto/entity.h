@@ -1,5 +1,6 @@
 #pragma once
 #include "nodePtr.h"
+#include "conRuleInterface.h"
 
 namespace nechto
 {
@@ -16,11 +17,12 @@ namespace nechto
 		}
 	}
 	template<class TCon>
-	concept essT = 
+	concept essT =
 		std::is_move_constructible<TCon>::value &&
-		std::is_move_assignable<TCon>::value &&
-		std::is_copy_constructible<TCon>::value &&
-		std::is_copy_assignable<TCon>::value;
+		std::is_move_assignable<TCon>::value;
+
+
+
 	//////////////////////////////////////////////////////////////////////////////
 	class entityInterface
 	{
@@ -28,10 +30,10 @@ namespace nechto
 		entityInterface() { ++numberOfEntities; }//сущность существует отдельно
 		static void setEntityPtr(existing<nodePtr> esNode, entityInterface* es);
 	public:
-		virtual const operation& getMethod(unsigned char number) const
+		/*virtual const operation& getMethod(unsigned char number) const
 		{
 			return operation();
-		}
+		}*/
 		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
 		{
 			buffer.clear();
@@ -51,6 +53,10 @@ namespace nechto
 		static i64 numberOfEntities;
 	};
 	i64 entityInterface::numberOfEntities = 0;
+
+
+
+	////////////////////////////////////////////////////////////////////entityPtr
 	class entityPtr : public existing<nodePtr>
 	{
 	protected:
@@ -108,14 +114,18 @@ namespace nechto
 	{
 		entityPtr(esNode).setEntityPtr(es);
 	}
+
+
+
+	////////////////////////////////////////////////////////////////////entity
 	template<essT ECon>
 	class entity : public entityInterface
 	{
 	protected:
 		entity(const ECon& d)
 			:entityInterface(), data(d) {}
-		entity(const ECon&& d)
-			:entityInterface(), data(d) {}
+		entity(ECon&& d)
+			:entityInterface(), data(std::move(d)) {}
 
 	public:
 		ECon data;
@@ -125,14 +135,17 @@ namespace nechto
 		}
 	};
 	
+
+
+	////////////////////////////////////////////////////////////////////oneSideLinkedEntity
 	template<essT ECon>
 	class oneSideLinkedEntity :public entity<ECon>
 	{
 	public:
 		oneSideLinkedEntity(const ECon& d)
 			:entity<ECon>(d) {}
-		oneSideLinkedEntity(const ECon&& d)
-			:entity<ECon>(d) {}
+		oneSideLinkedEntity(ECon&& d)
+			:entity<ECon>(std::move(d)) {}
 		virtual void disconnect(nodePtr enNode) override
 		{
 			assert(entityPtr::match(enNode));
@@ -149,18 +162,21 @@ namespace nechto
 		}
 		
 	};
+
+
+	////////////////////////////////////////////////////////////////////singleConnectedEntity
 	template<essT ECon>
 	class singleConnectedEntity :public entity<ECon>
 	{
 	public:
 		singleConnectedEntity(const ECon& d, entityPtr esNode)
 			:entity<ECon>(d) { connect(esNode); }
-		singleConnectedEntity(const ECon&& d, entityPtr esNode)
-			:entity<ECon>(d) { connect(esNode); }
+		singleConnectedEntity(ECon&& d, entityPtr esNode)
+			:entity<ECon>(std::move(d)) { connect(esNode); }
 		singleConnectedEntity(const ECon& d)
 			:entity<ECon>(d), enNode(nullptr) {}
-		singleConnectedEntity(const ECon&& d)
-			:entity<ECon>(d), enNode(nullptr) {}
+		singleConnectedEntity(ECon&& d)
+			:entity<ECon>(std::move(d)), enNode(nullptr) {}
 
 		virtual void disconnect(nodePtr entityNode) override
 		{

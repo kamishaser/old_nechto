@@ -1,5 +1,6 @@
 #pragma once
 #include "nodePtr.h"
+#include <string>
 
 namespace nechto
 {
@@ -8,51 +9,64 @@ namespace nechto
 		unsigned char type = 0; //тип соединения. Если null - соединение не обязательно
 		bool subtypeImportant = 0;
 		unsigned char subtype = 0;
+		bool transitable = true; //можно ли передавать через итератор. Не работает с самими итераторами
 	};
 	struct iteratorRule
 	{
-		bool noTransit = 0;
-		bool necessarilyPointToConnectedPort = true;
-		bool necessarilyPointToNoConnectedPort = false;
+		bool subtypeImportant = 0;
+		unsigned char subtype = 0;
+		bool necessarilyExistingIterator = true;
+		contentRule iterContentRule = contentRule::Any;
+	};
+	struct nonTypedEntityRule
+	{
+		bool subtypeImportant = 0;
+		unsigned char subtype = 0;
+		unsigned char nodeType = nodeT::Object;
+		bool transitable = true; //можно ли передавать через итератор. Не работает с самими итераторами
+		contentRule entityContentRule = contentRule::Any;
 	};
 	struct entityRule
 	{
-		bool typeImportant = false;
-		bool necessarilyEmpty = false;
-		bool necessarilyNoEmpty = false;
-		std::wstring typeName;
-		i64 id = 0;
+		bool subtypeImportant = 0;
+		unsigned char subtype = 0;
+		bool transitable = true; //можно ли передавать через итератор. Не работает с самими итераторами
 	};
 	class conRuleInterface
 	{
 	protected:
 	public:
-		virtual nodePtr getConnection(existing<nodePtr> v1, int number)const
+		virtual nodePtr getConnection(nodePtr node)const//нода - значение порта
 		{
 			return nullptr;
 		}
-		virtual bool check(nodePtr v1) const
+		virtual bool check(nodePtr node) const//нода - значение порта
 		{
 			return false;
 		}
-		virtual elementaryRule getElementaryRule(int number) const//работает только для стандартного правила
-		{
-			return elementaryRule();
-		}
-		virtual iteratorRule getIteratorRule(int number) const//работает только для итераторов
-		{
-			return iteratorRule();
-		}
-		virtual entityRule getEntityRule(int number) const//работает только для сущностей
-		{
-			return entityRule();
-		}
-		virtual bool isStandartRule(int number) const
-		{
-			return true;
-		}
-
 		virtual ~conRuleInterface()
 		{}
+	};
+
+	struct conRule
+	{
+		const conRuleInterface* conRules[3];//правила трёх подключений
+		bool read[3] = { true, true, true };
+		bool write[3] = { true, true, true };
+		bool changeNet = true;
+	};
+	struct operation
+	{
+		bool(*operationPtr)(nodePtr, nodePtr, nodePtr);
+		conRule cRule;
+		std::wstring name;
+
+		operation(const std::wstring& n, const conRule& cr,
+			bool(*op)(nodePtr, nodePtr, nodePtr) = nullptr)
+			:operationPtr(op), cRule(cr), name(n) {}
+
+		operation(const std::wstring& n, const conRuleInterface* con0, const conRuleInterface* con1, const conRuleInterface* con2,
+			bool(*op)(nodePtr, nodePtr, nodePtr) = nullptr)
+			:operation(n, conRule(con0, con1, con2), op) {}
 	};
 }

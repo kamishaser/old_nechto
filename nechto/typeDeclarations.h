@@ -102,7 +102,22 @@ namespace nechto
 		unsigned char subtype = 0;
 		nodeId hubPort;
 		nodeId port[4];
+		template <class TCon>
+		TCon* getDataPtr()
+		{
+			return static_cast<TCon*>(static_cast<void*>(&Data));
+		}
 	};
+	struct operationData
+	{
+		bool correctNoTransitConnection[3]{ false, false, false };
+		nodeId currentOperator;
+	};
+	/*operationData* opDataPtr()
+		{
+			return getDataPtr<operationData>();
+		}*/
+
 
 	template <class TCon>
 	class existing : public TCon
@@ -118,6 +133,9 @@ namespace nechto
 	class entityInterface;
 
 	class nullNodePtrT;
+
+	class essencePtr;
+	class operationPtr;
 
 	class i64VariablePtr;
 	class f64VariablePtr;

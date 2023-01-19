@@ -145,6 +145,7 @@ namespace nechto
 			return true;
 		}
 	}
+
 	class MathOperationPtr : public existing<nodePtr>
 	{
 	public:
@@ -162,35 +163,9 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		const operation* getOperation() const
+		operationData* opDataPtr()
 		{
-			return &operSet.getOperation(subtype());
+			return getDataPtr<operationData>();
 		}
-	};
-	const staticNodeOperationSet MathOperationPtr::operSet
-	{
-		{L"assigment", operation::wrap<ntV, const ntV, mathOperationF::assigmentF>()},
-		{L"unaryMinus", operation::wrap<ntV, const ntV, mathOperationF::unaryMinusF>()},
-
-		{L"addition", operation::wrap<ntV, const ntV, const ntV, mathOperationF::additionF>()},
-		{L"subtraction", operation::wrap<ntV, const ntV, const ntV, mathOperationF::subtractionF>()},
-
-		{L"multiplication", operation::wrap<ntV, const ntV, const ntV, mathOperationF::multiplicationF>()},
-		{L"division", operation::wrap<ntV, const ntV, const ntV, mathOperationF::divisionF>()},
-
-		{L"equal", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::equalF>()},
-		{L"notEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::notEqualF>()},
-
-		{L"less", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::lessF>()},
-		{L"greater", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::greaterF>()},
-		{L"lessOrEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::lessOrEqualF>()},
-		{L"greaterOrEqual", operation::wrap<ntI64, const ntV, const ntV, mathOperationF::greaterOrEqualF>()},
-
-		{L"logicNegation", operation::wrap<ntI64, const ntI64, mathOperationF::logicNegationF>()},
-		{L"logicAnd", operation::wrap<ntI64, const ntI64, const ntI64, mathOperationF::logicAndF>()},
-		{L"logicOr", operation::wrap<ntI64, const ntI64, const ntI64, mathOperationF::logicOrF>()},
-
-		{L"increment", operation::wrap<ntI64, mathOperationF::incrementF>()},
-		{L"decrement", operation::wrap<ntI64, mathOperationF::decrementF>()}
 	};
 }

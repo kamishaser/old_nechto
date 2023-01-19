@@ -89,10 +89,10 @@ namespace nechto
 			return node;
 		}
 		static nonTypedObjectPtr createObject(unsigned char uniqueOwner,
-			object* object = nullptr)
+			entityInterface* object = nullptr)
 		{
 			existing<nodePtr> node = allocate(nodeT::Object, uniqueOwner);
-			nonTypedObjectPtr(node).setObjectPtr(object);
+			nonTypedObjectPtr(node).setEntityPtr(object);
 			return node;
 		}
 		static textPtr createText(bool own)
@@ -190,8 +190,8 @@ namespace nechto
 			case nechto::nodeT::Variable:
 				break;
 			case nechto::nodeT::Object:
-				if (nonTypedObjectPtr(node).isUniqueOwner())
-					delete nonTypedObjectPtr(node).getObjectPtr();
+				if (nonTypedObjectPtr(node).isOneSideLink())
+					delete nonTypedObjectPtr(node).getEntityPtr();
 				break;
 			case nechto::nodeT::Text:
 				textPtr(node).reset();

@@ -1,68 +1,59 @@
 #pragma once
-#include "connectionRule.h"
 #include <array>
+#include "conRuleInterface.h"
 
 namespace nechto
 {
-	using namedOperation = std::pair<std::wstring, operation>;
-	class staticNodeOperationSet
+	template<int size = 256>
+	class nodeOperationSet
 	{
 	public:
-		std::array<operation, 256> opSet;
-		std::array<std::wstring, 256> nameSet;
-		unsigned char size;
+		std::array<operation, size> opSet;
+		const unsigned char usedSize;
 		//массив всех операций
 
 		//инициализация по initializer_list
-		staticNodeOperationSet(
-			std::initializer_list<namedOperation> ilist)
-			:size(static_cast<char>(ilist.size()))
+		nodeOperationSet(
+			std::initializer_list<operation> ilist)
+			:usedSize(static_cast<char>(ilist.size()))
 		{
 			assert(ilist.size() < 256);
-			char number = 0;
+			int number = 0;
 			for (auto& i : ilist)
 			{
-				nameSet[number] = i.first;
-				opSet[number] = i.second;
+				opSet[number] = i;
 				number++;
 			}
 		}
-		staticNodeOperationSet()
-			:size(0) {}
+		nodeOperationSet()
+			:usedSize(0) {}
 		//инициализация копированием с добавлением
-		staticNodeOperationSet(
-			const staticNodeOperationSet& snoSet,
-			std::initializer_list<namedOperation> ilist)
-			:size(snoSet.size + ilist.size())
+		nodeOperationSet(
+			const nodeOperationSet<size>& nopSet,
+			std::initializer_list<operation> ilist)
+			:usedSize(nopSet.usedSize + ilist.size())
 		{
-			assert((ilist.size() + snoSet.size) < 256);
-			unsigned char number = 0;
-			for (; number < snoSet.size; ++number)
+			assert((ilist.size() + nopSet.usedSize) < 256);
+			int number = 0;
+			for (; number < nopSet.usedSize; ++number)
 			{
-				nameSet[number] = snoSet.nameSet[number];
-				opSet[number] = snoSet.opSet[number];
+				opSet[number] = nopSet.opSet[number];
 			}
 			for (auto& i : ilist)
 			{
-				nameSet[number] = i.first;
-				opSet[number] = i.second;
+				opSet[number] = i;
 				number++;
 			}
-		}
-
-		constexpr const std::wstring& getName(unsigned char number) const
-		{
-			return nameSet[number];
 		}
 		constexpr char getNumber(const std::wstring& name) const
 		{
-			for (int i = 0; i < 256; ++i)
+			for (int i = 0; i < usedSize; ++i)
 				if (nameSet[i] == name)
 					return i;
 		}
-		const operation& getOperation(unsigned char number) const
+		const operation* getOperation(unsigned char number) const
 		{
-			return opSet[number];
+			return &opSet[number];
 		}
 
 		bool operate(nodePtr v1, unsigned char number) const

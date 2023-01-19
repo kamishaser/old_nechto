@@ -1,7 +1,6 @@
 #pragma once
 #include "GLM/glm.hpp"
 #include "SFML/Graphics.hpp"
-#include "connectionRule.h"
 #include "nodeOperationSet.h"
 #include "connectionIterator.h"
 #include "namedExConGroup.h"

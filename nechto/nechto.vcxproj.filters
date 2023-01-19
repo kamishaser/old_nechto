@@ -23,9 +23,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="connectionRule.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="connecter.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
@@ -66,9 +63,6 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="portSearch.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="connectionRuleCheck.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="serializer.h">
@@ -156,6 +150,9 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="conRuleInterface.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="numberedConnectionHandling.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>

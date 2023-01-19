@@ -141,8 +141,6 @@
     <ClInclude Include="compressor.h" />
     <ClInclude Include="connecter.h" />
     <ClInclude Include="connectionOperation.h" />
-    <ClInclude Include="connectionRule.h" />
-    <ClInclude Include="connectionRuleCheck.h" />
     <ClInclude Include="conRuleInterface.h" />
     <ClInclude Include="creationOperation.h" />
     <ClInclude Include="creator.h" />
@@ -154,6 +152,7 @@
     <ClInclude Include="hubPosPair.h" />
     <ClInclude Include="iterationOperation.h" />
     <ClInclude Include="entity.h" />
+    <ClInclude Include="numberedConnectionHandling.h" />
     <ClInclude Include="operator.h" />
     <ClInclude Include="operatorManagement.h" />
     <ClInclude Include="portSearch.h" />

@@ -1,6 +1,5 @@
 #pragma once
 #include "nodePtr.h"
-#include "connectionRule.h"
 #include "nodeOperationSet.h"
 #include "entity.h"
 #include <functional>
