@@ -1,20 +1,20 @@
 #pragma once
 #include "nodePtr.h"
-#include "connectionIterator.h"
+#include "connectionPointer.h"
 
 #include "hubPtr.h"
 #include "variablePtr.h"
-#include "iteratorPtr.h"
+#include "pointerPtr.h"
 #include "groupPtr.h"
 #include "MathOperation.h"
-#include "object.h"
+#include "entity.h"
 #include "condition.h"
 #include "method.h"
 #include "text.h"
 #include "textOperation.h"
 #include "operatorManagement.h"
 #include "hubManagement.h"
-#include "iterationOperation.h"
+#include "pointerMovementOperation.h"
 #include "operator.h"
 #include "readingOperation.h"
 #include "creationOperation.h"
@@ -49,31 +49,31 @@ namespace nechto
 			else
 				return createF64();
 		}
-		static portIteratorPtr createPortIterator()
+		static portPointerPtr createPortPointer()
 		{
-			existing<nodePtr> node = allocate(nodeT::Iterator, iteratorT::PortIter);
-			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
-			return portIteratorPtr(node);
+			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::PortPointer);
+			pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
+			return portPointerPtr(node);
 		}
-		static groupIteratorPtr createGroupIterator()
+		static groupPointerPtr createGroupPointer()
 		{
-			existing<nodePtr> node = allocate(nodeT::Iterator, iteratorT::GroupIter);
-			iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
-			return groupIteratorPtr(node);
+			existing<nodePtr> node = allocate(nodeT::Pointer, pointerT::GroupPointer);
+			pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
+			return groupPointerPtr(node);
 		}
-		static iteratorPtr createIterator(unsigned char subtype)
+		static pointerPtr createPointer(unsigned char subtype)
 		{
 			switch (subtype)
 			{
-			case nechto::iteratorT::PortIter:
-				return createPortIterator();
-			case nechto::iteratorT::GroupIter:
-				return createGroupIterator();
+			case nechto::pointerT::PortPointer:
+				return createPortPointer();
+			case nechto::pointerT::GroupPointer:
+				return createGroupPointer();
 			default:
 				assert(false);
 			}
 		}
-		static MathOperationPtr createMathOperation(unsigned char operationType)
+		static mathOperationPtr createMathOperation(unsigned char operationType)
 		{
 			existing<nodePtr> node = allocate(nodeT::MathOperation, operationType);
 			return node;
@@ -86,13 +86,6 @@ namespace nechto
 		static conditionPtr createCondition()
 		{
 			existing<nodePtr> node = allocate(nodeT::Condition);
-			return node;
-		}
-		static nonTypedObjectPtr createObject(unsigned char uniqueOwner,
-			entityInterface* object = nullptr)
-		{
-			existing<nodePtr> node = allocate(nodeT::Object, uniqueOwner);
-			nonTypedObjectPtr(node).setEntityPtr(object);
 			return node;
 		}
 		static textPtr createText(bool own)
@@ -141,9 +134,9 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::CreationOperation, subtype);
 			return node;
 		}
-		static iterationOperationPtr createIterationOperation(unsigned char subtype)
+		static pointerMovementOperationPtr createPointerationOperation(unsigned char subtype)
 		{
-			existing<nodePtr> node = allocate(nodeT::IterationOperation, subtype);
+			existing<nodePtr> node = allocate(nodeT::PointerationOperation, subtype);
 			return node;
 		}
 		static readingOperationPtr createReadingOperation(unsigned char subtype)
@@ -166,6 +159,15 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::OperatorManagement, subtype);
 			return node;
 		}
+		static entityPtr createEntity(unsigned char subtype, entityInterface* ent)
+		{
+			existing<nodePtr> node = allocate(nodeT::Entity, subtype);
+			if (ent == nullptr)
+				node.setData(nullptr);
+			else
+				ent->connect(node);
+			return node;
+		}
 		/*static TYPENAMEPtr createTYPENAME(unsigned char subtype)
 		{
 			existing<nodePtr> node = allocate(nodeT::TYPENAME, subtype);
@@ -185,13 +187,13 @@ namespace nechto
 				disconnectAllGroup(node);
 				deleteAllGroupHubs(node);
 				break;
-			case nechto::nodeT::Iterator:
+			case nechto::nodeT::Pointer:
 				break;
 			case nechto::nodeT::Variable:
 				break;
-			case nechto::nodeT::Object:
-				if (nonTypedObjectPtr(node).isOneSideLink())
-					delete nonTypedObjectPtr(node).getEntityPtr();
+			case nechto::nodeT::Entity:
+				if (entityPtr(node).isOneSideLink())
+					delete entityPtr(node).getEntityPtr();
 				break;
 			case nechto::nodeT::Text:
 				textPtr(node).reset();
@@ -217,12 +219,12 @@ namespace nechto
 			{
 			case nechto::nodeT::Group:
 				return createGroup(subtype);
-			case nechto::nodeT::Iterator:
-				return createIterator(subtype);
+			case nechto::nodeT::Pointer:
+				return createPointer(subtype);
 			case nechto::nodeT::Variable:
 				return createVariable(subtype);
-			case nechto::nodeT::Object:
-				return createObject(subtype);
+			case nechto::nodeT::Entity:
+				return createEntity(subtype);
 			case nechto::nodeT::Text:
 				return createText(subtype);
 			case nechto::nodeT::MathOperation:

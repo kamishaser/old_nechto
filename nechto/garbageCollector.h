@@ -1,5 +1,5 @@
 #pragma once
-#include "object.h"
+#include "entity.h"
 #include "group.h"
 #include "connecter.h"
 #include "nodeStorage.h"
@@ -37,12 +37,12 @@ namespace nechto
 	private:
 		static ushort getNodeLevel(existing<nodePtr> node)
 		{
-			if (nonTypedObjectPtr::match(node) && isStrongExternalConnection(node))
+			if (nonTypedEntityPtr::match(node) && isStrongExternalConnection(node))
 				return 1;
 			ushort bottomLevel = 0;
 			if (groupPtr::match(node))
 			{
-				groupIterator gi(node);
+				groupPointer gi(node);
 				do
 				{
 					ushort level = getConnectionLevel(gi);
@@ -50,52 +50,52 @@ namespace nechto
 						bottomLevel = level;
 				} while (gi.stepForward());
 			}
-			portIterator iter(node);
+			portPointer ptr(node);
 			do
 			{
-				ushort level = getConnectionLevel(iter);
+				ushort level = getConnectionLevel(ptr);
 				if (level > bottomLevel)
 					bottomLevel = level;
-			} while (iter.stepForward());
+			} while (ptr.stepForward());
 			return bottomLevel;
 		}
 		static const ushort maxConnectionLevel = 1024;
-		static ushort getConnectionLevel(iterator iter)
+		static ushort getConnectionLevel(pointer ptr)
 		{
-			if (!isStrongConnection(iter))
+			if (!isStrongConnection(ptr))
 				return 0;
-			ushort bottomLevel =  iter.get().node()->bottomLevel + 1;
+			ushort bottomLevel =  ptr.get().node()->bottomLevel + 1;
 			//защита от замкнутых сильных связей с автоматим удалением оных
 			if (bottomLevel > maxConnectionLevel)
 			{
-				nearestDisconnect(iter);
+				nearestDisconnect(ptr);
 				return 0;
 			}
 			return bottomLevel;
 		}
-		static bool isStrongConnection(iterator iter)
+		static bool isStrongConnection(pointer ptr)
 		{
-			nodePtr node = iter.get();
+			nodePtr node = ptr.get();
 			if (!node.exist())
 				return false;
 			switch (node.type())
 			{
-			case nodeT::Object:
-				return isObjectBackConnectionStrong(node, iter.getPurpose());
+			case nodeT::Entity:
+				return isEntityBackConnectionStrong(node, ptr.getPurpose());
 			case nodeT::Group:
-				return isGroupBackConnectionStrong(node, iter.getPurpose());
+				return isGroupBackConnectionStrong(node, ptr.getPurpose());
 			case nodeT::Struct:
-				//return isStructBackConnectionStrong(node, iter.getPurpose());
+				//return isStructBackConnectionStrong(node, ptr.getPurpose());
 			default:
 				return false;
 			}
 		}
-		static bool isObjectBackConnectionStrong(nonTypedObjectPtr object, existing<nodePtr> node)
+		static bool isEntityBackConnectionStrong(nonTypedEntityPtr entity, existing<nodePtr> node)
 		{
-			if(!isStrongExternalConnection(object))
+			if(!isStrongExternalConnection(entity))
 				return false;
 			for (int i = 0; i < 4; ++i)
-				if (object.connection(i) == node)
+				if (entity.connection(i) == node)
 					return true;
 			return false;
 		}
@@ -103,7 +103,7 @@ namespace nechto
 		{
 			if (!group.isStrong())
 				return false;
-			groupIterator gi(group);
+			groupPointer gi(group);
 			do
 			{
 				if (gi.get() == node)
@@ -112,11 +112,11 @@ namespace nechto
 			return false;
 		}
 		//bool isStructBackConnectionStrong(structPtr structure, existing<nodePtr> node);
-		static bool isStrongExternalConnection(nonTypedObjectPtr object)
+		static bool isStrongExternalConnection(nonTypedEntityPtr entity)
 		{
-			if (object.isUniqueOwner())
+			if (entity.isUniqueOwner())
 				return false;
-			if (!object.dataExist())
+			if (!entity.dataExist())
 				return false;
 			return true;
 		}

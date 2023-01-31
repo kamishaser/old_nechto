@@ -1,7 +1,15 @@
 #pragma once
 #include "nodePtr.h"
+#include "nodeOperationSet.h"
+#include "crSet.h"
 namespace nechto
 {
+	namespace operatorManagementF
+	{
+	}
+	namespace operatorManagementO
+	{
+	}
 	class operatorManagementPtr : public existing<nodePtr>
 	{
 		friend class creator;

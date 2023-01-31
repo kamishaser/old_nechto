@@ -11,7 +11,7 @@ namespace nechto::ide
 		
 	public:
 		dipSwitch testButton;
-		consistentGroup settingListVisualGroup{ creator::createObject(0),
+		consistentGroup settingListVisualGroup{ creator::createEntity(0),
 			L"список настроек", glm::vec2(100.f, 100.f) };
 
 		buttonList settingButtonList;
@@ -20,7 +20,7 @@ namespace nechto::ide
 			:gui(g),
 			testButton(g, L"testButton"),
 
-			settingButtonList(creator::createObject(0), &settingListVisualGroup,
+			settingButtonList(creator::createEntity(0), &settingListVisualGroup,
 				L"список настроек", { testButton })
 		{
 			settingListVisualGroup.mode.horisontal = false;

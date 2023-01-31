@@ -21,28 +21,28 @@ namespace nechto::ide
 	//	virtual void update()
 	//	{
 	//		assert(nBoard);
-	//		groupIterator i1(nBoard->vNodeGroup());
+	//		groupPointer i1(nBoard->vNodeGroup());
 	//		do
 	//		{
-	//			visualNode* vNode = getObject<visualNode>(i1.get());
+	//			visualNode* vNode = getEntity<visualNode>(i1.get());
 	//			if (!vNode)
 	//				continue;
 	//			//для каждой ноды сначала вычесляется смещение, а только потом применяется
 	//			//стремление к центру
 	//			vNode->target += centripet(vNode);
 	//			//отталкивание
-	//			groupIterator i2(nBoard->vNodeGroup());
+	//			groupPointer i2(nBoard->vNodeGroup());
 	//			do
 	//			{
-	//				visualNode* vNode2 = getObject<visualNode>(i2.get());
+	//				visualNode* vNode2 = getEntity<visualNode>(i2.get());
 	//				if (vNode2 && (i1.get() != i2.get()))
 	//					vNode->target += repuls(vNode, vNode2);
 	//			} while (i2.stepForward());
 	//			//притягивание по соединениям
-	//			connectionIterator i3(i1.get());
+	//			connectionPointer i3(i1.get());
 	//			do
 	//			{
-	//				visualConnection* vscon = getObject<visualConnection>(i3.get());
+	//				visualConnection* vscon = getEntity<visualConnection>(i3.get());
 	//				if (vscon)
 	//				{
 	//					nodePtr v1 = i3.get()->connection[0];
@@ -50,7 +50,7 @@ namespace nechto::ide
 	//					//vscon - соединение 2 нод. нужна та, что != i1.get()
 	//					if (v1 == i1.get())
 	//						v1 = v2;
-	//					visualNode* vNode2 = getObject<visualNode>(v1);
+	//					visualNode* vNode2 = getEntity<visualNode>(v1);
 	//					assert(vNode2);
 	//					vNode->target += attract(vNode, vNode2);
 	//				}

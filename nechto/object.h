@@ -6,58 +6,58 @@
 
 namespace nechto
 {
-	class nonTypedObjectPtr : public entityPtr
+	class nonTypedEntityPtr : public entityPtr
 	{
 	protected:
-		friend class object;
+		friend class entity;
 		friend class creator;
 	public:
-		nonTypedObjectPtr(const entityPtr& eptr)
+		nonTypedEntityPtr(const entityPtr& eptr)
 			:entityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		nonTypedObjectPtr(const existing<nodePtr>& eptr)
+		nonTypedEntityPtr(const existing<nodePtr>& eptr)
 			:entityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		nonTypedObjectPtr(nodePtr eptr)
+		nonTypedEntityPtr(nodePtr eptr)
 			:entityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
 		static bool match(const entityPtr& eptr)
 		{
-			return eptr.type() == nodeT::Object;
+			return eptr.type() == nodeT::Entity;
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return entityPtr::match(eptr) && (eptr.type() == nodeT::Object);
+			return entityPtr::match(eptr) && (eptr.type() == nodeT::Entity);
 		}
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
 	};
-	using ntObj = nonTypedObjectPtr;
+	using ntObj = nonTypedEntityPtr;
 
 
-	class objectNullPtr : public nonTypedObjectPtr
+	class entityNullPtr : public nonTypedEntityPtr
 	{
 	public:
-		objectNullPtr(const nonTypedObjectPtr& eptr)
-			:nonTypedObjectPtr(eptr)
+		entityNullPtr(const nonTypedEntityPtr& eptr)
+			:nonTypedEntityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		static bool match(const nonTypedObjectPtr& ptr)
+		static bool match(const nonTypedEntityPtr& ptr)
 		{
 			return !ptr.entityExist();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return nonTypedObjectPtr::match(eptr) && match(nonTypedObjectPtr(eptr));
+			return nonTypedEntityPtr::match(eptr) && match(nonTypedEntityPtr(eptr));
 		}
 		static bool match(const nodePtr& ptr)
 		{
@@ -67,60 +67,60 @@ namespace nechto
 
 	
 
-	template<class TCon>
-	class objectPtr : public nonTypedObjectPtr
+	/*template<class TCon>
+	class entityPtr : public nonTypedEntityPtr
 	{
 	public:
-		objectPtr(const nonTypedObjectPtr& eptr)
-			:nonTypedObjectPtr(eptr)
+		entityPtr(const nonTypedEntityPtr& eptr)
+			:nonTypedEntityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		objectPtr(existing<nodePtr> eptr)
-			:nonTypedObjectPtr(eptr)
+		entityPtr(existing<nodePtr> eptr)
+			:nonTypedEntityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		objectPtr(nodePtr eptr)
-			:nonTypedObjectPtr(eptr)
+		entityPtr(nodePtr eptr)
+			:nonTypedEntityPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		static bool match(const nonTypedObjectPtr& ptr)
+		static bool match(const nonTypedEntityPtr& ptr)
 		{
-			return dynamic_cast<TCon*>(ptr.getObjectPtr()) != nullptr;
+			return dynamic_cast<TCon*>(ptr.getEntityPtr()) != nullptr;
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return nonTypedObjectPtr::match(eptr) && match(nonTypedObjectPtr(eptr));
+			return nonTypedEntityPtr::match(eptr) && match(nonTypedEntityPtr(eptr));
 		}
 		static bool match(const nodePtr& ptr)
 		{
-			return nonTypedObjectPtr::match(ptr) && match(nonTypedObjectPtr(ptr));
+			return nonTypedEntityPtr::match(ptr) && match(nonTypedEntityPtr(ptr));
 		}
 		const TCon* operator->() const
 		{
-			return dynamic_cast<TCon*>(getObjectPtr());
+			return dynamic_cast<TCon*>(getEntityPtr());
 		}
 		TCon* operator->()
 		{
-			return dynamic_cast<TCon*>(getObjectPtr());
+			return dynamic_cast<TCon*>(getEntityPtr());
 		}
 		TCon* get()
 		{
-			return dynamic_cast<TCon*>(getObjectPtr());
+			return dynamic_cast<TCon*>(getEntityPtr());
 		}
 	};
 	template <class TCon>
-	TCon* getObject(nodePtr node)
+	TCon* getEntity(nodePtr node)
 	{
-		if (!objectPtr<TCon>::match(node))
+		if (!entityPtr<TCon>::match(node))
 			return nullptr;
-		return objectPtr<TCon>(node).get();
-	}
+		return entityPtr<TCon>(node).get();
+	}*/
 
 #ifdef OBJECT_template
-	class OBJECT :public object
+	class OBJECT :public entity
 	{
 	public:
 		const static std::wstring typeName;
@@ -132,7 +132,7 @@ namespace nechto
 		{
 			return operation();
 		}
-		virtual void serialize(std::vector<char>& buffer, nonTypedObjectPtr obj) const
+		virtual void serialize(std::vector<char>& buffer, nonTypedEntityPtr obj) const
 		{
 			buffer.clear();
 		}

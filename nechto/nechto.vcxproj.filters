@@ -15,11 +15,14 @@
     <Filter Include="Исходные файлы\node">
       <UniqueIdentifier>{f52fceb8-2277-4619-8e10-db7e7174e4e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\node\object">
-      <UniqueIdentifier>{29431e14-4f89-48f5-b972-2ddc795c9443}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\entity">
       <UniqueIdentifier>{6424a8b0-e0b7-4dd8-ad44-9b0e938ed57d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\connectionRule">
+      <UniqueIdentifier>{ab28fe1b-b2e4-4ef5-98d5-2b4178af645c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\serializer">
+      <UniqueIdentifier>{7e67edad-87be-4395-a415-f96a003e0990}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,7 +35,7 @@
     <ClInclude Include="nodeStorage.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="connectionIterator.h">
+    <ClInclude Include="connectionPointer.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="creator.h">
@@ -65,9 +68,6 @@
     <ClInclude Include="portSearch.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="serializer.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="fileSerializer.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
@@ -86,17 +86,8 @@
     <ClInclude Include="nodePtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="iteratorPtr.h">
+    <ClInclude Include="pointerPtr.h">
       <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
-    <ClInclude Include="namedExCon.h">
-      <Filter>Исходные файлы\node\object</Filter>
-    </ClInclude>
-    <ClInclude Include="namedExConGroup.h">
-      <Filter>Исходные файлы\node\object</Filter>
-    </ClInclude>
-    <ClInclude Include="object.h">
-      <Filter>Исходные файлы\node\object</Filter>
     </ClInclude>
     <ClInclude Include="text.h">
       <Filter>Исходные файлы\node</Filter>
@@ -125,7 +116,7 @@
     <ClInclude Include="creationOperation.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="iterationOperation.h">
+    <ClInclude Include="pointerMovementOperation.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
     <ClInclude Include="hubManagement.h">
@@ -146,14 +137,26 @@
     <ClInclude Include="entity.h">
       <Filter>Исходные файлы\entity</Filter>
     </ClInclude>
-    <ClInclude Include="standartConRule.h">
+    <ClInclude Include="numberedConnectionHandling.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="conRuleInterface.h">
+      <Filter>Исходные файлы\connectionRule</Filter>
+    </ClInclude>
+    <ClInclude Include="standartConRule.h">
+      <Filter>Исходные файлы\connectionRule</Filter>
+    </ClInclude>
+    <ClInclude Include="crSet.h">
+      <Filter>Исходные файлы\connectionRule</Filter>
+    </ClInclude>
+    <ClInclude Include="operation.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="numberedConnectionHandling.h">
-      <Filter>Исходные файлы</Filter>
+    <ClInclude Include="serializer.h">
+      <Filter>Исходные файлы\serializer</Filter>
+    </ClInclude>
+    <ClInclude Include="connectionPosition.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

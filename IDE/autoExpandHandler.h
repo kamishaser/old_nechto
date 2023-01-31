@@ -19,46 +19,46 @@ namespace nechto::ide
 			expand();
 		}
 	private:
-		bool checkAndExpand(iterator expandAim, visualNode* vNode1)
+		bool checkAndExpand(pointer expandAim, visualNode* vNode1)
 		{
 			if (!expandAim.get().exist())
 				return false;
 			//visualNode и visualConnection отображать запрещено
-			auto vNode2 = getObject<visualNode>(expandAim.get());
+			auto vNode2 = getEntity<visualNode>(expandAim.get());
 			if (vNode2 != nullptr &&
-				gui.workBoard.onThisBoard(getObjectPtr(vNode2)))
+				gui.workBoard.onThisBoard(getEntityPtr(vNode2)))
 				return false;
 			auto vConnection =
-				getObject<visualConnection>(expandAim.get());
+				getEntity<visualConnection>(expandAim.get());
 			if (vConnection != nullptr &&
-				gui.workBoard.onThisBoard(objectPtr<visualConnection>(expandAim.get())))
+				gui.workBoard.onThisBoard(entityPtr<visualConnection>(expandAim.get())))
 				return false;
-			vNode2 = getObject<visualNode>(gui.workBoard.visualized(expandAim.get()));
+			vNode2 = getEntity<visualNode>(gui.workBoard.visualized(expandAim.get()));
 			if (vNode2 != nullptr)
 			{//если нода визуализированна, надо проверить наличие соединения с ней 
-				if (!gui.workBoard.connected(getObjectPtr(vNode1), getObjectPtr(vNode2)))
+				if (!gui.workBoard.connected(getEntityPtr(vNode1), getEntityPtr(vNode2)))
 				{//если нету - добавить
-					gui.workBoard.addConnection(visualConnection::create(getObjectPtr(vNode1), getObjectPtr(vNode2)));
+					gui.workBoard.addConnection(visualConnection::create(getEntityPtr(vNode1), getEntityPtr(vNode2)));
 				}
 			}
 			else
 			{
 				//если нода не визуализированна, надо добавить visualNode 
-				vNode2 = new visualNode(creator::createObject(1), expandAim.get());
-				gui.workBoard.addNode(getObjectPtr(vNode2));
-				gui.workBoard.addConnection(visualConnection::create(getObjectPtr(vNode1), getObjectPtr(vNode2)));
+				vNode2 = new visualNode(creator::createEntity(1), expandAim.get());
+				gui.workBoard.addNode(getEntityPtr(vNode2));
+				gui.workBoard.addConnection(visualConnection::create(getEntityPtr(vNode1), getEntityPtr(vNode2)));
 			}
 			return true;
 		}
 		void deleteNonExistentNodes()
 		{
-			groupIterator gi(gui.workBoard.vNodeGroup());
+			groupPointer gi(gui.workBoard.vNodeGroup());
 			do
 			{
 				nodePtr v1 = gi.get();
 				if (v1.exist())
 				{
-					auto vNode = getObject<visualNode>(v1);
+					auto vNode = getEntity<visualNode>(v1);
 					if (!v1.connection(0).exist() || vNode == nullptr)
 					{
 						
@@ -69,14 +69,14 @@ namespace nechto::ide
 		}
 		void deleteNonExistentConnections()
 		{
-			groupIterator gi(gui.workBoard.vConnectionGroup());
+			groupPointer gi(gui.workBoard.vConnectionGroup());
 			do
 			{
-				auto vConnection = getObject<visualConnection>(gi.get());
+				auto vConnection = getEntity<visualConnection>(gi.get());
 				if (!vConnection)
 					continue;
-				auto vNode0 = getObject<visualNode>(gi.get().connection(0));
-				auto vNode1 = getObject<visualNode>(gi.get().connection(1));
+				auto vNode0 = getEntity<visualNode>(gi.get().connection(0));
+				auto vNode1 = getEntity<visualNode>(gi.get().connection(1));
 				if (vNode0 == nullptr || vNode1 == nullptr)
 				{
 					creator::deleteNode(gi.get());
@@ -92,22 +92,22 @@ namespace nechto::ide
 		}
 		void expand()
 		{
-			groupIterator gi(gui.workBoard.vNodeGroup());
+			groupPointer gi(gui.workBoard.vNodeGroup());
 			do
 			{
 				if (!gi.get().exist() || !gi.get().connection(0).exist())
 					continue;//не существующие соединения интереса не представляют
-				auto vNode1 = getObject<visualNode>(gi.get());
+				auto vNode1 = getEntity<visualNode>(gi.get());
 				nodePtr v1 = gi.get().connection(0);
 				if (groupPtr::match(v1))
 				{
-					groupIterator gi2(v1);
+					groupPointer gi2(v1);
 					do
 					{
 						checkAndExpand(gi2, vNode1);
 					} while (gi2.stepForward());
 				}
-				portIterator ci(v1);
+				portPointer ci(v1);
 				do
 				{
 					checkAndExpand(ci, vNode1);

@@ -6,22 +6,22 @@
 
 namespace nechto
 {
-	class iteratorPtr : public existing<nodePtr>
+	class pointerPtr : public existing<nodePtr>
 	{
 	public:
-		explicit iteratorPtr(const existing<nodePtr>& eptr)
+		explicit pointerPtr(const existing<nodePtr>& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
 		}
-		explicit iteratorPtr(const nodePtr& eptr)
+		explicit pointerPtr(const nodePtr& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return eptr.type() == nodeT::Iterator;
+			return eptr.type() == nodeT::Pointer;
 		}
 		static bool match(const nodePtr& ptr)
 		{
@@ -55,77 +55,77 @@ namespace nechto
 			setData(hpp);
 		}
 	};
-	class portIteratorPtr : public iteratorPtr
+	class portPointerPtr : public pointerPtr
 	{
 	public:
-		portIteratorPtr(const iteratorPtr& eptr)
-			:iteratorPtr(eptr)
+		portPointerPtr(const pointerPtr& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		explicit portIteratorPtr(const existing<nodePtr>& eptr)
-			:iteratorPtr(eptr)
+		explicit portPointerPtr(const existing<nodePtr>& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		explicit portIteratorPtr(const nodePtr& eptr)
-			:iteratorPtr(eptr)
+		explicit portPointerPtr(const nodePtr& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		static bool match(const iteratorPtr& eptr)
+		static bool match(const pointerPtr& eptr)
 		{
-			return eptr.subtype() == iteratorT::PortIter;
+			return !eptr.getHPPair().inGroup();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return iteratorPtr::match(eptr) && match(iteratorPtr(eptr));
+			return pointerPtr::match(eptr) && match(pointerPtr(eptr));
 		}
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
 
-		bool operator<(const portIteratorPtr& iter)
+		bool operator<(const portPointerPtr& ptr)
 		{
-			assert(purpose() == iter.purpose());
-			return getGlobalPos() < iter.getGlobalPos();
+			assert(purpose() == ptr.purpose());
+			return getGlobalPos() < ptr.getGlobalPos();
 		}
 	}; 
-	class groupIteratorPtr : public iteratorPtr
+	class groupPointerPtr : public pointerPtr
 	{
 	public:
-		groupIteratorPtr(const iteratorPtr& eptr)
-			:iteratorPtr(eptr)
+		groupPointerPtr(const pointerPtr& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		explicit groupIteratorPtr(const existing<nodePtr>& eptr)
-			:iteratorPtr(eptr)
+		explicit groupPointerPtr(const existing<nodePtr>& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		explicit groupIteratorPtr(const nodePtr& eptr)
-			:iteratorPtr(eptr)
+		explicit groupPointerPtr(const nodePtr& eptr)
+			:pointerPtr(eptr)
 		{
 			assert(match(eptr));
 		}
-		static bool match(const iteratorPtr& eptr)
+		static bool match(const pointerPtr& eptr)
 		{
-			return eptr.subtype() == iteratorT::GroupIter;
+			return eptr.getHPPair().inGroup();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
-			return iteratorPtr::match(eptr) && match(iteratorPtr(eptr));
+			return pointerPtr::match(eptr) && match(pointerPtr(eptr));
 		}
 		static bool match(const nodePtr& ptr)
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		bool operator<(const groupIteratorPtr& iter)
+		bool operator<(const groupPointerPtr& ptr)
 		{
-			assert(purpose() == iter.purpose());
-			return getGlobalPos() < iter.getGlobalPos();
+			assert(purpose() == ptr.purpose());
+			return getGlobalPos() < ptr.getGlobalPos();
 		}
 	};
 }

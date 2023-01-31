@@ -1,20 +1,20 @@
 #pragma once
-#include "iteratorPtr.h"
+#include "pointerPtr.h"
 #include "hubPtr.h"
 #include "groupPtr.h"
 
 namespace nechto
 {
-	struct iterator : public hubPosPair
+	struct pointer : public hubPosPair
 	{
 	protected:
 		nodePtr purpose;
 	public:
-		iterator() {}
-		iterator(nodePtr Purpose, hubPosPair hpp)
+		pointer() {}
+		pointer(nodePtr Purpose, hubPosPair hpp)
 			:hubPosPair(hpp), purpose(Purpose) {}
-		explicit iterator(iteratorPtr iterPtr)
-			:hubPosPair(iterPtr.getHPPair()), purpose(iterPtr.purpose()){}
+		explicit pointer(pointerPtr ptrPtr)
+			:hubPosPair(ptrPtr.getHPPair()), purpose(ptrPtr.purpose()){}
 		operator bool()const
 		{return exist(); }
 		nodePtr get()const 
@@ -22,25 +22,25 @@ namespace nechto
 			return follow();
 		}
 		//вытянуть данные из ноды итератора
-		void pull(iteratorPtr iter)
+		void pull(pointerPtr ptr)
 		{
-			setHPPair(iter.getHPPair());
-			purpose = iter.purpose();
+			setHPPair(ptr.getHPPair());
+			purpose = ptr.purpose();
 		}
 		//отправить данные в ноду итератор
-		bool push(iteratorPtr iter) const
+		bool push(pointerPtr ptr) const
 		{
-			if (iter.purpose() != purpose)
+			if (ptr.purpose() != purpose)
 				return false;
-			iter.setHPPair(*this);
+			ptr.setHPPair(*this);
 		}
-		//bool operator==(const iterator& iter) const
+		//bool operator==(const pointer& ptr) const
 		//{
-		//	return (hpp == iter.hpp) && (purpose == iter.purpose);
+		//	return (hpp == ptr.hpp) && (purpose == ptr.purpose);
 		//}
-		//bool operator!=(const iterator& iter) const
+		//bool operator!=(const pointer& ptr) const
 		//{
-		//	return (hpp != iter.hpp) || (purpose != iter.purpose);
+		//	return (hpp != ptr.hpp) || (purpose != ptr.purpose);
 		//}
 		nodePtr getPurpose() const
 		{
@@ -57,15 +57,15 @@ namespace nechto
 		}
 	};
 
-	class portIterator : public iterator
+	class portPointer : public pointer
 	{
 	public:
-		explicit portIterator(existing<nodePtr> Purpose, char pos = 0)
-			:iterator(Purpose, hubPosPair(Purpose, pos)) {}
-		explicit portIterator(portIteratorPtr conIter)
-			:iterator(iteratorPtr(conIter)){}
-		portIterator(nodePtr Purpose, hubPosPair hpp)
-			:iterator(Purpose, hpp) {}
+		explicit portPointer(existing<nodePtr> Purpose, char pos = 0)
+			:pointer(Purpose, hubPosPair(Purpose, pos)) {}
+		explicit portPointer(portPointerPtr conPointer)
+			:pointer(pointerPtr(conPointer)){}
+		portPointer(nodePtr Purpose, hubPosPair hpp)
+			:pointer(Purpose, hpp) {}
 	private:
 		bool nextHub()
 		{
@@ -110,30 +110,30 @@ namespace nechto
 				return false;
 			return true;
 		}
-		auto operator<=>(const portIterator& iter)
+		auto operator<=>(const portPointer& ptr)
 		{
-			assert(hub == iter.hub);
-			return getGlobalPos() <=> iter.getGlobalPos();
+			assert(hub == ptr.hub);
+			return getGlobalPos() <=> ptr.getGlobalPos();
 		}
 	};
-	class groupIterator : public iterator
+	class groupPointer : public pointer
 	{
 	public:
-		explicit groupIterator(groupPtr group)
-			:iterator(group, hubPosPair(group.firstGroupHub(), 0)){}
-		explicit groupIterator(groupIteratorPtr groupIter)
-			:iterator(iteratorPtr(groupIter)){}
-		explicit groupIterator(iterator iter)
-			:iterator(iter) 
+		explicit groupPointer(groupPtr group)
+			:pointer(group, hubPosPair(group.firstGroupHub(), 0)){}
+		explicit groupPointer(groupPointerPtr groupPointer)
+			:pointer(pointerPtr(groupPointer)){}
+		explicit groupPointer(pointer ptr)
+			:pointer(ptr) 
 		{
-			if (iter.exist())
+			if (ptr.exist())
 			{
-				assert(iter.getPurpose().type() == nodeT::Group);
+				assert(ptr.getPurpose().type() == nodeT::Group);
 				assert(inGroup());
 			}
 		}
-		groupIterator(nodePtr Purpose, hubPosPair hpp)
-			:iterator(Purpose, hpp) {}
+		groupPointer(nodePtr Purpose, hubPosPair hpp)
+			:pointer(Purpose, hpp) {}
 
 		groupPtr group()
 		{
@@ -215,12 +215,12 @@ namespace nechto
 				return false;
 			return atFirstHub();
 		}
-		auto operator<=>(const groupIterator& iter)
+		auto operator<=>(const groupPointer& ptr)
 		{
-			assert(hub == iter.hub);
-			return getGlobalPos() <=> iter.getGlobalPos();
+			assert(hub == ptr.hub);
+			return getGlobalPos() <=> ptr.getGlobalPos();
 		}
 	};
-	const portIterator nullPortIterator = portIterator(nullptr, hubPosPair());
-	const groupIterator nullGroupIterator = groupIterator(nullptr, hubPosPair());
+	const portPointer nullPortPointer = portPointer(nullptr, hubPosPair());
+	const groupPointer nullGroupPointer = groupPointer(nullptr, hubPosPair());
 }

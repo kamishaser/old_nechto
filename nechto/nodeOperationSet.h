@@ -1,14 +1,14 @@
 #pragma once
 #include <array>
 #include "conRuleInterface.h"
+#include "operation.h"
 
 namespace nechto
 {
-	template<int size = 256>
 	class nodeOperationSet
 	{
 	public:
-		std::array<operation, size> opSet;
+		std::array<operation, 256> opSet;
 		const unsigned char usedSize;
 		//массив всех операций
 
@@ -29,7 +29,7 @@ namespace nechto
 			:usedSize(0) {}
 		//инициализация копированием с добавлением
 		nodeOperationSet(
-			const nodeOperationSet<size>& nopSet,
+			const nodeOperationSet& nopSet,
 			std::initializer_list<operation> ilist)
 			:usedSize(nopSet.usedSize + ilist.size())
 		{
@@ -45,20 +45,15 @@ namespace nechto
 				number++;
 			}
 		}
-		constexpr char getNumber(const std::wstring& name) const
+		/*constexpr char getNumber(const std::wstring& name) const
 		{
 			for (int i = 0; i < usedSize; ++i)
 				if (nameSet[i] == name)
 					return i;
-		}
+		}*/
 		const operation* getOperation(unsigned char number) const
 		{
 			return &opSet[number];
-		}
-
-		bool operate(nodePtr v1, unsigned char number) const
-		{
-			return opSet[number].operate(v1);
 		}
 
 	};

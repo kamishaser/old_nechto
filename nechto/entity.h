@@ -8,7 +8,7 @@ namespace nechto
 	{
 		switch (type)
 		{
-		case nodeT::Object:
+		case nodeT::Entity:
 		case nodeT::Operator:
 		case nodeT::Text:
 			return true;
@@ -17,9 +17,7 @@ namespace nechto
 		}
 	}
 	template<class TCon>
-	concept essT =
-		std::is_move_constructible<TCon>::value &&
-		std::is_move_assignable<TCon>::value;
+	concept essT = true;
 
 
 
@@ -44,7 +42,7 @@ namespace nechto
 		{}
 		virtual constexpr const std::wstring& getTypeName() const
 		{
-			return L"nonTypedObject";
+			return L"nonTypedEntity";
 		}
 		virtual ~entityInterface()
 		{
@@ -56,7 +54,8 @@ namespace nechto
 
 
 
-	////////////////////////////////////////////////////////////////////entityPtr
+	/////////////////////////////////////////////////////////////////////entityPtr
+	//////////////////////////////////////////////////////////////////////////////
 	class entityPtr : public existing<nodePtr>
 	{
 	protected:
@@ -117,7 +116,8 @@ namespace nechto
 
 
 
-	////////////////////////////////////////////////////////////////////entity
+	////////////////////////////////////////////////////////////////////////entity
+	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
 	class entity : public entityInterface
 	{
@@ -136,8 +136,8 @@ namespace nechto
 	};
 	
 
-
-	////////////////////////////////////////////////////////////////////oneSideLinkedEntity
+	///////////////////////////////////////////////////////////oneSideLinkedEntity
+	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
 	class oneSideLinkedEntity :public entity<ECon>
 	{
@@ -156,6 +156,7 @@ namespace nechto
 		{
 			if (enNode.exist())
 			{
+				entityInterface::setEntityPtr(enNode, this);
 				assert(entityPtr::match(enNode));
 				assert(enNode.subtype() == entityT::oneSideLink);
 			}
@@ -163,8 +164,8 @@ namespace nechto
 		
 	};
 
-
-	////////////////////////////////////////////////////////////////////singleConnectedEntity
+	/////////////////////////////////////////////////////////singleConnectedEntity
+	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
 	class singleConnectedEntity :public entity<ECon>
 	{
@@ -205,6 +206,7 @@ namespace nechto
 	private:
 		nodePtr enNode;
 	};
+	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
 	ECon* entityPtr::getEntity()
 	{
@@ -220,5 +222,63 @@ namespace nechto
 		if (ptr == nullptr)
 			return nullptr;
 		return &ptr->data;
+	}
+	//////////////////////////////////////////////////////////////////////////////
+	//указатель на несуществующую сущность
+	class entityNullPtr : public entityPtr
+	{
+	public:
+		entityNullPtr(const entityPtr& eptr)
+			:entityPtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		static bool match(const entityPtr& ptr)
+		{
+			return !ptr.entityExist();
+		}
+		static bool match(const existing<nodePtr>& eptr)
+		{
+			return entityPtr::match(eptr) && match(entityPtr(eptr));
+		}
+		static bool match(const nodePtr& ptr)
+		{
+			return ptr.exist() && match(existing<nodePtr>(ptr));
+		}
+	};
+	template<essT ECon>
+	class typedEntityPtr : public entityPtr
+	{
+	public:
+		typedEntityPtr(const entityPtr& eptr)
+			:entityPtr(eptr)
+		{
+			assert(match(eptr));
+		}
+		static bool match(const entityPtr& ptr)
+		{
+			return entityPtr::getEntity<ECon>() != nullptr;
+		}
+		static bool match(const existing<nodePtr>& eptr)
+		{
+			return entityPtr::match(eptr) && match(entityPtr(eptr));
+		}
+		static bool match(const nodePtr& ptr)
+		{
+			return ptr.exist() && match(existing<nodePtr>(ptr));
+		}
+		//получение сущности
+		ECon* get()
+		{
+			return entityPtr::confidentlyGetEntity<ECon>();
+		}
+	};
+	template <essT ECon>
+	using teptr = typedEntityPtr<ECon>;
+
+	template <essT ECon>
+	ECon* getEntity(teptr<ECon> node)
+	{
+		return node.confidentlyGetEntity();
 	}
 }

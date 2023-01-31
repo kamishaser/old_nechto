@@ -1,5 +1,5 @@
 #pragma once
-#include "connectionIterator.h"
+#include "connectionPointer.h"
 #include "groupPtr.h"
 
 #include "creator.h"
@@ -11,7 +11,7 @@ namespace nechto::groupOperations
 	i64 numberOfMembers(groupPtr group)
 	{
 		i64 counter = 0;
-		groupIterator i(group);
+		groupPointer i(group);
 		do
 		{
 			if (i.get().exist())
@@ -21,7 +21,7 @@ namespace nechto::groupOperations
 	}
 	bool empty(groupPtr group)
 	{
-		groupIterator i(group);
+		groupPointer i(group);
 		do
 		{
 			if (i.get().exist())
@@ -33,7 +33,7 @@ namespace nechto::groupOperations
 	
 	void nearestGroupDisconnectAll(groupPtr group)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		do
 		{
 			if (gi.get().exist())
@@ -43,13 +43,13 @@ namespace nechto::groupOperations
 	void clear(groupPtr group)
 	{
 		nearestGroupDisconnectAll(group);
-		groupIterator gi(group);
+		groupPointer gi(group);
 		gi.goToNextHub();
 		hubManager::eraseHub(gi, -1);
 	}
 	bool contains(groupPtr group, nodePtr v1)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		do
 		{
 			if (gi.get() == v1)
@@ -57,14 +57,14 @@ namespace nechto::groupOperations
 		} while (gi.stepForward());
 		return false;
 	}
-	groupIterator getIteratorToConnection(groupPtr group, nodePtr v1)
+	groupPointer getPointerToConnection(groupPtr group, nodePtr v1)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		do
 		{
 			if (gi.get() == v1)
 				return gi;
 		} while (gi.stepForward());
-		return nullGroupIterator;
+		return nullGroupPointer;
 	}
 }

@@ -6,7 +6,7 @@
 
 namespace nechto
 {
-	struct namedExConGroup :public namedExCon
+	/*struct namedExConGroup :public namedExCon
 	{
 		namedExConGroup(const std::wstring& n)
 			:namedExCon(n)
@@ -14,9 +14,9 @@ namespace nechto
 			
 			NumNumConnect(node(), creator::createGroup(), 0, 0);
 		}
-		namedExConGroup(nodePtr emptyObject, 
+		namedExConGroup(nodePtr emptyEntity, 
 			const std::wstring& n)
-			:namedExCon(emptyObject, n)
+			:namedExCon(emptyEntity, n)
 		{
 			NumNumConnect(node(), creator::createGroup(), 0, 0);
 		}
@@ -35,23 +35,23 @@ namespace nechto
 		}
 		void addNodeToNearestPort(nodePtr v1) const
 		{
-			IterHubConnect(firstEmptyGroupPort(getGroup()), v1);
+			PointerHubConnect(firstEmptyGroupPort(getGroup()), v1);
 		}
-		void addNodeToNearestPort(iterator iter) const
+		void addNodeToNearestPort(pointer ptr) const
 		{
-			IterIterConnect(firstEmptyGroupPort(getGroup()), iter);
+			PointerPointerConnect(firstEmptyGroupPort(getGroup()), ptr);
 		}
 		void addNodeToEnd(nodePtr v1) const
 		{
-			IterHubConnect(backGroupPort(getGroup()), v1);
+			PointerHubConnect(backGroupPort(getGroup()), v1);
 		}
-		void addNodeToEnd(iterator iter) const
+		void addNodeToEnd(pointer ptr) const
 		{
-			IterIterConnect(backGroupPort(getGroup()), iter);
+			PointerPointerConnect(backGroupPort(getGroup()), ptr);
 		}
 		i64 size() const
 		{
 			return groupOperations::numberOfMembers(groupPtr(getGroup()));
 		}
-	};
+	};*/
 }

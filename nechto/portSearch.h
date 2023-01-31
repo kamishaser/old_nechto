@@ -4,10 +4,10 @@
 
 namespace nechto
 {
-	portIterator firstEmptyHubPort(existing<nodePtr> eptr)
+	portPointer firstEmptyHubPort(existing<nodePtr> eptr)
 	{
 		assert(eptr.type() != nodeT::Hub);
-		portIterator ci(eptr);
+		portPointer ci(eptr);
 		while (true)
 		{
 			if (!ci.hub.hub().exist())
@@ -21,9 +21,9 @@ namespace nechto
 				}
 		}
 	}
-	groupIterator firstEmptyGroupPort(groupPtr group)
+	groupPointer firstEmptyGroupPort(groupPtr group)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		while (true)
 		{
 			for (int i = 0; i < 4; ++i)
@@ -39,31 +39,31 @@ namespace nechto
 			gi.goToNextHub();
 		}
 	}
-	portIterator lastConnectedPort(existing<nodePtr> node)
+	portPointer lastConnectedPort(existing<nodePtr> node)
 	{
-		portIterator iter(node);
-		portIterator lastConnected(nullptr, hubPosPair());
+		portPointer ptr(node);
+		portPointer lastConnected(nullptr, hubPosPair());
 		do
 		{
-			if (iter.get().exist())
-				lastConnected = iter;
-		} while (iter.stepForward());
+			if (ptr.get().exist())
+				lastConnected = ptr;
+		} while (ptr.stepForward());
 		return lastConnected;
 	}
-	groupIterator lastConnectedGroupPort(groupPtr group)
+	groupPointer lastConnectedGroupPort(groupPtr group)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		gi.stepBack();
 		do
 		{
 			if (gi.get().exist())
 				return gi;
 		} while (gi.stepBack());
-		return groupIterator(group, hubPosPair());
+		return groupPointer(group, hubPosPair());
 	}
-	groupIterator backGroupPort(groupPtr group)
+	groupPointer backGroupPort(groupPtr group)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		gi.stepBack();
 
 		if (gi.get().exist())//если последний порт занят
@@ -80,31 +80,31 @@ namespace nechto
 	}
 	/*возврощает итератор на ближайший порт ноды node подключённый к connection.
 	* Ели не находит - возвращает пустой итератор */
-	portIterator findNearestNonGroupConnection(
+	portPointer findNearestNonGroupConnection(
 		existing<nodePtr> node, existing<nodePtr> connection)
 	{
-		portIterator ci(node);
+		portPointer ci(node);
 		do
 		{
 			if (ci.get() == connection)
 				return ci;
 		} while (ci.stepForward());
-		return portIterator(nullptr, hubPosPair(nullptr, 0));
+		return portPointer(nullptr, hubPosPair(nullptr, 0));
 	}
 	/*возврощает итератор на ближайший порт группы group подключённый к connection.
 	* Ели не находит - возвращает пустой итератор */
-	groupIterator findNearestGroupConnection(
+	groupPointer findNearestGroupConnection(
 		groupPtr group, existing<nodePtr> connection)
 	{
-		groupIterator gi(group);
+		groupPointer gi(group);
 		do
 		{
 			if (gi.get() == connection)
 				return gi;
 		} while (gi.stepForward());
-		return groupIterator(nullptr, hubPosPair(nullptr, 0));
+		return groupPointer(nullptr, hubPosPair(nullptr, 0));
 	}
-	iterator findNearestConnection(
+	pointer findNearestConnection(
 		existing<nodePtr> node, existing<nodePtr> connection)
 	{
 		if (node.type() == nodeT::Group)
@@ -118,7 +118,7 @@ namespace nechto
 	}
 	bool hasConnection(existing<nodePtr> node0, existing<nodePtr> node1)
 	{
-		portIterator p1(node0);
+		portPointer p1(node0);
 		do
 		{
 			if (p1.get() == node1)

@@ -48,22 +48,22 @@ namespace nechto::ide
 		std::wstring header = L"_____";
 		std::wstring iText;
 
-		textInputBox(objectPtr<visualNode> v1)
+		textInputBox(entityPtr<visualNode> v1)
 			:namedExCon(L"TextInputBox")
 		{
 			NumHubConnect(node(), v1, 0);
 		}
 		visualNode* aim() const
 		{
-			if (!objectPtr<visualNode>::match(node().connection(1)))
+			if (!entityPtr<visualNode>::match(node().connection(1)))
 				return nullptr;
-			return objectPtr<visualNode>(node().connection(1)).get();
+			return entityPtr<visualNode>(node().connection(1)).get();
 		}
 		visualNode* box() const
 		{
-			if (!objectPtr<visualNode>::match(node().connection(0)))
+			if (!entityPtr<visualNode>::match(node().connection(0)))
 				return nullptr;
-			return objectPtr<visualNode>(node().connection(0)).get();
+			return entityPtr<visualNode>(node().connection(0)).get();
 		}
 		void update(int input)
 		{

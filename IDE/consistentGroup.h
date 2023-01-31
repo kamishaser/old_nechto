@@ -46,10 +46,9 @@ namespace nechto::ide
 		arrangeMode mode;
 		float distance = 2;
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(nodePtr emptyExternalObject, const std::wstring& name, 
-			glm::vec2 startPoint = glm::vec2(0,0), arrangeMode Mode = arrangeMode())
-			:visualGroup(emptyExternalObject, name, startPoint), mode(Mode)
-			//при удалении ноды, удалится и сей объект !!!только выделять через new!!!
+		consistentGroup(teptr<visualGroup> node, glm::vec2 startPoint = glm::vec2(0,0), 
+			arrangeMode Mode = arrangeMode())
+			:visualGroup(node, startPoint), mode(Mode)
 		{}
 		void setPositionByStartPoint(glm::vec2 pos)
 		{
@@ -65,9 +64,9 @@ namespace nechto::ide
 			frame.size = size;
 		}
 		//расставить ноды в группе согласно mode на расстоянии distance друг от друга
-		virtual void update()
+		virtual void update(teptr<visualGroup> node)
 		{
-			groupIterator gi(vNodeGroup());
+			groupPointer gi(vNodeGroup(node));
 			glm::vec2 startPos = mode.startPoint(frame);//точка установки первой ноды
 			frame.size = glm::vec2{ 0, 0 };
 			float lenghtPos{ startPos[mode.lenght()]};//точка установки
@@ -100,7 +99,7 @@ namespace nechto::ide
 					gi.goToPreviousHub();
 				do
 				{
-					glm::vec2 size = arrangeRow(gi, rPos, lenghtPos);
+					glm::vec2 size = arrangeRow(node, gi, rPos, lenghtPos);
 					lenghtPos += size[mode.lenght()] + distance;
 					if (size[mode.width()] > frame.size[mode.width()])
 					{
@@ -126,7 +125,7 @@ namespace nechto::ide
 			r1->position.x = (mode.xSizeOffset()) ? (pos.x - r1->size.x) : pos.x;
 			r1->position.y = (mode.ySizeOffset()) ? (pos.y - r1->size.y) : pos.y;
 		}
-		glm::vec2 arrangeOne(groupIterator gi, glm::vec2 pos) const
+		glm::vec2 arrangeOne(groupPointer gi, glm::vec2 pos) const
 		{
 			rect* r1 = getRect(gi.get());
 			if (r1)
@@ -137,7 +136,7 @@ namespace nechto::ide
 			else
 				return glm::vec2{ 0,0 };
 		}
-		glm::vec2 arrangeRow(groupIterator gi,
+		glm::vec2 arrangeRow(teptr<visualGroup> node, groupPointer gi,
 			std::array<float, 4>widthPos, float lenghtPos) const
 		{
 			glm::vec2 size{ 0,0 };
@@ -155,12 +154,12 @@ namespace nechto::ide
 						size[mode.lenght()] = r1->size[mode.lenght()];
 				}
 			}
-			size[mode.width()] += (mode.rightAlignment) ? maxSizeInRow(0) : maxSizeInRow(3);
+			size[mode.width()] += (mode.rightAlignment) ? maxSizeInRow(node, 0) : maxSizeInRow(node, 3);
 			return size;
 		}
-		float maxSizeInRow(int rowNumber) const
+		float maxSizeInRow(teptr<visualGroup> node, int rowNumber) const
 		{
-			groupIterator gi = groupIterator(groupPtr(getGroup()));
+			groupPointer gi = groupPointer(groupPtr(vNodeGroup(node)));
 			gi.setLocalPos(rowNumber);
 			float maxRSize = 0;//поиск максимального размера
 			do
@@ -176,7 +175,7 @@ namespace nechto::ide
 			return maxRSize;
 		}
 		//получение стартовой точки каждого ряда для 4table
-		std::array<float, 4> rowPos(float startPoint, float distance) const
+		std::array<float, 4> rowPos(teptr<visualGroup> node, float startPoint, float distance) const
 		{
 			std::array<float, 4> rowPos;
 			//в каждом ряду, кроме последнего
@@ -184,34 +183,32 @@ namespace nechto::ide
 			{
 				rowPos[3] = startPoint;
 				for (int i = 2; i >= 0; --i)
-					rowPos[i] = rowPos[i + 1] - maxSizeInRow(i + 1) - distance;
+					rowPos[i] = rowPos[i + 1] - maxSizeInRow(node, i + 1) - distance;
 			}
 			else
 			{
 				rowPos[0] = startPoint;
 				for (int i = 0; i < 3; ++i)
-					rowPos[i + 1] = rowPos[i] + maxSizeInRow(i) + distance;
+					rowPos[i + 1] = rowPos[i] + maxSizeInRow(node, i) + distance;
 			}
 			return rowPos;
 		}
 	public:
 		const static std::wstring typeName;
-		const static staticNodeOperationSet methodSet;
-		virtual const std::wstring& getTypeName() const override
+		/*virtual const std::wstring& getTypeName() const override
 		{
 			return typeName;
 		}
 		virtual const operation& getMethod(unsigned char number)const override
 		{
 			return methodSet.getOperation(number);
-		}
+		}*/
 	};
 	const std::wstring consistentGroup::typeName = L"nechtoIde.consistentGroup";
-	const staticNodeOperationSet consistentGroup::methodSet
 	{
 		/*visualGroup::methodSet,
 		namedOperation(L"nothing", operation{
-				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
+				connectionRule(conRule::ExternalEntity, conRule::Input, nullptr),
 				[](nodePtr v0, nodePtr v1, nodePtr v2)
 			{
 				return true;

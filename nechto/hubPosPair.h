@@ -1,5 +1,6 @@
 #pragma once
 #include "nodePtr.h"
+#include "connectionPosition.h"
 
 namespace nechto
 {
@@ -7,7 +8,7 @@ namespace nechto
 	{
 	private:
 		uint32_t position;
-		friend struct iterator;
+		friend struct pointer;
 	public:
 		nodePtr hub;
 

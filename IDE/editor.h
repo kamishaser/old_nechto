@@ -22,8 +22,8 @@ namespace nechto::ide
 		conType con1Type = conType::Hub;
 		conType con2Type = conType::Hub;
 	public:
-		buttonList nList{ creator::createObject(1), 
-			new consistentGroup(creator::createObject(1),
+		buttonList nList{ creator::createEntity(1), 
+			new consistentGroup(creator::createEntity(1),
 				L"тип создаваемой ноды", glm::vec2(5.f, 10.f)),
 				L"тип создаваемой ноды", {
 				L"Text",
@@ -32,8 +32,8 @@ namespace nechto::ide
 				L"Group",
 				L"If",
 				L"MathOperation"}, L"Text" };
-		buttonList c1List{ creator::createObject(1),
-			new consistentGroup(creator::createObject(1),
+		buttonList c1List{ creator::createEntity(1),
+			new consistentGroup(creator::createEntity(1),
 				L"тип создаваемого соединения 1", glm::vec2(5.f, 40.f)),
 			L"тип создаваемого соединения 1", {
 				L"Hub",
@@ -42,8 +42,8 @@ namespace nechto::ide
 				L"N1",
 				L"N2",
 				L"N3"}, L"Hub"};
-		buttonList c2List{ creator::createObject(1),
-			new consistentGroup(creator::createObject(1),
+		buttonList c2List{ creator::createEntity(1),
+			new consistentGroup(creator::createEntity(1),
 				L"тип создаваемого соединения 2", glm::vec2(5.f, 70.f)),
 			L"тип создаваемого соединения 2", {
 				L"Hub",
@@ -53,19 +53,19 @@ namespace nechto::ide
 				L"N2",
 				L"N3"}, L"Hub" };
 
-		buttonList MathOperationList{ creator::createObject(1),
-			new consistentGroup(creator::createObject(1),
+		buttonList MathOperationList{ creator::createEntity(1),
+			new consistentGroup(creator::createEntity(1),
 				L"математический оператор", glm::vec2(10.f, 100.f)),
 			L"математический оператор", 
 			typeName::getTypeNameList(typeName::getMathOperationShortSubtypeName, 
 				MathOperationT::Decrement+1) };
-		consistentGroup editorGroup{ creator::createObject(1), L"редактор", glm::vec2(10, 10) };
+		consistentGroup editorGroup{ creator::createEntity(1), L"редактор", glm::vec2(10, 10) };
 		editor(GUI& g, selectHandler& shandler)
 			:gui(g), sh(shandler)
 		{
 			gui.setbList(nList, [&](buttonList* bList)
 				{
-					auto vNode = getObject<visualNode>(
+					auto vNode = getEntity<visualNode>(
 						bList->lClicked()->node().connection(0));
 
 					const std::wstring& name = bList->lClicked()->name;
@@ -76,7 +76,7 @@ namespace nechto::ide
 						assert(creatingType == nodeT::MathOperation);
 						if(!MathOperationList.visible())
 							MathOperationList.show(&gui.interfaceBoard);
-						auto vGroup = getObject<visualGroup>(MathOperationList.getGroup());
+						auto vGroup = getEntity<visualGroup>(MathOperationList.getGroup());
 						if (vGroup)
 						{
 							vGroup->frame.size = vNode->frame.size + glm::vec2(0.f, 30.f);
@@ -141,9 +141,9 @@ namespace nechto::ide
 						}
 				});
 			gui.interfaceBoard.addGroup(editorGroup.node());
-			editorGroup.addGroup(getObjectPtr(nList.vNodeGroup()));
-			editorGroup.addGroup(getObjectPtr(c1List.vNodeGroup()));
-			editorGroup.addGroup(getObjectPtr(c2List.vNodeGroup()));
+			editorGroup.addGroup(getEntityPtr(nList.vNodeGroup()));
+			editorGroup.addGroup(getEntityPtr(c1List.vNodeGroup()));
+			editorGroup.addGroup(getEntityPtr(c2List.vNodeGroup()));
 			gui.topGroup.addGroup(editorGroup.node());
 			editorGroup.mode.horisontal = false;
 			editorGroup.update();
@@ -152,17 +152,17 @@ namespace nechto::ide
 		visualNode* addNode()
 		{
 			nodePtr v1 = creator::createNode(creatingType, creatingSubtype);
-			auto vNode1 = new visualNode(creator::createObject(1), v1);
-			gui.workBoard.addNode(getObjectPtr<visualNode>(vNode1));
+			auto vNode1 = new visualNode(creator::createEntity(1), v1);
+			gui.workBoard.addNode(getEntityPtr<visualNode>(vNode1));
 			connect(vNode1);
 			return vNode1;
 		}
 		void connect(visualNode* vNode1)
 		{
-			groupIterator gi(sh.selectedGroup());
+			groupPointer gi(sh.selectedGroup());
 			do
 			{
-				auto vNode2 = getObject<visualNode>(gi.get());
+				auto vNode2 = getEntity<visualNode>(gi.get());
 				if ((!(vNode2)) || (vNode1->node() == vNode2->node()))
 					continue;
 				connect(vNode1, vNode2, con1Type, con2Type);
@@ -176,9 +176,9 @@ namespace nechto::ide
 			nodePtr v2 = vNode2->node().connection(0);
 			if (!(v1.exist() && v2.exist()))
 				return;
-			IterIterConnect(getIter(v1, ct1), getIter(v2, ct2));
+			PointerPointerConnect(getPointer(v1, ct1), getPointer(v2, ct2));
 		}
-		static iterator getIter(nodePtr v1, conType c1)
+		static pointer getPointer(nodePtr v1, conType c1)
 		{
 			if (c1 == conType::Hub)
 				return firstEmptyHubPort(v1);
@@ -189,7 +189,7 @@ namespace nechto::ide
 				else
 					return firstEmptyHubPort(v1);
 			}
-			return portIterator(v1, 
+			return portPointer(v1, 
 				static_cast<int>(c1) - static_cast<int>(conType::N0));
 		}
 		

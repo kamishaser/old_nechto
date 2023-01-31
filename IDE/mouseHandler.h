@@ -35,7 +35,7 @@ namespace nechto::ide
 		}
 		visualNode* cursored() const
 		{
-			return getObject<visualNode>(cursor.node().connection(0));
+			return getEntity<visualNode>(cursor.node().connection(0));
 		}
 		void setCursored(visualNode* cursoredNode)
 		{
@@ -45,7 +45,7 @@ namespace nechto::ide
 		}
 		visualNode* lastClicked() const
 		{
-			return getObject<visualNode>(lClicked.node().connection(0));
+			return getEntity<visualNode>(lClicked.node().connection(0));
 		}
 		void click(visualNode* clickedNode)
 		{
@@ -77,10 +77,10 @@ namespace nechto::ide
 	private:
 		void updateCursored(const nodeBoard* nBoard, glm::vec2 cursorPosition)
 		{
-			groupIterator i1(nBoard->vNodeGroup());
+			groupPointer i1(nBoard->vNodeGroup());
 			do
 			{
-				auto* vNode = getObject<visualNode>(i1.get());
+				auto* vNode = getEntity<visualNode>(i1.get());
 				if (!vNode)
 					continue;
 				if (vNode->frame.contains(cursorPosition))
@@ -102,7 +102,7 @@ namespace nechto::ide
 		//обработка действий левой кнопкой мыши (в основном)
 		void updateLeftButton()
 		{
-			auto vNode = getObject<visualNode>(leftButton.content());
+			auto vNode = getEntity<visualNode>(leftButton.content());
 			bool clicked = leftButton.bClickEvent();
 			if (vNode == nullptr)//если мышь ни на что не наведена
 			{
@@ -162,10 +162,10 @@ namespace nechto::ide
 		}
 		void moveAllSelected(glm::vec2 offset)
 		{
-			groupIterator gi(sh.selectedGroup());
+			groupPointer gi(sh.selectedGroup());
 			do
 			{
-				auto vNode = getObject<visualNode>(gi.get());
+				auto vNode = getEntity<visualNode>(gi.get());
 				if (vNode)
 				{
 					vNode->frame.position += offset;
@@ -175,11 +175,11 @@ namespace nechto::ide
 		void updateButtonByNode(visualNode* vNode, bool status)
 		{
 			auto button =
-				getObject<sharedButton>(vNode->node().connection(0));
+				getEntity<sharedButton>(vNode->node().connection(0));
 			if (button)
 			{
 				button->update(status);
-				auto bList = getObject<buttonList>(button->getList());
+				auto bList = getEntity<buttonList>(button->getList());
 				if (bList)
 					if (button->bClickEvent())
 					{

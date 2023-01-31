@@ -48,7 +48,7 @@ namespace nechto::ide
 			if (mouse.rightButton.bClickEvent())
 			{
 				auto vNode1 =
-					getObject<visualNode>(mouse.rightButton.content());
+					getEntity<visualNode>(mouse.rightButton.content());
 				if (vNode1)
 					editText(vNode1);
 				else
@@ -64,7 +64,7 @@ namespace nechto::ide
 				if (keyboard[sf::Keyboard::Delete].bClickEvent())//удаление
 					deleteAllSelected();
 				if (keyboard[sf::Keyboard::C].bClickEvent())//подключение
-					ed.connect(getObject<visualNode>(selectH.lastSelected()));
+					ed.connect(getEntity<visualNode>(selectH.lastSelected()));
 				if (keyboard[sf::Keyboard::D].bClickEvent())//отключение
 					disconnectSelected();
 				if (keyboard[sf::Keyboard::A].bClickEvent())//выделение всех
@@ -85,7 +85,7 @@ namespace nechto::ide
 				else
 					gui.cursoredParametrs.nodeText =
 					std::to_wstring(nodeStorage::terminal.numberOfNodes) + L"\n" +
-					std::to_wstring(object::numberOfObjects);
+					std::to_wstring(entity::numberOfEntitys);
 			}
 			else
 			{
@@ -112,7 +112,7 @@ namespace nechto::ide
 		}
 		void deleteAllSelected()
 		{
-			groupIterator gi(selectH.selectedGroup());
+			groupPointer gi(selectH.selectedGroup());
 			do
 			{
 				if (gi.get().exist())
@@ -128,10 +128,10 @@ namespace nechto::ide
 		{
 			if (vNode1 == nullptr)
 				return;
-			groupIterator gi(selectH.selectedGroup());
+			groupPointer gi(selectH.selectedGroup());
 			do
 			{
-				auto vNode2 = getObject<visualNode>(gi.get());
+				auto vNode2 = getEntity<visualNode>(gi.get());
 				if (vNode2)
 				{
 					nodePtr v1 = vNode1->node().connection(0);
@@ -142,12 +142,12 @@ namespace nechto::ide
 						{
 							HubHubConnect(v1, v2);
 						}
-						if (!gui.workBoard.connected(getObjectPtr(vNode1), 
-							getObjectPtr(vNode2)))
+						if (!gui.workBoard.connected(getEntityPtr(vNode1), 
+							getEntityPtr(vNode2)))
 						{
 							gui.workBoard.addConnection(visualConnection::create(
-								getObjectPtr(vNode1),
-								getObjectPtr(vNode2)));
+								getEntityPtr(vNode1),
+								getEntityPtr(vNode2)));
 						}
 					}
 				}
@@ -157,7 +157,7 @@ namespace nechto::ide
 		{
 			if (!selectH.lastSelected().exist())
 				return;
-			groupIterator gi(selectH.selectedGroup());
+			groupPointer gi(selectH.selectedGroup());
 			do
 			{
 				if (gi.get().exist() && gi.get() != selectH.lastSelected())
@@ -171,10 +171,10 @@ namespace nechto::ide
 		}
 		void randomOfsetSelected()
 		{
-			groupIterator gi(selectH.selectedGroup());
+			groupPointer gi(selectH.selectedGroup());
 			do
 			{
-				auto vNode = getObject<visualNode>(gi.get());
+				auto vNode = getEntity<visualNode>(gi.get());
 				if (vNode)
 					vNode->frame.position += randomOffset(100);
 			} while (gi.stepForward());
@@ -193,10 +193,10 @@ namespace nechto::ide
 			lSelected = step(lSelected);
 			if (!lSelected.exist())
 				return;
-			portIterator ci(lSelected);
+			portPointer ci(lSelected);
 			do
 			{
-				auto vNode = getObject<visualNode>(ci.get());
+				auto vNode = getEntity<visualNode>(ci.get());
 				if (vNode)
 				{
 					selectH.select(vNode);

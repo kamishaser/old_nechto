@@ -12,7 +12,7 @@ namespace nechto
 			= 1,	//разветвитель
 			Group
 			= 2,	//группа объектов
-			Iterator
+			Pointer
 			= 3,	//указатель на объект
 			Struct
 			= 4,	//структурная нода
@@ -20,15 +20,15 @@ namespace nechto
 			= 5,	//объект-переменная базового типа
 			Vector
 			= 6,	//вектор<subtype>
-			Object
-			= 7,	//внешний объект
+			Entity
+			= 7,	//внешняя сущность
 			Text
 			= 8,	//текст
 			Operator
 			= 9,	//оператор
 
 			Method
-			= 128,	//метод Object
+			= 128,	//метод Entity
 			Condition
 			= 129,	//if
 			MathOperation
@@ -39,7 +39,7 @@ namespace nechto
 			= 132,	//операция подключения
 			CreationOperation
 			= 133,	//операция создания
-			IterationOperation
+			PointerationOperation
 			= 134,	//операция перемещения итератора
 			HubManagement
 			= 135,	//операции с хабами
@@ -58,14 +58,6 @@ namespace nechto
 		{
 			F64 = 0,//false
 			I64 = 1 //true
-		};
-	}
-	namespace objectT
-	{
-		enum Type
-		{
-			NotOwning = 0,//false
-			Owning = 1 //true
 		};
 	}
 	namespace textT
@@ -113,12 +105,12 @@ namespace nechto
 			Decrement,		// --
 		};
 	}
-	namespace iteratorT
+	namespace pointerT
 	{
 		enum Type
 		{
-			PortIter,//итератор соединений
-			GroupIter//итератор массива
+			PortPointer,//итератор соединений
+			GroupPointer//итератор массива
 		};
 	}
 	namespace vectorT
@@ -146,28 +138,75 @@ namespace nechto
 	{
 		enum Type
 		{
-			n
+			Disconnect,
+			Connect,
+			Swap,
 		};
 	}
 	namespace creationOperationT
 	{
 		enum Type
 		{
-			n
+			DeleteNode,
+			CreateNode,
+			CopyNode,
+			CreateGroup,
+			CreatePointer,
+			CreateStruct,
+			CreateVariable,
+			CreateVector,
+
+			CreateEntity,
+			CreateText,
+			CreateOperator,
+			
+			CreateMethod,
+			CreateMathOperation,
+			CreateVectorOperation,
+			CreateConnectionOperation,
+			CreateCreationOperation,
+			CreatePointerationOperation,
+			CreateHubManagementOperation,
+			CreateOperatorManagementOperation,
+			CreateReadingOperation,
+			CreateTextOperation,
+			
 		};
 	}
-	namespace iterationOperationT
+	namespace pointerMovementOperationT
 	{
 		enum Type
 		{
-			n
+			stepForward,
+			stepBack, //только для групп
+			goToBegin,
+			goToPosition,
+			nextConnectedPort,
+			
+			setByPointer,
+			setByPointerPurpose, //переименовать при первой же возможности. Ну очень тупое название
+			setByConnection,
+			
+			assigment,
+			nearestBackPort,
+			lastConnectedPort,
+			
+			firstEmptyPort,
+			firstEmtpyHubPort,
+			backPort,
+			emptyPortAtFirstHub,
+			findNearestConnection,
+			emtpyAfterCurrent,
 		};
 	}
 	namespace hubManagementT
 	{
 		enum Type
 		{
-			n
+			insert,
+			erase,
+			compress,
+			compressGroup
 		};
 	}
 	namespace operatorManagementT
@@ -181,14 +220,55 @@ namespace nechto
 	{
 		enum Type
 		{
-			n
+			pointerExist,//наличие у указателя hubPosPair
+			pointerdExist,//pointer.get().exist
+			connectionExist,
+			isConnection,
+			isGroupMember,
+
+			numberOfHubs,
+			numberOfConnectedPorts,
+			numberOfGroupHubs,
+			numberOfGroupMembers,
+
+			getPointerGlobalPosition,
+			getPointerLocalPosition,
+			isEqual,
+			isEqualPurpese,
+
+			isPositionEqual,
+			isPositionLess,
+
+			entityExist,
+			
+			isTypeEquals,
+			isTypeSubtypeEquals,
+			getSubtypeId,
+			getTypeId,
+
+			isCorrectOperation, //все соединения подключены верно
+			isCorrectConnection, //одно соединение подключено верно
+
+
 		};
 	}
 	namespace textOperationT
 	{
 		enum Type
 		{
-			n
+			assigment,
+			addition, //? сложение 2 строк с получением удлинённой
+			substring, //получение подкстроки из исходной
+
+			size,
+			constains,
+			compare,
+			startWith,
+			endWith,
+
+			getTypeName,
+			getSubtypeName,
+			getEssenceTypeName
 		};
 	}
 	namespace structT

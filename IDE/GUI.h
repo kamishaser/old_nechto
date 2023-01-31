@@ -13,38 +13,38 @@ namespace nechto::ide
 {
 	class GUI
 	{
-		namedExConGroup activeButtonList{ creator::createObject(0), L"pressedButton" };
+		namedExConGroup activeButtonList{ creator::createEntity(0), L"pressedButton" };
 	public:
 		display dp;
 
 		nodeBoard workBoard;
-		consistentGroup leftGroup{ creator::createObject(0), L"leftGroup" };
-		consistentGroup rightGroup{ creator::createObject(0), L"rightGroup" };
-		visualGroup center = { creator::createObject(0), L"center"};
+		consistentGroup leftGroup{ creator::createEntity(0), L"leftGroup" };
+		consistentGroup rightGroup{ creator::createEntity(0), L"rightGroup" };
+		visualGroup center = { creator::createEntity(0), L"center"};
 
 		nodeBoard interfaceBoard;
-		consistentGroup topGroup{ creator::createObject(0), L"topGroup"};
-		consistentGroup bottomGroup{ creator::createObject(0), L"bottomGroup" };
+		consistentGroup topGroup{ creator::createEntity(0), L"topGroup"};
+		consistentGroup bottomGroup{ creator::createEntity(0), L"bottomGroup" };
 
-		visualNode cursoredParametrs{ creator::createObject(0)};
-		visualNode cursoredConnections{ creator::createObject(0)};
-		visualNode textBoxNode{ creator::createObject(0)};
+		visualNode cursoredParametrs{ creator::createEntity(0)};
+		visualNode cursoredConnections{ creator::createEntity(0)};
+		visualNode textBoxNode{ creator::createEntity(0)};
 		textInputBox  textBox;
 		
 		std::map<std::wstring, namedExCon> parameterSet;//список параметров nechto
 		
-		namedExConGroup dropListGroup{ creator::createObject(0), L"dropList" };
+		namedExConGroup dropListGroup{ creator::createEntity(0), L"dropList" };
 
 		GUI(const std::filesystem::path& path)
 			:dp(path), textBox(textBoxNode.node())
 		{
 			//добавление групп на доски
-			workBoard.addGroup(getObjectPtr<visualGroup>(&leftGroup));
-			workBoard.addGroup(getObjectPtr<visualGroup>(&rightGroup));
-			workBoard.addGroup(getObjectPtr<visualGroup>(&center));
+			workBoard.addGroup(getEntityPtr<visualGroup>(&leftGroup));
+			workBoard.addGroup(getEntityPtr<visualGroup>(&rightGroup));
+			workBoard.addGroup(getEntityPtr<visualGroup>(&center));
 
-			interfaceBoard.addGroup(getObjectPtr<visualGroup>(&topGroup));
-			interfaceBoard.addGroup(getObjectPtr<visualGroup>(&bottomGroup));
+			interfaceBoard.addGroup(getEntityPtr<visualGroup>(&topGroup));
+			interfaceBoard.addGroup(getEntityPtr<visualGroup>(&bottomGroup));
 			//установка режима позицианирования
 			rightGroup.mode.rightAlignment = true;
 			topGroup.mode.horisontal = true;
@@ -52,13 +52,13 @@ namespace nechto::ide
 			bottomGroup.mode.rightAlignment = true;
 			//bottomGroup.mode.rightAlignment = true;
 			//добавление элементов интерфейса
-			interfaceBoard.addNode(getObjectPtr<visualNode>(&cursoredParametrs));
-			interfaceBoard.addNode(getObjectPtr<visualNode>(&cursoredConnections));
-			interfaceBoard.addNode(getObjectPtr<visualNode>(&textBoxNode));
+			interfaceBoard.addNode(getEntityPtr<visualNode>(&cursoredParametrs));
+			interfaceBoard.addNode(getEntityPtr<visualNode>(&cursoredConnections));
+			interfaceBoard.addNode(getEntityPtr<visualNode>(&textBoxNode));
 
-			bottomGroup.addNode(getObjectPtr<visualNode>(&cursoredParametrs));
-			bottomGroup.addNode(getObjectPtr<visualNode>(&cursoredConnections));
-			bottomGroup.addNode(getObjectPtr<visualNode>(&textBoxNode));
+			bottomGroup.addNode(getEntityPtr<visualNode>(&cursoredParametrs));
+			bottomGroup.addNode(getEntityPtr<visualNode>(&cursoredConnections));
+			bottomGroup.addNode(getEntityPtr<visualNode>(&textBoxNode));
 
 			cursoredParametrs.nodeText = L"наведи на ноду для получения данных";
 
@@ -77,10 +77,10 @@ namespace nechto::ide
 		{
 			setChainsPosition();
 
-			groupIterator gi(interfaceBoard.vNodeGroup());
+			groupPointer gi(interfaceBoard.vNodeGroup());
 			do
 			{
-				auto vNode = getObject<visualNode>(gi.get());
+				auto vNode = getEntity<visualNode>(gi.get());
 				if (vNode)
 					vNode->frame.size = glm::vec2(0, 0);
 			} while (gi.stepForward());
@@ -89,10 +89,10 @@ namespace nechto::ide
 		}
 		void addButton(sharedButton* button, visualGroup* group)
 		{
-			auto vNode = getObject<visualNode>(button->node().connection(0));
+			auto vNode = getEntity<visualNode>(button->node().connection(0));
 			if (!vNode)
 			{
-				vNode = new visualNode(creator::createObject(1));
+				vNode = new visualNode(creator::createEntity(1));
 				NumNumConnect(button->node(), vNode->node(), 0, 0);
 			}
 			vNode->nodeText = button->name;
@@ -102,18 +102,18 @@ namespace nechto::ide
 		}
 		void deleteButton(sharedButton* button)
 		{
-			auto vNode = getObject<visualNode>(button->node().connection(0));
+			auto vNode = getEntity<visualNode>(button->node().connection(0));
 			if (vNode)
 				creator::deleteNode(vNode->node());
 		}
 		void hideAllActiveDropLists()
 		{
-			groupIterator gi(dropListGroup.getGroup());
+			groupPointer gi(dropListGroup.getGroup());
 			do
 			{
-				if (objectPtr<buttonList>::match(gi.get()))
+				if (entityPtr<buttonList>::match(gi.get()))
 				{
-					objectPtr<buttonList>(gi.get())->hide();
+					entityPtr<buttonList>(gi.get())->hide();
 				}
 			} while (gi.stepForward());
 		}
@@ -122,8 +122,8 @@ namespace nechto::ide
 		{
 			auto vGroup = list.vNodeGroup();
 
-			interfaceBoard.addGroup(getObjectPtr<visualGroup>(vGroup));
-			//topGroup.addGroup(getObjectPtr<visualGroup>(vGroup));
+			interfaceBoard.addGroup(getEntityPtr<visualGroup>(vGroup));
+			//topGroup.addGroup(getEntityPtr<visualGroup>(vGroup));
 			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
 			if (cGroup)
 				cGroup->mode.horisontal = true;
@@ -134,7 +134,7 @@ namespace nechto::ide
 			buttonList::clickEventT clickEvent = nullptr, bool closeAfterClick = true)
 		{
 			auto vGroup = list.vNodeGroup();
-			interfaceBoard.addGroup(getObjectPtr(vGroup));
+			interfaceBoard.addGroup(getEntityPtr(vGroup));
 			auto cGroup = dynamic_cast<consistentGroup*>(vGroup);
 			if (cGroup)
 			{
@@ -150,7 +150,7 @@ namespace nechto::ide
 			}
 			else
 				list.clickEvent = clickEvent;
-			IterHubConnect(firstEmptyGroupPort(dropListGroup.getGroup()), list.node());
+			PointerHubConnect(firstEmptyGroupPort(dropListGroup.getGroup()), list.node());
 		}
 		bool isButtonActive(sharedButton* button)
 		{

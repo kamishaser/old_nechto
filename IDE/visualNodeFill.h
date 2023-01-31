@@ -2,7 +2,7 @@
 #include "visualNode.h"
 #include "textOut.h"
 #include "MathOperation.h"
-#include "Object.h"
+#include "Entity.h"
 #include "text.h"
 #include "method.h"
 #include "buttonList.h"
@@ -43,8 +43,8 @@ namespace nechto::ide
 				break;
 			case nodeT::Method:
 				vn1->nodeText = L"не доделал имена методов";
-			case nodeT::Iterator:
-				if (subtype == iteratorT::PortIter)
+			case nodeT::Pointer:
+				if (subtype == pointerT::PortPointer)
 					vn1->nodeText = L"*p";
 				else
 					vn1->nodeText = L"*g";
@@ -52,12 +52,12 @@ namespace nechto::ide
 			case nodeT::Group:
 				vn1->nodeText = L"group";
 				break;
-			case nodeT::Object:
-				if (nonTypedObjectPtr(n1).getObjectPtr() == nullptr)
+			case nodeT::Entity:
+				if (nonTypedEntityPtr(n1).getEntityPtr() == nullptr)
 					vn1->nodeText = L"nullptr";
 				else
 					vn1->nodeText =
-					nonTypedObjectPtr(n1).getObjectPtr()->getTypeName();
+					nonTypedEntityPtr(n1).getEntityPtr()->getTypeName();
 				
 				break;
 			default:
@@ -80,7 +80,7 @@ namespace nechto::ide
 				vn->nShape = circle();
 				break;
 			case nodeT::Variable:
-			case nodeT::Iterator:
+			case nodeT::Pointer:
 				vn->nShape = octagon();
 				break;
 			default:
@@ -105,7 +105,7 @@ namespace nechto::ide
 
 			assert(vNode->getTypeName() == L"nechtoIde.visualNode");
 			assert(vNode->node().exist());
-			auto button = getObject<sharedButton>(vNode->node().connection(0));
+			auto button = getEntity<sharedButton>(vNode->node().connection(0));
 			if (button)
 				bColor = setByButtonState(button);
 			if (vNode->node().hub().exist())
@@ -118,13 +118,13 @@ namespace nechto::ide
 		int setByAttribute(visualNode* vNode)
 		{
 			int color = -2;
-			portIterator ci(vNode->node());
+			portPointer ci(vNode->node());
 			do
 			{
 				nodePtr temp = ci.get();
 				if (typeCompare(temp, nodeT::Group))
 					temp = temp.connection(0);
-				namedExCon* attribute = getObject<namedExCon>(temp);
+				namedExCon* attribute = getEntity<namedExCon>(temp);
 				if (attribute)
 				{
 					//выделение
@@ -154,7 +154,7 @@ namespace nechto::ide
 		int setByButtonState(sharedButton* button)
 		{
 			const int baseColor = -2;
-			auto bList = getObject<buttonList>(button->getList());
+			auto bList = getEntity<buttonList>(button->getList());
 			if(bList && bList->isLClicked(button))
 				return 2;
 			return baseColor;

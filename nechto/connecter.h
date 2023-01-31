@@ -1,8 +1,8 @@
 #pragma once
 #include "typeDeclarations.h"
 #include "nodePtr.h"
-#include "iteratorPtr.h"
-#include "connectionIterator.h"
+#include "pointerPtr.h"
+#include "connectionPointer.h"
 
 #include "creator.h"
 
@@ -11,66 +11,66 @@ namespace nechto
 	class connecter
 	{
 	public:
-		static bool connect(existing<iterator> iter1, existing<iterator> iter2)
+		static bool connect(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			if ((iter1.get().exist()) || (iter2.get().exist()))
+			if ((ptr1.get().exist()) || (ptr2.get().exist()))
 				return false;
-			if(iter1.inGroup())
-				if(groupConnectProhibition(groupIterator(iter1), iter2))
+			if(ptr1.inGroup())
+				if(groupConnectProhibition(groupPointer(ptr1), ptr2))
 					return false;
-			if (iter2.inGroup())
-				if (groupConnectProhibition(groupIterator(iter2), iter1))
+			if (ptr2.inGroup())
+				if (groupConnectProhibition(groupPointer(ptr2), ptr1))
 					return false;
-			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = iter2.getPurpose();
-			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = iter1.getPurpose();
+			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.getPurpose();
+			ptr2.getHPPair().hub.node()->port[ptr2.getLocalPos()] = ptr1.getPurpose();
 			return true;
 		}
-		static bool disconnect(existing<iterator> iter1, existing<iterator> iter2)
+		static bool disconnect(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			if (!isConnection(iter1, iter2))
+			if (!isConnection(ptr1, ptr2))
 				return false;//только двустороннии соединения
-			resetIterator(iter1);
-			resetIterator(iter2);
-			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = nullptr;
-			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = nullptr;
+			resetPointer(ptr1);
+			resetPointer(ptr2);
+			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = nullptr;
+			ptr2.getHPPair().hub.node()->port[ptr2.getLocalPos()] = nullptr;
 			return true;
 		}
-		static bool isConnection(existing<iterator> iter1, existing<iterator> iter2)
+		static bool isConnection(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			return (iter1.get() == iter2.getPurpose()) &&
-				(iter2.get() == iter1.getPurpose());
+			return (ptr1.get() == ptr2.getPurpose()) &&
+				(ptr2.get() == ptr1.getPurpose());
 		}
-		static void swap(existing<iterator> iter1, existing<iterator> iter2)
+		static void swap(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			assert(iter1.getPurpose() == iter2.getPurpose());
-			resetIterator(iter1);
-			resetIterator(iter2);
-			nodePtr temp = iter1.get();
-			iter1.getHPPair().hub.node()->port[iter1.getLocalPos()] = iter2.get();
-			iter2.getHPPair().hub.node()->port[iter2.getLocalPos()] = temp;
+			assert(ptr1.getPurpose() == ptr2.getPurpose());
+			resetPointer(ptr1);
+			resetPointer(ptr2);
+			nodePtr temp = ptr1.get();
+			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.get();
+			ptr2.getHPPair().hub.node()->port[ptr2.getLocalPos()] = temp;
 		}
 		
 		//исключение хаба из цепочки без оповещения итераторов
 		
-		static void resetIterator(existing<iterator> iter)
+		static void resetPointer(existing<pointer> ptr)
 		{
-			existing<nodePtr> node = iter.getHPPair().hub;
-			if (node.type() == nodeT::Iterator &&
-				(iter.getLocalPos() == 0) && (node.subtype() > 0))
-				iteratorPtr(node).setHPPair(hubPosPair(nullptr, 0));
+			existing<nodePtr> node = ptr.getHPPair().hub;
+			if (node.type() == nodeT::Pointer &&
+				(ptr.getLocalPos() == 0) && (node.subtype() > 0))
+				pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
 		}
-		static bool groupConnectProhibition(groupIterator gi, iterator iter)
+		static bool groupConnectProhibition(groupPointer gi, pointer ptr)
 		{
-			if (iter.hub.type() == nodeT::Iterator)
-				if (iter.getGlobalPos() == 0)
+			if (ptr.hub.type() == nodeT::Pointer)
+				if (ptr.getGlobalPos() == 0)
 					return true;
 			return false;
 		}
 	};
-	iterator findNearestConnection(
+	pointer findNearestConnection(
 		existing<nodePtr> node, existing<nodePtr> connection);//определено в portSearch
-	portIterator firstEmptyHubPort(existing<nodePtr> eptr);
-	void nearestDisconnect(existing<iterator> i1)
+	portPointer firstEmptyHubPort(existing<nodePtr> eptr);
+	void nearestDisconnect(existing<pointer> i1)
 	{
 		if (!(i1.getPurpose().exist() && i1.get().exist()))
 			return;
@@ -78,21 +78,21 @@ namespace nechto
 	}
 	void nearestDisconnect(existing<nodePtr> node1, char port)
 	{
-		nearestDisconnect(portIterator(node1, port));
+		nearestDisconnect(portPointer(node1, port));
 	}
 	void nearestDisconnect(existing<nodePtr> node1, existing<nodePtr> node2)
 	{
-		iterator iter1 = findNearestConnection(node1, node2);
-		iterator iter2 = findNearestConnection(node2, node1);
-		if(iter1.exist() && iter2.exist())
-			connecter::disconnect(iter1, iter2);
+		pointer ptr1 = findNearestConnection(node1, node2);
+		pointer ptr2 = findNearestConnection(node2, node1);
+		if(ptr1.exist() && ptr2.exist())
+			connecter::disconnect(ptr1, ptr2);
 	}
 
 	void NumNumConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1, char port2)
 	{
-		portIterator ci1(node1, port1);
-		portIterator ci2(node2, port2);
+		portPointer ci1(node1, port1);
+		portPointer ci2(node2, port2);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		if (ci2.get().exist())
@@ -102,7 +102,7 @@ namespace nechto
 	void NumHubConnect(
 		existing<nodePtr> node1, existing<nodePtr> node2, char port1)
 	{
-		portIterator ci1(node1, port1);
+		portPointer ci1(node1, port1);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
@@ -113,7 +113,7 @@ namespace nechto
 		connecter::connect(
 			firstEmptyHubPort(node1), firstEmptyHubPort(node2));
 	}
-	void IterIterConnect(iterator ci1, iterator ci2)
+	void PointerPointerConnect(pointer ci1, pointer ci2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -121,19 +121,19 @@ namespace nechto
 			nearestDisconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
-	void IterNumConnect(
-		iterator ci1, existing<nodePtr> node2, char port2)
+	void PointerNumConnect(
+		pointer ci1, existing<nodePtr> node2, char port2)
 	{
 		assert(port2 < 4);
-		portIterator ci2(node2, port2);
+		portPointer ci2(node2, port2);
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
 		if (ci2.get().exist())
 			nearestDisconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
-	void IterHubConnect(
-		iterator ci1, existing<nodePtr> node2)
+	void PointerHubConnect(
+		pointer ci1, existing<nodePtr> node2)
 	{
 		if (ci1.get().exist())
 			nearestDisconnect(ci1);
@@ -141,18 +141,18 @@ namespace nechto
 	}
 	void creator::disconnectAll(existing<nodePtr> node)
 	{
-		portIterator iter(node);
+		portPointer ptr(node);
 		do
 		{
-			nearestDisconnect(iter);
-		} while (iter.stepForward());
+			nearestDisconnect(ptr);
+		} while (ptr.stepForward());
 	}
 	void creator::disconnectAllGroup(groupPtr group)
 	{
-		groupIterator iter(group);
+		groupPointer ptr(group);
 		do
 		{
-			nearestDisconnect(iter);
-		} while (iter.stepForward());
+			nearestDisconnect(ptr);
+		} while (ptr.stepForward());
 	}
 }

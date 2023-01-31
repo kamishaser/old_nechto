@@ -1,14 +1,18 @@
 #pragma once
 #include "variablePtr.h"
 #include "nodeOperationSet.h"
+#include "crSet.h"
+#include "typeNames.h"
 
 namespace nechto
 {
 	namespace mathOperationF
 	{
 		bool assigmentF(
-			variablePtr result, const variablePtr fArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
 			if (result.subtype() && fArg.subtype())
 				result = (i64)fArg;
 			else
@@ -16,8 +20,10 @@ namespace nechto
 			return true;
 		}
 		bool unaryMinusF(
-			variablePtr result, const variablePtr fArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
 			if (result.subtype() && fArg.subtype())
 				result = -(i64)fArg;
 			else
@@ -25,8 +31,11 @@ namespace nechto
 			return true;
 		}
 		bool additionF(
-			variablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (result.subtype() && fArg.subtype() && sArg.subtype())
 				result = (i64)fArg + (i64)sArg;
 			else
@@ -34,8 +43,11 @@ namespace nechto
 			return true;
 		}
 		bool subtractionF(
-			variablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (result.subtype() && fArg.subtype() && sArg.subtype())
 				result = (i64)fArg - (i64)sArg;
 			else
@@ -43,8 +55,11 @@ namespace nechto
 			return true;
 		}
 		bool multiplicationF(
-			variablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (result.subtype() && fArg.subtype() && sArg.subtype())
 				result = (i64)fArg * (i64)sArg;
 			else
@@ -52,8 +67,11 @@ namespace nechto
 			return true;
 		}
 		bool divisionF(
-			variablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			variablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (result.subtype() && fArg.subtype() && sArg.subtype())
 				result = (i64)fArg - (i64)sArg;
 			else
@@ -61,8 +79,11 @@ namespace nechto
 			return true;
 		}
 		bool equalF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg == (i64)sArg;
 			else
@@ -70,8 +91,11 @@ namespace nechto
 			return true;
 		}
 		bool notEqualF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg != (i64)sArg;
 			else
@@ -79,8 +103,11 @@ namespace nechto
 			return true;
 		}
 		bool lessF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg == (i64)sArg;
 			else
@@ -88,8 +115,11 @@ namespace nechto
 			return true;
 		}
 		bool greaterF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg != (i64)sArg;
 			else
@@ -97,8 +127,11 @@ namespace nechto
 			return true;
 		}
 		bool lessOrEqualF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg == (i64)sArg;
 			else
@@ -106,8 +139,11 @@ namespace nechto
 			return true;
 		}
 		bool greaterOrEqualF(
-			i64VariablePtr result, const variablePtr fArg, const variablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			variablePtr fArg = arg.port1;
+			variablePtr sArg = arg.port2;
 			if (fArg.subtype() && sArg.subtype())
 				result = (i64)fArg != (i64)sArg;
 			else
@@ -115,42 +151,52 @@ namespace nechto
 			return true;
 		}
 		bool logicNegationF(
-			i64VariablePtr result, const i64VariablePtr fArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			i64VariablePtr fArg = arg.port1;
 			result = !(fArg);
 			return true;
 		}
 		bool logicAndF(
-			i64VariablePtr result, const i64VariablePtr fArg, const i64VariablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			i64VariablePtr fArg = arg.port1;
+			i64VariablePtr sArg = arg.port2;
 			result = fArg && sArg;
 			return true;
 		}
 		bool logicOrF(
-			i64VariablePtr result, const i64VariablePtr fArg, const i64VariablePtr sArg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr result = arg.port0;
+			i64VariablePtr fArg = arg.port1;
+			i64VariablePtr sArg = arg.port2;
 			result = fArg || sArg;
 			return true;
 		}
 		bool incrementF(
-			i64VariablePtr Arg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr Arg= arg.port0;
 			Arg = Arg.get() + 1;
 			return true;
 		}
 		bool decrementF(
-			i64VariablePtr Arg)
+			const operationArgument& arg)
 		{
+			i64VariablePtr Arg = arg.port0;
 			Arg = Arg.get() - 1;
 			return true;
 		}
 	}
 
-	class MathOperationPtr : public existing<nodePtr>
+	class mathOperationPtr : public existing<nodePtr>
 	{
 	public:
-		static const staticNodeOperationSet operSet;
-		MathOperationPtr(const existing<nodePtr>& eptr)
+		static const nodeOperationSet operSet;
+		mathOperationPtr(const existing<nodePtr>& eptr)
 			:existing<nodePtr>(eptr)
 		{
 			assert(match(eptr));
@@ -168,4 +214,56 @@ namespace nechto
 			return getDataPtr<operationData>();
 		}
 	};
+	namespace mathOperationO
+	{
+		using namespace mathOperationF;
+		const conRule vv(cr::AnyVariable, 0, 1, cr::AnyVariable, 1, 0);
+		const conRule vvv(cr::AnyVariable, 0, 1, cr::AnyVariable, 1, 0, cr::AnyVariable, 1, 0);
+		const conRule ivv(cr::I64, 0, 1, cr::AnyVariable, 1, 0, cr::AnyVariable, 1, 0);
+		const conRule i(cr::I64, 1, 1);
+		const conRule ii(cr::I64, 0, 1, cr::I64, 1, 0);
+		const conRule iii(cr::I64, 0, 1, cr::I64, 1, 0, cr::I64, 1, 0);
+
+		const operationProperties moProp{ false };
+
+		const operation assigmentO{ L"=", vv, moProp, assigmentF };
+		const operation unaryMinusO{ L"-", vv, moProp, unaryMinusF };
+		const operation additionO{ L"+", vvv, moProp, additionF };
+		const operation subtractionO{ L"-", vvv, moProp, subtractionF };
+		const operation multiplicationO{ L"*", vvv, moProp, multiplicationF };
+		const operation	divisionO{ L"/", vvv, moProp, divisionF };
+		const operation equalO{ L"==", ivv, moProp, equalF };
+		const operation notEqualO{ L"!=", ivv, moProp, notEqualF };
+		const operation lessO{ L"<", ivv, moProp, lessF };
+		const operation greaterO{ L">", ivv, moProp, greaterF };
+		const operation lessOrEqualO{ L"<=", ivv, moProp, lessOrEqualF };
+		const operation greaterOrEqualO{ L">=", ivv, moProp, greaterOrEqualF };
+		const operation logicNegationO{ L"!", ii, moProp, logicNegationF };
+		const operation logicAndO{ L"&&", iii, moProp, logicAndF };
+		const operation logicOrO{ L"||", iii, moProp, logicOrF };
+		const operation IncrementO{ L"++", i, moProp, incrementF };
+		const operation DecrementO{ L"++", i, moProp, decrementF };
+
+	}
+	const nodeOperationSet mathOperationPtr::operSet
+	{
+		mathOperationO::assigmentO,
+		mathOperationO::unaryMinusO,
+		mathOperationO::additionO,
+		mathOperationO::subtractionO,
+		mathOperationO::multiplicationO,
+		mathOperationO::divisionO,
+		mathOperationO::equalO,
+		mathOperationO::notEqualO,
+		mathOperationO::lessO,
+		mathOperationO::greaterO,
+		mathOperationO::lessOrEqualO,
+		mathOperationO::greaterOrEqualO,
+		mathOperationO::logicNegationO,
+		mathOperationO::logicAndO,
+		mathOperationO::logicOrO,
+		mathOperationO::IncrementO,
+		mathOperationO::DecrementO
+	};
+
 }

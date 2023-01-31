@@ -2,8 +2,8 @@
 #include "GLM/glm.hpp"
 #include "SFML/Graphics.hpp"
 #include "nodeOperationSet.h"
-#include "connectionIterator.h"
-#include "namedExConGroup.h"
+#include "connectionPointer.h"
+#include "entity.h"
 
 #include <codecvt>
 #include <locale>

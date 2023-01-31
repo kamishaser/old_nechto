@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "enums.h"
+#include "connectionPosition.h"
 namespace nechto
 {
 	using ushort = unsigned short;
@@ -22,12 +23,13 @@ namespace nechto
 	class compressor;
 	class nodeOperator;
 
-	struct iterator;
-	class portIterator;
-	class groupIterator;
+	struct pointer;
+	class portPointer;
+	class groupPointer;
 
 	class garbageCollector;
 
+	class serializationBuffer;
 	class serializer;
 	class deserializer;
 
@@ -64,6 +66,7 @@ namespace nechto
 		friend class nodePtr;
 		friend class garbageCollector;
 		friend struct nodeData;
+		friend class serializationBuffer;
 
 		void operator=(std::nullptr_t)
 		{
@@ -105,7 +108,7 @@ namespace nechto
 		template <class TCon>
 		TCon* getDataPtr()
 		{
-			return static_cast<TCon*>(static_cast<void*>(&Data));
+			return static_cast<TCon*>(static_cast<void*>(&data));
 		}
 	};
 	struct operationData
@@ -132,23 +135,17 @@ namespace nechto
 	
 	class entityInterface;
 
-	class nullNodePtrT;
-
-	class essencePtr;
-	class operationPtr;
-
 	class i64VariablePtr;
 	class f64VariablePtr;
 	class variablePtr;
-	class iteratorPtr;
-	class portIteratorPtr;
-	class groupIteratorPtr;
+	class pointerPtr;
+	class portPointerPtr;
+	class groupPointerPtr;
 	class textPtr;
 	class groupPtr;
 	class methodPtr;
-	class MathOperationPtr;
-	class nonTypedObjectPtr;
-	class objectNullPtr;
+	class mathOperationPtr;
+	class entityNullPtr;
 
 	class namedExCon;
 	class namedExConGroup;
@@ -172,7 +169,7 @@ namespace nechto
 		case nodeT::Variable:
 		case nodeT::Text:
 		case nodeT::Group:
-		case nodeT::Iterator:
+		case nodeT::Pointer:
 			return true;
 		default:
 			return false;

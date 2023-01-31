@@ -10,7 +10,7 @@ namespace nechto::ide
 		GUI& gui;
 		sharedButton button;
 		bool status = false;
-		using clickEvent = std::function<void(objectPtr<sharedButton>)>;
+		using clickEvent = std::function<void(entityPtr<sharedButton>)>;
 		clickEvent bclickEvent;
 		clickEvent eclickEvent;
 	public:

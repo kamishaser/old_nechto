@@ -58,58 +58,54 @@ namespace nechto::ide
 			return false;
 		}
 	};
-	class sharedButton : public namedExCon, public basicButton
+	class sharedButton : public basicButton
 	{
-		using clickEvent = std::function<void(objectPtr<sharedButton>)>;
+		using clickEvent = std::function<void(teptr<sharedButton>)>;
 		//№0 - content
 		//№3 - список кнопок в котором она находится
 		clickEvent bcEvent;
 	public:
-		sharedButton(std::wstring name, 
-			clickEvent bce = nullptr, clickEvent ece = nullptr)
-			:namedExCon(name), bcEvent(bce) {}
-		sharedButton(nodePtr emptyExternalObject, std::wstring name, 
-			clickEvent bce = nullptr)
-			:namedExCon(emptyExternalObject, name), 
-			bcEvent(bce){}
-		nodePtr content()
+		sharedButton(clickEvent bce = nullptr)
+			:bcEvent(bce) {}
+		nodePtr content(teptr<visualGroup> node)
 		{
-			return node().connection(0);
+			return node.connection(0);
 		}
 		//обновление кнопки
-		bool update(bool newStatus, visualNode* vNode)
+		bool update(teptr<visualGroup> node, bool newStatus, teptr<visualNode> vNode)
 		{
 			if (basicButton::update(newStatus))
 			{
-				if (vNode)
-					NumHubConnect(node(), vNode->node(), 0);
+				if (vNode.exist())
+					NumHubConnect(node, vNode, 0);
 				else
-					nearestDisconnect(node(), 0);
+					nearestDisconnect(node, 0);
 				return true;
 			}
 			return false;
 		}
-		bool update(bool newStatus)
+		bool update(teptr<visualGroup> node, bool newStatus)
 		{
 			if (basicButton::update(newStatus))
 			{
 				if (bcEvent)
-					bcEvent(node());
+					bcEvent(node);
 				return true;
 			}
 			return false;
 		}
-		nodePtr getList()
+		nodePtr getList(teptr<visualGroup> node)
 		{
-			nodePtr temp = node().connection(3);
+			nodePtr temp = node.connection(3);
 			if (!temp.exist())
 				return nullptr;
 			return temp.connection(0);
 		}
 	};
-	sharedButton* createButton(const std::wstring& name)
+	teptr<sharedButton> createButton(const std::wstring& name, clickEvent bce = nullptr)
 	{
-		return new sharedButton(creator::createObject(1), name);
+		return creator::createEntity(entityT::oneSideLink, new 
+			oneSideLinkedEntity<sharedButton>(sharedButton(bce)));
 	}
-	using clickEvent = std::function<void(objectPtr<sharedButton>)>;
+	using clickEvent = std::function<void(teptr<sharedButton>)>;
 }

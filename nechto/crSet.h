@@ -4,12 +4,11 @@
 
 namespace nechto
 {
-	using ccrInterface = const conRuleInterface const*;
 	class ruleGenerator
 	{
-		static std::vector<const std::unique_ptr<const conRuleInterface>> ruleSet;
+		static std::vector<std::unique_ptr<conRuleInterface>> ruleSet;
 	public:
-		static size_t registerRule(ccrInterface rule)//регистрация нового правила извне
+		static size_t registerRule(conRuleInterface* rule)//регистрация нового правила извне
 		{
 			size_t number = ruleSet.size();
 			ruleSet.emplace_back(rule);
@@ -26,106 +25,105 @@ namespace nechto
 		///////////////////////////////////////////////////////////////////////
 		template<unsigned char type, bool subtypeImportant = false, 
 			unsigned char subtype = 0, bool transitable = true>
-		constexpr static ccrInterface generateBasicRule()
+		static ccrInterface generateBasicRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule<elementaryRule(
+			conRuleInterface* rule = new basicConnectionRule<elementaryRule(
 				type, subtypeImportant, subtype, transitable)>();
-			ruleSet.emplace_back(rule);
+			number = registerRule(rule);
 			return rule;
 		}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		template<bool subtypeImportant = false,
-			unsigned char subtype = 0, bool necessarilyExistingIterator = true,
+			unsigned char subtype = 0, bool necessarilyExistingPointer = true,
 			contentRule cr = contentRule::Any>
-		constexpr static ccrInterface generateIteratorRule()
+		static ccrInterface generatePointerRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule<iteratorRule(
-				subtypeImportant, subtype, necessarilyExistingIterator, cr)>();
-			ruleSet.emplace_back(rule);
+			conRuleInterface* rule = new pointerConnectionRule<pointerRule(
+				subtypeImportant, subtype, necessarilyExistingPointer, cr)>();
+			number = registerRule(rule);
 			return rule;
 		}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		template<contentRule content = contentRule::Any, bool subtypeImportant = false,
 			unsigned char subtype = 0, bool transitable = true>
-		constexpr static ccrInterface generateNonTypedObjectRule()
+		static ccrInterface generateNonTypedEntityRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule<nonTypedEntityRule(
-				subtypeImportant, subtype, nodeT::Object, transitable, content>();
-			ruleSet.emplace_back(rule);
+			conRuleInterface* rule = new nonTypedEntityConnectionRule<nonTypedEntityRule(
+				subtypeImportant, subtype, nodeT::Entity, transitable, content)>();
+			number = registerRule(rule);
 			return rule;
 		}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		template<contentRule content = contentRule::Any, bool subtypeImportant = false,
 			unsigned char subtype = 0, bool transitable = true>
-		constexpr static ccrInterface generateTextRule()
+		static ccrInterface generateTextRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule < nonTypedEntityRule(
-				subtypeImportant, subtype, nodeT::Text, transitable, content > ();
-			ruleSet.emplace_back(rule);
+			conRuleInterface* rule = new nonTypedEntityConnectionRule < nonTypedEntityRule(
+				subtypeImportant, subtype, nodeT::Text, transitable, content )> ();
+			number = registerRule(rule);
 			return rule;
 		}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		template<contentRule content = contentRule::Any, bool subtypeImportant = false,
 			unsigned char subtype = 0, bool transitable = true>
-		constexpr static ccrInterface generateOperatorRule()
+		static ccrInterface generateOperatorRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule < nonTypedEntityRule(
-				subtypeImportant, subtype, nodeT::Operator, transitable, content > ();
-			ruleSet.emplace_back(rule);
+			conRuleInterface* rule = new nonTypedEntityConnectionRule < nonTypedEntityRule(
+				subtypeImportant, subtype, nodeT::Operator, transitable, content )> ();
+			number = registerRule(rule);
 			return rule;
 		}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		template<essT ECon, bool subtypeImportant = false,
 			unsigned char subtype = 0, bool transitable = true>
-		constexpr static ccrInterface generateObjectRule()
+		static ccrInterface generateEntityRule()
 		{
 			static size_t number = -1;
 			if (number != -1)
 				return ruleSet[number].get();
-			number = ruleSet.size();
-			const conRuleInterface const* rule = new basicConnectionRule < entityRule(
-				subtypeImportant, subtype, transitable>, ECon ();
-			ruleSet.emplace_back(rule);
+			conRuleInterface* rule = new entityConnectionRule < entityRule(
+				subtypeImportant, subtype, transitable), ECon>();
+			number = registerRule(rule);
 			return rule;
 		}
 	};
-	std::vector<const std::unique_ptr<const conRuleInterface>> ruleGenerator::ruleSet;
+	std::vector<std::unique_ptr<conRuleInterface>> ruleGenerator::ruleSet;
 	
-	namespace crSet
+	namespace cr
 	{
-		ccrInterface Variable = 
+		ccrInterface getNoneRule()
+		{
+			return ruleGenerator::generateBasicRule<0>();
+		}//по некоторым причинам ccrInterface None инициализирован в "conRuleInterface.h"
+
+		ccrInterface AnyVariable = 
 			ruleGenerator::generateBasicRule<nodeT::Variable>();
 		ccrInterface I64 = 
 			ruleGenerator::generateBasicRule<nodeT::Variable, true, variableT::I64>();
 		ccrInterface F64 = 
 			ruleGenerator::generateBasicRule<nodeT::Variable, true, variableT::F64>();
 
-		ccrInterface Group =
+		ccrInterface AnyGroup =
 			ruleGenerator::generateBasicRule<nodeT::Group>();
 		ccrInterface WeakGroup =
 			ruleGenerator::generateBasicRule<nodeT::Group, true, groupT::weak>();
@@ -138,24 +136,24 @@ namespace nechto
 		ccrInterface Vector =
 			ruleGenerator::generateBasicRule<nodeT::Vector>();
 
-		ccrInterface anyObject =
-			ruleGenerator::generateNonTypedObjectRule<contentRule::Any>();
-		ccrInterface emptyObject =
-			ruleGenerator::generateNonTypedObjectRule<contentRule::Empty>();
+		ccrInterface AnyEntity =
+			ruleGenerator::generateNonTypedEntityRule<contentRule::Any>();
+		ccrInterface EmptyEntity =
+			ruleGenerator::generateNonTypedEntityRule<contentRule::Empty>();
 
-		ccrInterface anyIterator =
-			ruleGenerator::generateIteratorRule<false, 0, false>();
-		ccrInterface PortIterator =
-			ruleGenerator::generateIteratorRule<true, iteratorT::PortIter, false>();
-		ccrInterface PortIterator =
-			ruleGenerator::generateIteratorRule<true, iteratorT::GroupIter, false>();
+		ccrInterface AnyPointer =
+			ruleGenerator::generatePointerRule<false, 0, false>();
+		ccrInterface PortPointer =
+			ruleGenerator::generatePointerRule<true, pointerT::PortPointer, false>();
+		ccrInterface GroupPointer =
+			ruleGenerator::generatePointerRule<true, pointerT::GroupPointer, false>();
 
-		ccrInterface anyExistingIterator =
-			ruleGenerator::generateIteratorRule<false>();
-		ccrInterface ExistingPortIterator =
-			ruleGenerator::generateIteratorRule<true, iteratorT::PortIter>();
-		ccrInterface ExistingGroupIterator =
-			ruleGenerator::generateIteratorRule<true, iteratorT::GroupIter>();
+		ccrInterface anyExistingPointer =
+			ruleGenerator::generatePointerRule<false>();
+		ccrInterface ExistingPortPointer =
+			ruleGenerator::generatePointerRule<true, pointerT::PortPointer>();
+		ccrInterface ExistingGroupPointer =
+			ruleGenerator::generatePointerRule<true, pointerT::GroupPointer>();
 		
 		ccrInterface Text =
 			ruleGenerator::generateTextRule<contentRule::Any>();

@@ -36,7 +36,7 @@ namespace nechto::ide
 		{
 			if (contains(vNode))
 				return false;
-			IterHubConnect(firstEmptyGroupPort(selectedGroup()), vNode->node());
+			PointerHubConnect(firstEmptyGroupPort(selectedGroup()), vNode->node());
 			
 			if (numberOfLastSelected < 3)
 			{
@@ -65,7 +65,7 @@ namespace nechto::ide
 					if (i != 3)
 					{
 						for (int i1 = i; i1 < 3; ++i1)
-							connecter::swap(portIterator(vls, i1 + 1), portIterator(vls, i1));
+							connecter::swap(portPointer(vls, i1 + 1), portPointer(vls, i1));
 					}
 					if (numberOfLastSelected >= i)
 						--numberOfLastSelected;
@@ -83,10 +83,10 @@ namespace nechto::ide
 		void selectGroup(nodePtr group)
 		{
 			assert(typeCompare(group, nodeT::Group));
-			groupIterator gi(group);
+			groupPointer gi(group);
 			do
 			{
-				auto vNode = getObject<visualNode>(gi.get());
+				auto vNode = getEntity<visualNode>(gi.get());
 				if (vNode)
 					select(vNode);
 			} while (gi.stepForward());
@@ -110,14 +110,14 @@ namespace nechto::ide
 		{
 			nodePtr vls = lastSelectedNode.node();
 			for (int i = 2; i >= 0; --i)
-				connecter::swap(portIterator(vls, i + 1), portIterator(vls, i));
+				connecter::swap(portPointer(vls, i + 1), portPointer(vls, i));
 		}
 		//сдвиг последних выделенных назад
 		void lsBackShift()
 		{
 			nodePtr vls = lastSelectedNode.node();
 			for (int i = 0; i < 3; ++i)
-				connecter::swap(portIterator(vls, i + 1), portIterator(vls, i));
+				connecter::swap(portPointer(vls, i + 1), portPointer(vls, i));
 		}
 	};
 }

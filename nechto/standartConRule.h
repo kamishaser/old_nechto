@@ -1,18 +1,18 @@
 #pragma once
 #include "entity.h"
 #include "conRuleInterface.h"
-#include "iteratorPtr.h"
-#include "connectionIterator.h"
+#include "pointerPtr.h"
+#include "connectionPointer.h"
 
 namespace nechto
 {
 	template<elementaryRule elRule>
-	struct standartOneConnectionRule : public conRuleInterface
+	struct basicConnectionRule : public conRuleInterface
 	{
 	protected:
 	public:
-		static_assert(elRule.type != nodeT::Iterator);
-		static_assert(elRule.type != nodeT::Object);
+		static_assert(elRule.type != nodeT::Pointer);
+		static_assert(elRule.type != nodeT::Entity);
 		static_assert(elRule.type != nodeT::Operator);
 		static_assert(elRule.type != nodeT::Text);
 		virtual nodePtr getConnection(nodePtr node)const//монструозна€ система получени€ соединени€
@@ -22,9 +22,9 @@ namespace nechto
 			if (!node.exist())
 				return nullptr;
 			if constexpr (elRule.transitable)
-				if (node.type() == nodeT::Iterator)
+				if (node.type() == nodeT::Pointer)
 				{
-					node = iteratorPtr(node).follow();
+					node = pointerPtr(node).follow();
 					if (!node.exist())
 						return nullptr;
 				}
@@ -39,13 +39,13 @@ namespace nechto
 		{
 			if constexpr (elRule.type == 0)
 				return true;
-			if (getConnection() == nullptr)
+			if (getConnection(node) == nullptr)
 				return false;
 			return true;
 		}
 	};
-	template<iteratorRule iterRule>
-	struct iteratorConnectionRule
+	template<pointerRule ptrRule>
+	struct pointerConnectionRule : public conRuleInterface
 	{
 	protected:
 	public:
@@ -53,18 +53,31 @@ namespace nechto
 		{
 			if (!node.exist())
 				return nullptr;
-			if (iter.type() != nodeT::Iterator)
+			if (node.type() != nodeT::Pointer)
 				return nullptr;
-			if constexpr (iterRule.subtypeImportant)
-				if (iter.subtype() != iterRule.subtype)
+			if constexpr (ptrRule.subtypeImportant)
+				if (node.subtype() != ptrRule.subtype)
 					return nullptr;
-			if constexpr (iterRule.necessarilyExistingIterator)
+			if constexpr (ptrRule.necessarilyExistingPointer)
 			{
-				if (!iteratorPtr(iter).getHPPair().exist())
+				if (!pointerPtr(node).getHPPair().exist())
 					return nullptr;
-				if constexpr (iterRule.necessarilyPointToConnectedPort)
-					if (!iteratorPtr(iter).follow().exist())
+				if constexpr (ptrRule.ptrContentRule == contentRule::Any)
+					return node;
+				else if constexpr (ptrRule.ptrContentRule == contentRule::Empty)
+				{
+					if (pointerPtr(node).getHPPair().follow().exist())
 						return nullptr;
+					else
+						return node;
+				}
+				else
+				{
+					if (pointerPtr(node).getHPPair().follow().exist())
+						return node;
+					else
+						return nullptr;
+				}
 			}
 			return node;
 		}
@@ -76,7 +89,7 @@ namespace nechto
 		}
 	};
 	template<nonTypedEntityRule entRule>
-	struct nonTypedObjectConnectionRule
+	struct nonTypedEntityConnectionRule : public conRuleInterface
 	{
 	protected:
 	public:
@@ -85,9 +98,9 @@ namespace nechto
 			if (!node.exist())
 				return nullptr;
 			if constexpr (entRule.transitable)
-				if (node.type() == nodeT::Iterator)
+				if (node.type() == nodeT::Pointer)
 				{
-					node = iteratorPtr(node).follow();
+					node = pointerPtr(node).follow();
 					if (!node.exist())
 						return nullptr;
 				}
@@ -96,13 +109,22 @@ namespace nechto
 			if constexpr (entRule.subtypeImportant)
 				if (node.subtype() != entRule.subtype)
 					return nullptr;
-			if constexpr (entRule.necessarilyEmpty)
+			if constexpr (entRule.entityContentRule == contentRule::Any)
+				return node;
+			else if constexpr (entRule.entityContentRule == contentRule::Empty)
 			{
 				if (entityPtr(node).entityExist())
 					return nullptr;
-				return node;
+				else
+					return node;
 			}
-			return node;
+			else
+			{
+				if (entityPtr(node).entityExist())
+					return node;
+				else
+					return nullptr;
+			}
 		}
 		virtual bool check(nodePtr node) const
 		{
@@ -112,7 +134,7 @@ namespace nechto
 		}
 	};
 	template<entityRule entRule, essT ECon>
-	struct objectConnectionRule
+	struct entityConnectionRule : public conRuleInterface
 	{
 	protected:
 	public:
@@ -121,13 +143,13 @@ namespace nechto
 			if (!node.exist())
 				return nullptr;
 			if constexpr (entRule.transitable)
-				if (node.type() == nodeT::Iterator)
+				if (node.type() == nodeT::Pointer)
 				{
-					node = iteratorPtr(node).follow();
+					node = pointerPtr(node).follow();
 					if (!node.exist())
 						return nullptr;
 				}
-			if (node.type() != nodeT::Object)
+			if (node.type() != nodeT::Entity)
 				return nullptr;
 			if constexpr (entRule.subtypeImportant)
 				if (node.subtype() != entRule.subtype)

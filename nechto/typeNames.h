@@ -1,10 +1,11 @@
 #pragma once
 #include "typeDeclarations.h"
 #include <functional>
+#include <string>
 
 namespace nechto::typeName
 {
-	const std::wstring getTypeName(unsigned char type)
+	constexpr const std::wstring getTypeName(unsigned char type)
 	{
 		switch (type)
 		{
@@ -14,12 +15,12 @@ namespace nechto::typeName
 			return L"Hub";
 		case nechto::nodeT::Group:
 			return L"Group";
-		case nechto::nodeT::Iterator:
-			return L"Iterator";
+		case nechto::nodeT::Pointer:
+			return L"Pointer";
 		case nechto::nodeT::Variable:
 			return L"Variable";
-		case nechto::nodeT::Object:
-			return L"Object";
+		case nechto::nodeT::Entity:
+			return L"Entity";
 		case nechto::nodeT::Text:
 			return L"Text";
 		case nechto::nodeT::MathOperation:
@@ -33,7 +34,7 @@ namespace nechto::typeName
 			//return L"";
 		}
 	}
-	std::wstring getGroupSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getGroupSubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
@@ -45,20 +46,20 @@ namespace nechto::typeName
 			return L"error";
 		}		
 	}
-	std::wstring getIteratorSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getPointerSubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
-		case nechto::iteratorT::PortIter:
-			return L"PortIter";
-		case nechto::iteratorT::GroupIter:
-			return L"GroupIter";
+		case nechto::pointerT::PortPointer:
+			return L"PortPointer";
+		case nechto::pointerT::GroupPointer:
+			return L"GroupPointer";
 		default:
 			return L"Error";
 			//return L"";
 		}
 	}
-	std::wstring getVariableSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getVariableSubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
@@ -71,33 +72,21 @@ namespace nechto::typeName
 			//return L"";
 		}
 	}
-	std::wstring getObjectSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getEntitySubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
-		case nechto::objectT::NotOwning:
-			return L"NotOwning";
-		case nechto::objectT::Owning:
-			return L"Owning";
+		case nechto::entityT::oneSideLink:
+			return L"OneSideLink";
+		case nechto::entityT::singleConnection:
+			return L"SingleConnection";
+		case nechto::entityT::multipleConnection:
+			return L"MultipleConnection";
 		default:
 			return L"Error";
-			//return L"";
 		}
 	}
-	std::wstring getTextSubtypeName(unsigned char subtype)
-	{
-		switch (subtype)
-		{
-		case nechto::textT::NotOwning:
-			return L"NotOwning";
-		case nechto::textT::Owning:
-			return L"Owning";
-		default:
-			return L"Error";
-			//return L"";
-		}
-	}
-	std::wstring getMathOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getMathOperationSubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
@@ -140,7 +129,7 @@ namespace nechto::typeName
 			//return L"";
 		}
 	}
-	std::wstring getMathOperationShortSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getMathOperationShortSubtypeName(unsigned char subtype)
 	{
 		switch (subtype)
 		{
@@ -183,62 +172,62 @@ namespace nechto::typeName
 			//return L"";
 		}
 	}
-	std::wstring getVectorSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getVectorSubtypeName(unsigned char subtype)
 	{
 		//VectorT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getOperatorSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getOperatorSubtypeName(unsigned char subtype)
 	{
 		//OperatorT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getVectorOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getVectorOperationSubtypeName(unsigned char subtype)
 	{
 		//VectorOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getConnectionOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getConnectionOperationSubtypeName(unsigned char subtype)
 	{
 		//ConnectionOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getCreationOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getCreationOperationSubtypeName(unsigned char subtype)
 	{
 		//CreationOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getIterationOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getPointerationOperationSubtypeName(unsigned char subtype)
 	{
-		//IterationOperationT::Type type = subtype;
+		//PointerationOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getHubManagementSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getHubManagementSubtypeName(unsigned char subtype)
 	{
 		//HubManagementT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getOperatorManagementSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getOperatorManagementSubtypeName(unsigned char subtype)
 	{
 		//OperatorManagementT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getReadingOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getReadingOperationSubtypeName(unsigned char subtype)
 	{
 		//ReadingOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getTextOperationSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getTextOperationSubtypeName(unsigned char subtype)
 	{
 		//TextOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getStructSubtypeName(unsigned char subtype)
+	constexpr const std::wstring getStructSubtypeName(unsigned char subtype)
 	{
 		//TextOperationT::Type type = subtype;
 		return L"error";
 	}
-	std::wstring getSubtypeName(unsigned char type, unsigned char subtype)
+	constexpr const std::wstring getSubtypeName(unsigned char type, unsigned char subtype)
 	{
 		switch (type)
 		{
@@ -248,14 +237,14 @@ namespace nechto::typeName
 			return L"";
 		case nechto::nodeT::Group:
 			return getGroupSubtypeName(subtype);
-		case nechto::nodeT::Iterator:
-			return getIteratorSubtypeName(subtype);
+		case nechto::nodeT::Pointer:
+			return getPointerSubtypeName(subtype);
 		case nechto::nodeT::Variable:
 			return getVariableSubtypeName(subtype);
-		case nechto::nodeT::Object:
-			return getObjectSubtypeName(subtype);
+		case nechto::nodeT::Entity:
+			return getEntitySubtypeName(subtype);
 		case nechto::nodeT::Text:
-			return getTextSubtypeName(subtype);
+			return getEntitySubtypeName(subtype);
 		case nechto::nodeT::MathOperation:
 			return getMathOperationSubtypeName(subtype);
 		case nechto::nodeT::Condition:
@@ -270,8 +259,8 @@ namespace nechto::typeName
 			return getConnectionOperationSubtypeName(subtype);
 		case nodeT::CreationOperation:
 			return getCreationOperationSubtypeName(subtype);
-		case nodeT::IterationOperation:
-			return getIterationOperationSubtypeName(subtype);
+		case nodeT::PointerationOperation:
+			return getPointerationOperationSubtypeName(subtype);
 		case nodeT::ReadingOperation:
 			return getReadingOperationSubtypeName(subtype);
 		case nodeT::TextOperation:
@@ -281,18 +270,18 @@ namespace nechto::typeName
 		case nodeT::OperatorManagement:
 			return getOperatorManagementSubtypeName(subtype);
 		case nodeT::Operator:
-			return getOperatorSubtypeName(subtype);
+			return getEntitySubtypeName(subtype);
 		case nodeT::Struct:
 			return getStructSubtypeName(subtype);
 		default:
 			return L"???";
 		}
 	}
-	std::wstring getTypeAndSubtypeName(unsigned char type, unsigned char subtype, std::wstring separator = L" ")
+	constexpr const std::wstring getTypeAndSubtypeName(unsigned char type, unsigned char subtype, std::wstring separator = L" ")
 	{
 		return getTypeName(type) + separator + getSubtypeName(type, subtype);
 	}
-	std::vector<std::wstring> getTypeNameList(const std::function<std::wstring(char)>& func, unsigned char max)
+	constexpr const std::vector<std::wstring> getTypeNameList(const std::function<std::wstring(char)>& func, unsigned char max)
 	{
 		std::vector<std::wstring> list;
 		for (char i = 0; i < max; ++i)

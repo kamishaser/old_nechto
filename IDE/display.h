@@ -82,17 +82,17 @@ namespace nechto::ide
 
 			assert(nBoard);
 
-			groupIterator i1(nBoard->vConnectionGroup());
+			groupPointer i1(nBoard->vConnectionGroup());
 			do
 			{
-				if(objectPtr<visualConnection>::match(i1.get()))
-					draw(objectPtr<visualConnection>(i1.get()));
+				if(entityPtr<visualConnection>::match(i1.get()))
+					draw(entityPtr<visualConnection>(i1.get()));
 			} while (i1.stepForward());
-			groupIterator i2(nBoard->vNodeGroup());
+			groupPointer i2(nBoard->vNodeGroup());
 			do
 			{
-				if (objectPtr<visualNode>::match(i2.get()))
-					draw(objectPtr<visualNode>(i2.get()).get());
+				if (entityPtr<visualNode>::match(i2.get()))
+					draw(entityPtr<visualNode>(i2.get()).get());
 			} while (i2.stepForward());
 
 		}
@@ -149,10 +149,10 @@ namespace nechto::ide
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////
-		void draw(objectPtr<visualConnection> vCon)
+		void draw(entityPtr<visualConnection> vCon)
 		{
-			visualNode* first = getObject<visualNode>(vCon.connection(0));
-			visualNode* second = getObject<visualNode>(vCon.connection(1));
+			visualNode* first = getEntity<visualNode>(vCon.connection(0));
+			visualNode* second = getEntity<visualNode>(vCon.connection(1));
 
 			assert((first) && (second));
 			////////////////////////////////////////////////////////////////////////

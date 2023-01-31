@@ -9,83 +9,83 @@ namespace nechto
 	{
 	public:
 		//сжать основную цепочку с перемещенем итераторов
-		static void compress_W_MI(const portIterator& begin)
+		static void compress_W_MI(const portPointer& begin)
 		{
-			portIterator pullIter = begin;
-			portIterator pushIter = begin;
-			std::map<ui32, portIteratorPtr> iterSet;
-			fillIteratorSet(iterSet, begin.getPurpose());
+			portPointer pullPointer = begin;
+			portPointer pushPointer = begin;
+			std::map<ui32, portPointerPtr> ptrSet;
+			fillPointerSet(ptrSet, begin.getPurpose());
 			do
 			{
-				if (pullIter.get().exist())
+				if (pullPointer.get().exist())
 				{
-					connecter::swap(pullIter, pushIter);
-					ui32 pos = pullIter.getGlobalPos();
-					if (iterSet.contains(pullIter.getGlobalPos()))
-						iterSet[pos].setHPPair(pushIter.getHPPair());
-					pushIter.stepForward();
+					connecter::swap(pullPointer, pushPointer);
+					ui32 pos = pullPointer.getGlobalPos();
+					if (ptrSet.contains(pullPointer.getGlobalPos()))
+						ptrSet[pos].setHPPair(pushPointer.getHPPair());
+					pushPointer.stepForward();
 				}
-			} while (pullIter.stepForward());
-			if (pushIter.getLocalPos() != 0)
-				pushIter.goToNextHub();
-			hubManager::eraseHubWithNoNotificationIterators(pushIter, -1);
+			} while (pullPointer.stepForward());
+			if (pushPointer.getLocalPos() != 0)
+				pushPointer.goToNextHub();
+			hubManager::eraseHubWithNoNotificationPointers(pushPointer, -1);
 		}
 		//сжать группу с перемещенем итераторов
-		static void compress_W_MI(const groupIterator& begin)
+		static void compress_W_MI(const groupPointer& begin)
 		{
-			groupIterator pullIter = begin;
-			groupIterator pushIter = begin;
-			std::map<ui32, groupIteratorPtr> iterSet;
-			fillIteratorSet(iterSet, begin.getPurpose());
+			groupPointer pullPointer = begin;
+			groupPointer pushPointer = begin;
+			std::map<ui32, groupPointerPtr> ptrSet;
+			fillPointerSet(ptrSet, begin.getPurpose());
 			do
 			{
-				if (pullIter.get().exist())
+				if (pullPointer.get().exist())
 				{
-					connecter::swap(pullIter, pushIter);
-					ui32 pos = pullIter.getGlobalPos();
-					if (iterSet.contains(pullIter.getGlobalPos()))
-						iterSet[pos].setHPPair(pushIter.getHPPair());
-					pushIter.stepForward();
+					connecter::swap(pullPointer, pushPointer);
+					ui32 pos = pullPointer.getGlobalPos();
+					if (ptrSet.contains(pullPointer.getGlobalPos()))
+						ptrSet[pos].setHPPair(pushPointer.getHPPair());
+					pushPointer.stepForward();
 				}
-			} while (pullIter.stepForward());
-			if (pushIter.getLocalPos() != 0)
-				pushIter.goToNextHub();
-			hubManager::eraseHubWithNoNotificationIterators(pushIter, -1);
+			} while (pullPointer.stepForward());
+			if (pushPointer.getLocalPos() != 0)
+				pushPointer.goToNextHub();
+			hubManager::eraseHubWithNoNotificationPointers(pushPointer, -1);
 		}
 		///////////////////////////////////////////////////////////////////
 		//сжать основную цепочку без перемещения итераторов
-		static void compress_WO_MI(const portIterator& begin)
+		static void compress_WO_MI(const portPointer& begin)
 		{
-			portIterator pullIter = begin;
-			portIterator pushIter = begin;
+			portPointer pullPointer = begin;
+			portPointer pushPointer = begin;
 			do
 			{
-				if (pullIter.get().exist())
+				if (pullPointer.get().exist())
 				{
-					connecter::swap(pullIter, pushIter);
-					pushIter.stepForward();
+					connecter::swap(pullPointer, pushPointer);
+					pushPointer.stepForward();
 				}
-			} while (pullIter.stepForward());
-			if (pushIter.getLocalPos() != 0)
-				pushIter.goToNextHub();
-			hubManager::eraseHub(pushIter, -1);
+			} while (pullPointer.stepForward());
+			if (pushPointer.getLocalPos() != 0)
+				pushPointer.goToNextHub();
+			hubManager::eraseHub(pushPointer, -1);
 		}
 		//сжать группу без перемещения итераторов
-		static void compress_WO_MI(const groupIterator& begin)
+		static void compress_WO_MI(const groupPointer& begin)
 		{
-			groupIterator pullIter = begin;
-			groupIterator pushIter = begin;
+			groupPointer pullPointer = begin;
+			groupPointer pushPointer = begin;
 			do
 			{
-				if (pullIter.get().exist())
+				if (pullPointer.get().exist())
 				{
-					connecter::swap(pullIter, pushIter);
-					pushIter.stepForward();
+					connecter::swap(pullPointer, pushPointer);
+					pushPointer.stepForward();
 				}
-			} while (pullIter.stepForward());
-			if (pushIter.getLocalPos() != 0)
-				pushIter.goToNextHub();
-			hubManager::eraseHub(pushIter, -1);
+			} while (pullPointer.stepForward());
+			if (pushPointer.getLocalPos() != 0)
+				pushPointer.goToNextHub();
+			hubManager::eraseHub(pushPointer, -1);
 		}
 
 
@@ -93,44 +93,44 @@ namespace nechto
 
 
 
-		static void fillIteratorSet(std::map<ui32, portIteratorPtr>& iterSet, nodePtr node)
+		static void fillPointerSet(std::map<ui32, portPointerPtr>& ptrSet, nodePtr node)
 		{
-			portIterator iter(node);
+			portPointer ptr(node);
 			do
 			{
-				if (isPortIteratorPtr(iter))
+				if (isPortPointerPtr(ptr))
 				{
-					portIteratorPtr temp(iter.get());
-					iterSet.emplace(temp.getGlobalPos(), temp);
+					portPointerPtr temp(ptr.get());
+					ptrSet.emplace(temp.getGlobalPos(), temp);
 				}
-			} while (iter.stepForward());
+			} while (ptr.stepForward());
 		}
-		static void fillIteratorSet(std::map<ui32, groupIteratorPtr>& iterSet, nodePtr node)
+		static void fillPointerSet(std::map<ui32, groupPointerPtr>& ptrSet, nodePtr node)
 		{
-			portIterator iter(node);
+			portPointer ptr(node);
 			do
 			{
-				if (isGroupIteratorPtr(iter))
+				if (isGroupPointerPtr(ptr))
 				{
-					groupIteratorPtr temp(iter.get());
-					iterSet.emplace(temp.getGlobalPos(), temp);
+					groupPointerPtr temp(ptr.get());
+					ptrSet.emplace(temp.getGlobalPos(), temp);
 				}
-			} while (iter.stepForward());
+			} while (ptr.stepForward());
 		}
 	private:
-		static bool isPortIteratorPtr(portIterator iter)
+		static bool isPortPointerPtr(portPointer ptr)
 		{
-			nodePtr temp = iter.get();
-			if (portIteratorPtr::match(temp))
-				if (temp.connection(0) == iter.getPurpose())
+			nodePtr temp = ptr.get();
+			if (portPointerPtr::match(temp))
+				if (temp.connection(0) == ptr.getPurpose())
 					return true;
 			return false;
 		}
-		static bool isGroupIteratorPtr(portIterator iter)
+		static bool isGroupPointerPtr(portPointer ptr)
 		{
-			nodePtr temp = iter.get();
-			if (groupIteratorPtr::match(temp))
-				if (temp.connection(0) == iter.getPurpose())
+			nodePtr temp = ptr.get();
+			if (groupPointerPtr::match(temp))
+				if (temp.connection(0) == ptr.getPurpose())
 					return true;
 			return false;
 		}

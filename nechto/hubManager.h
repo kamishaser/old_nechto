@@ -4,7 +4,7 @@
 
 #include "hubPtr.h"
 #include "groupPtr.h"
-#include "connectionIterator.h"
+#include "connectionPointer.h"
 
 namespace nechto
 {
@@ -12,7 +12,7 @@ namespace nechto
 	class hubManager
 	{
 	public:
-		static void insertHub(existing<portIterator> begin, int quantity = 1)
+		static void insertHub(existing<portPointer> begin, int quantity = 1)
 		{
 			nodePtr previous = begin.getHPPair().hub;
 			nodePtr next = previous.hub();
@@ -28,21 +28,21 @@ namespace nechto
 				return;
 			//замыкание цепочки
 			hubPtr(next).connect(previous);
-			portIterator iter(begin.getPurpose());
+			portPointer ptr(begin.getPurpose());
 			do
 			{
-				if (portIteratorPtr::match(iter.get()))
+				if (portPointerPtr::match(ptr.get()))
 				{
-					auto hpp = portIteratorPtr(iter.get()).getHPPair();
+					auto hpp = portPointerPtr(ptr.get()).getHPPair();
 					if (hpp.getHubNumber() > hubNumber)
 					{
 						hpp.setHubNumber(hpp.getHubNumber() + quantity);
-						portIteratorPtr(iter.get()).setHPPair(hpp);
+						portPointerPtr(ptr.get()).setHPPair(hpp);
 					}
 				}
-			} while (iter.stepForward());
+			} while (ptr.stepForward());
 		}
-		static void insertHub(existing<groupIterator> begin, int quantity = 1)
+		static void insertHub(existing<groupPointer> begin, int quantity = 1)
 		{
 			hubPtr previous = begin.getHPPair().hub;
 			hubPtr next = previous.hub();
@@ -61,42 +61,42 @@ namespace nechto
 			if (next == begin.firstHub())
 				return;
 
-			portIterator iter(begin.getPurpose());
+			portPointer ptr(begin.getPurpose());
 			do
 			{
-				if (groupIteratorPtr::match(iter.get()))
+				if (groupPointerPtr::match(ptr.get()))
 				{
-					auto hpp = groupIteratorPtr(iter.get()).getHPPair();
+					auto hpp = groupPointerPtr(ptr.get()).getHPPair();
 					if (hpp.getHubNumber() > hubNumber)
 					{
 						hpp.setHubNumber(hpp.getHubNumber() + quantity);
-						groupIteratorPtr(iter.get()).setHPPair(hpp);
+						groupPointerPtr(ptr.get()).setHPPair(hpp);
 					}
 				}
-			} while (iter.stepForward());
+			} while (ptr.stepForward());
 		}
-		static bool eraseHub(portIterator& begin, int quantity)
+		static bool eraseHub(portPointer& begin, int quantity)
 		{
 			if (!begin.exist())
 				return false;
 			return pEraser(begin, quantity).eraseWithNotification();
 		}
-		static bool eraseHub(groupIterator& begin, int quantity)
+		static bool eraseHub(groupPointer& begin, int quantity)
 		{
 			if (!begin.exist())
 				return false;
 			return gEraser(begin, quantity).eraseWithNotification();
 		}
 
-		static bool eraseHubWithNoNotificationIterators(
-			portIterator& begin, int quantity)
+		static bool eraseHubWithNoNotificationPointers(
+			portPointer& begin, int quantity)
 		{
 			if (!begin.exist())
 				return false;
 			return pEraser(begin, quantity).eraseWOnotification();
 		}
-		static bool eraseHubWithNoNotificationIterators(
-			groupIterator& begin, int quantity)
+		static bool eraseHubWithNoNotificationPointers(
+			groupPointer& begin, int quantity)
 		{
 			if (!begin.exist())
 				return false;
@@ -106,12 +106,12 @@ namespace nechto
 		//структурки для взаимодействия функций удавления
 		struct pEraser
 		{
-			portIterator& begin;
+			portPointer& begin;
 			hubPtr hub;
 			nodePtr next;
 			existing<nodePtr> previous;
 			int quantity;//количество удаляемых хабов. Позже становится счётчиком
-			pEraser(portIterator& b, int q)
+			pEraser(portPointer& b, int q)
 				:begin(b), hub(begin.hub),
 				previous(hub.previous()), next(hub.hub()), quantity(q) {}
 
@@ -178,12 +178,12 @@ namespace nechto
 				int min = max - quantity;
 				if (quantity == 0)
 					return;
-				portIterator iter(begin.getPurpose());
+				portPointer ptr(begin.getPurpose());
 				do
 				{
-					if (portIteratorPtr::match(iter.get()))
+					if (portPointerPtr::match(ptr.get()))
 					{
-						portIteratorPtr temp(iter.get());
+						portPointerPtr temp(ptr.get());
 						if (temp.connection(0) != begin.getPurpose())
 							continue;
 						auto hpp = temp.getHPPair();
@@ -196,17 +196,17 @@ namespace nechto
 							hpp.setHubNumber(hubNumber - quantity);
 						temp.setHPPair(hpp);
 					}
-				} while (iter);
+				} while (ptr);
 			}
 		};
 		struct gEraser
 		{
-			groupIterator& begin;
+			groupPointer& begin;
 			hubPtr hub;
 			hubPtr next;
 			hubPtr previous;
 			int quantity;//количество удаляемых хабов. Позже становится счётчиком
-			gEraser(groupIterator& b, int q)
+			gEraser(groupPointer& b, int q)
 				:begin(b), hub(begin.hub),
 				previous(hub.previous()), next(hub.hub()), quantity(q) {}
 
@@ -269,12 +269,12 @@ namespace nechto
 				int min = max - quantity;
 				if (quantity == 0)
 					return;
-				portIterator iter(begin.getPurpose());
+				portPointer ptr(begin.getPurpose());
 				do
 				{
-					if (groupIteratorPtr::match(iter.get()))
+					if (groupPointerPtr::match(ptr.get()))
 					{
-						groupIteratorPtr temp(iter.get());
+						groupPointerPtr temp(ptr.get());
 						if (temp.connection(0) != begin.getPurpose())
 							continue;
 						auto hpp = temp.getHPPair();
@@ -287,7 +287,7 @@ namespace nechto
 							hpp.setHubNumber(hubNumber - quantity);
 						temp.setHPPair(hpp);
 					}
-				} while (iter);
+				} while (ptr);
 			}
 
 		};

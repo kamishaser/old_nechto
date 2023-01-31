@@ -1,5 +1,8 @@
 #pragma once
-#include "object.h"
+#include "entity.h"
+#include "entity.h"
+#include "nodeOperationSet.h"
+#include "crSet.h"
 
 namespace nechto
 {
@@ -19,35 +22,33 @@ namespace nechto
 		{
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
-		const connectionRule defaultConnectionRule =
-			connectionRule(conRule::Object, conRule::useType::readOrWrite);
-		nodePtr getObjectNode() const
+		/*nodePtr getEntityNode() const
 		{
 			return defaultConnectionRule.getConnection(*this, 0);
 		}
-		template<class TCon = object>
-		TCon* getObject() const
+		template<class TCon = entity>
+		TCon* getEntity() const
 		{
-			nonTypedObjectPtr object = getObjectNode();
-			if (!object.exist())
+			nonTypedEntityPtr entity = getEntityNode();
+			if (!entity.exist())
 				return nullptr;
-			return object.get<TCon>();
+			return entity.get<TCon>();
 		}
 		const operation* getMethod() const
 		{
-			auto obj = getObject();
+			auto obj = getEntity();
 			if (obj == nullptr)
 				return nullptr;
 			return &obj->getMethod(subtype());
 
 		}
-		const bool objectExist() const
+		const bool entityExist() const
 		{
-			return getObjectNode().exist();
-		
-			operationData* opDataPtr()
-			{
-				return getDataPtr<operationData>();
-			}
+			return getEntityNode().exist();
+		}*/
+		operationData* opDataPtr()
+		{
+			return getDataPtr<operationData>();
+		}
 	};
 }

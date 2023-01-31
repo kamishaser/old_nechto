@@ -24,10 +24,10 @@ namespace nechto::ide
 		}
 		void updateNodes(nodeBoard* nBoard, bool updateText)
 		{
-			groupIterator i1(nBoard->vNodeGroup());
+			groupPointer i1(nBoard->vNodeGroup());
 			do
 			{
-				visualNode* vNode = getObject<visualNode>(i1.get());
+				visualNode* vNode = getEntity<visualNode>(i1.get());
 				if (vNode)
 				{
 					if (i1.get().connection(0).exist() && updateText)
@@ -42,27 +42,27 @@ namespace nechto::ide
 		}
 		void updateConnections(nodeBoard* nBoard)
 		{
-			groupIterator i1(nBoard->vConnectionGroup());
+			groupPointer i1(nBoard->vConnectionGroup());
 			do
 			{
-				auto vConnection = getObject<visualConnection>(i1.get());
+				auto vConnection = getEntity<visualConnection>(i1.get());
 				if (vConnection)
 				{
-					auto vNode0 = getObject<visualNode>(i1.get().connection(0));
-					auto vNode1 = getObject<visualNode>(i1.get().connection(1));
+					auto vNode0 = getEntity<visualNode>(i1.get().connection(0));
+					auto vNode1 = getEntity<visualNode>(i1.get().connection(1));
 					assert((vNode0) && (vNode1));
 					nodePtr v0 = vNode0->node().connection(0);
 					nodePtr v1 = vNode1->node().connection(0);
 					if (v0.exist() && v1.exist())
 					{
-						iterator iter0 = findNearestConnection(v0, v1);
-						iterator iter1 = findNearestConnection(v1, v0);
-						if (iter0.exist() && iter1.exist())
+						pointer ptr0 = findNearestConnection(v0, v1);
+						pointer ptr1 = findNearestConnection(v1, v0);
+						if (ptr0.exist() && ptr1.exist())
 						{
 							setConType(vConnection, 0, 
-								iter0.getGlobalPos(), iter0.inGroup());
+								ptr0.getGlobalPos(), ptr0.inGroup());
 							setConType(vConnection, 1,
-								iter1.getGlobalPos(), iter1.inGroup());
+								ptr1.getGlobalPos(), ptr1.inGroup());
 						}
 					}
 				}
@@ -70,10 +70,10 @@ namespace nechto::ide
 		}
 		void updateGroups(nodeBoard* nBoard)
 		{
-			groupIterator i1(nBoard->vGroupGroup());
+			groupPointer i1(nBoard->vGroupGroup());
 			do
 			{
-				auto vGroup = getObject<visualGroup>(i1.get());
+				auto vGroup = getEntity<visualGroup>(i1.get());
 				if (vGroup)
 					vGroup->update();
 			} while (i1.stepForward());
