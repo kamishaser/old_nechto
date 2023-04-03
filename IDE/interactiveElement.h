@@ -10,6 +10,6 @@ namespace nechto::ide
 		
 		//структура содержимого. Зависит от типа элемента
 		nodePtr contentNode;
-
+		
 	};
 }
