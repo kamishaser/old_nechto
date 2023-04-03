@@ -29,10 +29,9 @@ namespace nechto
 		}
 		nodePtr follow() const
 		{
-			auto hpp = getHPPair();
-			if (!hpp.exist())
+			if (!exist())
 				return nullptr;
-			return hpp.follow();
+			return follow();
 		}
 		bool checkCorrectness()
 		{

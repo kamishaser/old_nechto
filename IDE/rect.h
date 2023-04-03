@@ -1,5 +1,6 @@
 #pragma once
 #include "GLM/glm.hpp"
+#include "ideStructurePack.h"
 
 namespace nechto::ide
 {
@@ -35,7 +36,7 @@ namespace nechto::ide
 		{
 			return contains(of.position) && contains(of.position + of.size);
 		}
-		glm::vec2 center()
+		glm::vec2 center() const
 		{
 			return position + (size / 2.f);
 		}
@@ -43,25 +44,28 @@ namespace nechto::ide
 		{
 			position = center - (size / 2.f);
 		}
-		float top()
+		float top() const
 		{
 			return position.y;
 		}
-		float bottom()
+		float bottom() const
 		{
 			return position.y + size.y;
 		}
-		float left()
+		float left() const
 		{
 			return position.x;
 		}
-		float right()
+		float right() const
 		{
 			return position.x + size.x;
 		}
 		rect(glm::vec2 Position, glm::vec2 Size)
 			:position(Position), size(Size) {}
-		//получить рамку по двум любым её вершинам
+		rect(float left = 0, float top = 0, float width = 0, float height = 0)
+			:position{ left, top }, size{ width, height } {}
+		
+		//получить рамку по двум любым её противоположным вершинам
 		static rect getByTwoPoint(glm::vec2 first, glm::vec2 second)
 		{
 			glm::vec2 position{
@@ -72,5 +76,54 @@ namespace nechto::ide
 				((first.y > second.y) ? first.y : second.y) - position.y };
 			return rect(position, size);
 		}
+		friend bool operator<<(nodePtr node, const rect& r)
+		{
+			nodePtr pos = sPack::rect::position / node;
+			nodePtr size = sPack::rect::size / node;
+			if (!(
+				sPack::vec2::x / pos << r.position.x &&
+				sPack::vec2::y / pos << r.position.y &&
+				sPack::vec2::x / size << r.size.x &&
+				sPack::vec2::y / size << r.size.y))
+				return false;
+			return true;
+		}
+		friend bool operator>>(nodePtr node, rect& r)
+		{
+			nodePtr pos = sPack::rect::position / node;
+			nodePtr size = sPack::rect::size / node;
+			if (!(
+				sPack::vec2::x / pos >> r.position.x &&
+				sPack::vec2::y / pos >> r.position.y &&
+				sPack::vec2::x / size >> r.size.x &&
+				sPack::vec2::y / size >> r.size.y))
+				return false;
+			return true;
+		}
+		rect(nodePtr node)
+		{
+			assert(node >> *this);
+		}
 	};
+	bool operator <<(nodePtr node, glm::vec2 vec)
+	{
+		return
+			sPack::vec2::x / node << vec.x &&
+			sPack::vec2::y / node << vec.y;
+	}
+	bool operator >>(nodePtr node, glm::vec2 vec)
+	{
+		return
+			sPack::vec2::x / node >> vec.x &&
+			sPack::vec2::y / node >> vec.y;
+	}
+	bool operator += (nodePtr node, glm::vec2 vec)
+	{
+		glm::vec2 value(0, 0);
+		if (!(node >> value))
+			return false;
+		value += vec;
+		node << value;
+		return true;
+	}
 }

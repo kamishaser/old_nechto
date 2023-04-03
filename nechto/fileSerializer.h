@@ -16,7 +16,10 @@ namespace nechto
 		{
 			assert(!isOpen());
 			stream.open(path, std::ios::binary | std::ios::trunc);
-			
+			ui32 type = 0;
+			ui32 version = 0;
+			stream.write(reinterpret_cast<const char*>(&type), 4);
+			stream.write(reinterpret_cast<const char*>(&version), 4);
 		}
 		bool isOpen()
 		{
@@ -25,7 +28,6 @@ namespace nechto
 		void close()
 		{
 			assert(isOpen());
-			end();
 			stream.close();
 		}
 		void serialize(nodePtr v1)
@@ -37,14 +39,19 @@ namespace nechto
 	{
 		std::ifstream stream;
 	public:
-		fileDeserializer()
+		fileDeserializer(deserializer::enDeserType enDeserFunc)
 			:deserializer([&](char* p, uint32_t size)
-				{stream.read(p, size); }) {}
+				{stream.read(p, size); }, enDeserFunc) {}
 		void open(std::filesystem::path path)
 		{
 			assert(!isOpen());
 			stream.open(path, std::ios::binary);
-
+			ui32 type = 0;
+			ui32 version = 0;
+			stream.read(reinterpret_cast<char*>(&type), 4);
+			stream.read(reinterpret_cast<char*>(&version), 4);
+			assert(type == 0);
+			assert(version == 0);
 		}
 		bool isOpen()
 		{

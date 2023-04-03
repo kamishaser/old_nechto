@@ -1,6 +1,6 @@
 #pragma once
 #include "nodePtr.h"
-#include "connectionPosition.h"
+#include "reverseConnectionPosition.h"
 
 namespace nechto
 {
@@ -53,6 +53,8 @@ namespace nechto
 		}
 		nodePtr follow() const
 		{
+			if (!hub.exist())
+				return nullptr;
 			return hub.connection(getLocalPos());
 		}
 		bool operator== (const hubPosPair hpp) const
@@ -65,9 +67,7 @@ namespace nechto
 		}
 		bool inGroup() const
 		{
-			if (!hubPtr::match(hub))
-				return false;
-			return hub.subtype();
+			return (hub.type() == nodeT::Hub) && (hub.subtype() == 1);
 		}
 	protected:
 		bool operator++()

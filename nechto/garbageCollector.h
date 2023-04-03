@@ -37,7 +37,7 @@ namespace nechto
 	private:
 		static ushort getNodeLevel(existing<nodePtr> node)
 		{
-			if (nonTypedEntityPtr::match(node) && isStrongExternalConnection(node))
+			if (entityPtr::match(node) && isStrongExternalConnection(node))
 				return 1;
 			ushort bottomLevel = 0;
 			if (groupPtr::match(node))
@@ -59,64 +59,59 @@ namespace nechto
 			} while (ptr.stepForward());
 			return bottomLevel;
 		}
-		static const ushort maxConnectionLevel = 1024;
 		static ushort getConnectionLevel(pointer ptr)
 		{
 			if (!isStrongConnection(ptr))
 				return 0;
 			ushort bottomLevel =  ptr.get().node()->bottomLevel + 1;
 			//защита от замкнутых сильных связей с автоматим удалением оных
-			if (bottomLevel > maxConnectionLevel)
+			if (bottomLevel == 255)
 			{
 				nearestDisconnect(ptr);
 				return 0;
 			}
 			return bottomLevel;
 		}
-		static bool isStrongConnection(pointer ptr)
+		static bool isStrongConnection(pointer p0)
 		{
-			nodePtr node = ptr.get();
-			if (!node.exist())
+			if (!p0.get().exist())
 				return false;
-			switch (node.type())
+			pointer p1 = reversePort(p0);
+			switch (p0.get().type())
 			{
 			case nodeT::Entity:
-				return isEntityBackConnectionStrong(node, ptr.getPurpose());
+				return isEntityBackConnectionStrong(p1);
 			case nodeT::Group:
-				return isGroupBackConnectionStrong(node, ptr.getPurpose());
+				return isGroupBackConnectionStrong(p1);
 			case nodeT::Struct:
 				//return isStructBackConnectionStrong(node, ptr.getPurpose());
 			default:
 				return false;
 			}
 		}
-		static bool isEntityBackConnectionStrong(nonTypedEntityPtr entity, existing<nodePtr> node)
+		static bool isEntityBackConnectionStrong(pointer reverseConnection)
 		{
-			if(!isStrongExternalConnection(entity))
+			if(!isStrongExternalConnection(reverseConnection.getPurpose()))
 				return false;
-			for (int i = 0; i < 4; ++i)
-				if (entity.connection(i) == node)
-					return true;
+			if (reverseConnection.getHubNumber() == 0)
+				return true;
 			return false;
 		}
-		static bool isGroupBackConnectionStrong(groupPtr group, existing<nodePtr> node)
+		static bool isGroupBackConnectionStrong(pointer reverseConnection)
 		{
-			if (!group.isStrong())
+			if (!groupPtr(reverseConnection.getPurpose()).isStrong())
 				return false;
-			groupPointer gi(group);
-			do
-			{
-				if (gi.get() == node)
-					return true;
-			} while (gi.stepForward());
+			nodePtr hub = reverseConnection.hub;
+			if (hub.type() == nodeT::Hub && hub.subtype() == 1)
+				return true;
 			return false;
 		}
 		//bool isStructBackConnectionStrong(structPtr structure, existing<nodePtr> node);
-		static bool isStrongExternalConnection(nonTypedEntityPtr entity)
+		static bool isStrongExternalConnection(entityPtr node)
 		{
-			if (entity.isUniqueOwner())
+			if (node.isOneSideLink())
 				return false;
-			if (!entity.dataExist())
+			if (!node.entityExist())
 				return false;
 			return true;
 		}

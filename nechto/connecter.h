@@ -13,22 +13,42 @@ namespace nechto
 	public:
 		static bool connect(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			if ((ptr1.get().exist()) || (ptr2.get().exist()))
-				return false;
+			//когда будешь делать защиту операций, не забудь про swap
+			if (ptr1.get().exist())
+				disconnect(ptr1);
+			if (ptr2.get().exist())
+				disconnect(ptr2);
 			if(ptr1.inGroup())
 				if(groupConnectProhibition(groupPointer(ptr1), ptr2))
 					return false;
 			if (ptr2.inGroup())
 				if (groupConnectProhibition(groupPointer(ptr2), ptr1))
 					return false;
-			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.getPurpose();
+			ui32 lp1 = ptr1.getLocalPos();
+			ui32 lp2 = ptr2.getLocalPos();
+			nodeData* h1 = ptr1.hub.node();
+			nodeData* h2 = ptr2.hub.node();
+
+			h1->port[lp1] = ptr2.getPurpose();
+			h1->reverseAddress[lp1] = ptr2.hub;
+			h1->reversePosition.setLocalPos(lp1, lp2);
+
+			h2->port[lp2] = ptr1.getPurpose();
+			h2->reverseAddress[lp2] = ptr1.hub;
+			h2->reversePosition.setLocalPos(lp1, lp2);
+			
+			
+			/*ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.getPurpose();
+			ptr1.getHPPair().hub.node()->backPosition[ptr1.getLocalPos()] = ptr2.getConPos();
 			ptr2.getHPPair().hub.node()->port[ptr2.getLocalPos()] = ptr1.getPurpose();
+			ptr2.getHPPair().hub.node()->backPosition[ptr2.getLocalPos()] = ptr1.getConPos();*/
 			return true;
 		}
-		static bool disconnect(existing<pointer> ptr1, existing<pointer> ptr2)
+		static bool disconnect(existing<pointer> ptr1)
 		{
-			if (!isConnection(ptr1, ptr2))
-				return false;//только двустороннии соединения
+			if (!ptr1.get().exist())
+				return false;
+			existing<pointer> ptr2 = reversePort(ptr1);
 			resetPointer(ptr1);
 			resetPointer(ptr2);
 			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = nullptr;
@@ -42,19 +62,22 @@ namespace nechto
 		}
 		static void swap(existing<pointer> ptr1, existing<pointer> ptr2)
 		{
-			assert(ptr1.getPurpose() == ptr2.getPurpose());
-			resetPointer(ptr1);
-			resetPointer(ptr2);
-			nodePtr temp = ptr1.get();
-			ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.get();
-			ptr2.getHPPair().hub.node()->port[ptr2.getLocalPos()] = temp;
+			pointer revPort1 = reversePort(ptr1);
+			pointer revPort2 = reversePort(ptr2);
+
+			disconnect(ptr1);
+			disconnect(ptr2);
+
+			connect(ptr1, revPort2);
+			connect(ptr2, revPort1);
 		}
+	public:
 		
 		//исключение хаба из цепочки без оповещения итераторов
 		
 		static void resetPointer(existing<pointer> ptr)
 		{
-			existing<nodePtr> node = ptr.getHPPair().hub;
+			existing<nodePtr> node = ptr.hub;
 			if (node.type() == nodeT::Pointer &&
 				(ptr.getLocalPos() == 0) && (node.subtype() > 0))
 				pointerPtr(node).setHPPair(hubPosPair(nullptr, 0));
@@ -70,22 +93,26 @@ namespace nechto
 	pointer findNearestConnection(
 		existing<nodePtr> node, existing<nodePtr> connection);//определено в portSearch
 	portPointer firstEmptyHubPort(existing<nodePtr> eptr);
-	void nearestDisconnect(existing<pointer> i1)
+	void disconnect(existing<pointer> i1)
 	{
 		if (!(i1.getPurpose().exist() && i1.get().exist()))
 			return;
-		connecter::disconnect(i1, findNearestConnection(i1.get(), i1.getPurpose()));
+		connecter::disconnect(i1);
 	}
-	void nearestDisconnect(existing<nodePtr> node1, char port)
+	void disconnect(existing<nodePtr> node1, char port)
 	{
-		nearestDisconnect(portPointer(node1, port));
+		disconnect(portPointer(node1, port));
 	}
-	void nearestDisconnect(existing<nodePtr> node1, existing<nodePtr> node2)
+	void disconnect(nodePtr node1, char port)
+	{
+		if (node1.exist())
+			disconnect(existing<nodePtr>(node1), port);
+	}
+	void disconnect(existing<nodePtr> node1, existing<nodePtr> node2)
 	{
 		pointer ptr1 = findNearestConnection(node1, node2);
-		pointer ptr2 = findNearestConnection(node2, node1);
-		if(ptr1.exist() && ptr2.exist())
-			connecter::disconnect(ptr1, ptr2);
+		if(ptr1.exist())
+			connecter::disconnect(ptr1);
 	}
 
 	void NumNumConnect(
@@ -94,9 +121,9 @@ namespace nechto
 		portPointer ci1(node1, port1);
 		portPointer ci2(node2, port2);
 		if (ci1.get().exist())
-			nearestDisconnect(ci1);
+			disconnect(ci1);
 		if (ci2.get().exist())
-			nearestDisconnect(ci2);
+			disconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
 	void NumHubConnect(
@@ -104,7 +131,7 @@ namespace nechto
 	{
 		portPointer ci1(node1, port1);
 		if (ci1.get().exist())
-			nearestDisconnect(ci1);
+			disconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
 	}
 	void HubHubConnect(
@@ -116,9 +143,9 @@ namespace nechto
 	void PointerPointerConnect(pointer ci1, pointer ci2)
 	{
 		if (ci1.get().exist())
-			nearestDisconnect(ci1);
+			disconnect(ci1);
 		if (ci2.get().exist())
-			nearestDisconnect(ci2);
+			disconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
 	void PointerNumConnect(
@@ -127,16 +154,16 @@ namespace nechto
 		assert(port2 < 4);
 		portPointer ci2(node2, port2);
 		if (ci1.get().exist())
-			nearestDisconnect(ci1);
+			disconnect(ci1);
 		if (ci2.get().exist())
-			nearestDisconnect(ci2);
+			disconnect(ci2);
 		connecter::connect(ci1, ci2);
 	}
 	void PointerHubConnect(
 		pointer ci1, existing<nodePtr> node2)
 	{
 		if (ci1.get().exist())
-			nearestDisconnect(ci1);
+			disconnect(ci1);
 		connecter::connect(ci1, firstEmptyHubPort(node2));
 	}
 	void creator::disconnectAll(existing<nodePtr> node)
@@ -144,7 +171,7 @@ namespace nechto
 		portPointer ptr(node);
 		do
 		{
-			nearestDisconnect(ptr);
+			disconnect(ptr);
 		} while (ptr.stepForward());
 	}
 	void creator::disconnectAllGroup(groupPtr group)
@@ -152,7 +179,7 @@ namespace nechto
 		groupPointer ptr(group);
 		do
 		{
-			nearestDisconnect(ptr);
+			disconnect(ptr);
 		} while (ptr.stepForward());
 	}
 }

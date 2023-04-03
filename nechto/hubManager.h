@@ -21,13 +21,13 @@ namespace nechto
 			for (int i = 0; i < quantity; ++i)
 			{
 				hubPtr hub = creator::createHub(0);
-				hub.connect(previous);
+				hub.connect(previous, hubNumber + i);
 				previous = hub;
 			}
 			if (!next.exist())
 				return;
 			//замыкание цепочки
-			hubPtr(next).connect(previous);
+			hubPtr(next).connect(previous, hubNumber + quantity);
 			portPointer ptr(begin.getPurpose());
 			do
 			{
@@ -42,7 +42,7 @@ namespace nechto
 				}
 			} while (ptr.stepForward());
 		}
-		static void insertHub(existing<groupPointer> begin, int quantity = 1)
+		static void insertHub(groupPointer begin, int quantity = 1)
 		{
 			hubPtr previous = begin.getHPPair().hub;
 			hubPtr next = previous.hub();
@@ -53,11 +53,12 @@ namespace nechto
 			for (int i = 0; i < quantity; ++i)
 			{
 				hubPtr hub = creator::createHub(1);
-				hub.connect(previous);
+				hub.connect(previous, hubNumber + i);
 				previous = hub;
+				begin.goToNextHub();
 			}
 			//замыкание цепочки
-			hubPtr(next).connect(previous);
+			hubPtr(next).connect(previous, hubNumber + quantity);
 			if (next == begin.firstHub())
 				return;
 
@@ -129,7 +130,7 @@ namespace nechto
 					return false;
 				bool result = erase();
 				close(result);
-				notify();
+				notifyPointers();
 				return result;
 			}
 		private:
@@ -161,17 +162,17 @@ namespace nechto
 				begin.setGlobalPos(begin.getGlobalPos() + (quantity << 2));
 
 				if (!result)//если завершено с ошибкой
-					hub.connect(previous);
+					hub.connect(previous, begin.getHubNumber());
 				else
 				{
 					if (next.exist())
-						hub.connect(previous);
+						hub.connect(previous, begin.getHubNumber());
 					else
 						previous.node()->hubPort = nullptr;
 				}
 			}
 			//оповестить
-			void notify()
+			void notifyPointers()
 			{
 				//замыкание цепочки
 				int max = begin.getHubNumber();
@@ -198,6 +199,7 @@ namespace nechto
 					}
 				} while (ptr);
 			}
+			
 		};
 		struct gEraser
 		{
@@ -228,7 +230,7 @@ namespace nechto
 				close(result);
 				groupPtr group(begin.getPurpose());
 				group.setSize(group.getNumberOfHubs() - quantity);
-				notify();
+				notifyPointers();
 				return result;
 			}
 		private:
@@ -259,10 +261,10 @@ namespace nechto
 				begin.hub = hub;
 				begin.setGlobalPos(begin.getGlobalPos() + (quantity << 2));
 
-				hub.connect(previous);
+				hub.connect(previous, begin.getHubNumber());
 			}
 			//оповестить
-			void notify()
+			void notifyPointers()
 			{
 				//замыкание цепочки
 				int max = begin.getHubNumber();
@@ -288,6 +290,10 @@ namespace nechto
 						temp.setHPPair(hpp);
 					}
 				} while (ptr);
+			}
+			void notifyConnections()
+			{
+			
 			}
 
 		};

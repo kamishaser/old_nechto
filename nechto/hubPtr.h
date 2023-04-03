@@ -1,5 +1,6 @@
 #pragma once
 #include "nodePtr.h"
+#include "hubPosPair.h"
 namespace nechto
 {
 	//хаб каждый хаб обязательно содержит следующие данные:
@@ -10,10 +11,11 @@ namespace nechto
 		friend class connecter;
 		friend class creator;
 		friend class hubManager;
+		friend class deserializer;
 
-		void connect(existing<nodePtr> previous)
+		void connect(existing<nodePtr> previous, ui32 previousNumber)
 		{
-			setData<nodePtr>(previous);
+			setData<hubPosPair>(hubPosPair(previous, previousNumber + 1));
 			previous.node()->hubPort = *this;
 		}
 		void setNext(nodePtr next)
@@ -34,7 +36,11 @@ namespace nechto
 		}
 		existing<nodePtr> previous() const
 		{
-			return existing<nodePtr>(getData<nodePtr>());
+			return existing<nodePtr>(getData<hubPosPair>().hub);
+		}
+		ui32 number() const
+		{
+			return getData<hubPosPair>().getGlobalPos();
 		}
 		bool empty() const
 		{
@@ -42,6 +48,10 @@ namespace nechto
 				connection(2).exist() || connection(3).exist())
 				return false;
 			return true;
+		}
+		bool inGroup() const
+		{
+			return subtype();
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{

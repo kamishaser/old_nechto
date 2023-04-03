@@ -42,6 +42,7 @@ namespace nechto
 		friend class deserializer;
 		friend class nodeOperator;
 		friend class garbageCollector;
+		friend class sType;
 	public:
 		nodePtr(nodeId id)
 			:nodeId(id) {}
@@ -51,6 +52,14 @@ namespace nechto
 		const nodePtr connection(int number) const
 		{
 			return node()->port[number];
+		}
+		const unsigned char reverseLocalPos(int number) const
+		{
+			return node()->reversePosition.getLocalPos(number);
+		}
+		const nodePtr reverseAddress(int number) const
+		{
+			return node()->reverseAddress[number];
 		}
 		unsigned char type() const
 		{
@@ -66,7 +75,10 @@ namespace nechto
 		{
 			return node()->hubPort;
 		}
-		
+		bool operator+() const
+		{
+			return exist();
+		}
 		nodePtr(nullptr_t)
 			:nodeId() {}
 	};

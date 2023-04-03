@@ -27,8 +27,8 @@ namespace nechto::typeName
 			return L"MathOperation";
 		case nechto::nodeT::Condition:
 			return L"Condition";
-		case nechto::nodeT::Method:
-			return L"Method";
+		case nechto::nodeT::Path:
+			return L"Path";
 		default:
 			return L"Error";
 			//return L"";
@@ -249,7 +249,7 @@ namespace nechto::typeName
 			return getMathOperationSubtypeName(subtype);
 		case nechto::nodeT::Condition:
 			return L"";
-		case nechto::nodeT::Method:
+		case nechto::nodeT::Path:
 			return L"";
 		case nodeT::Vector:
 			return getVectorSubtypeName(subtype);

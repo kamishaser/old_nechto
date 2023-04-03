@@ -1,13 +1,14 @@
 #pragma once
 #include "GLM/glm.hpp"
 #include "SFML/Graphics.hpp"
-#include "nodeOperationSet.h"
-#include "connectionPointer.h"
-#include "entity.h"
-
-#include <codecvt>
-#include <locale>
-
+//#include "nodeOperationSet.h"
+//#include "connectionPointer.h"
+//#include "entity.h"
+#include "rect.h"
+//
+//#include <codecvt>
+//#include <locale>
+//
 namespace nechto::ide
 {
 	template<class T = float>
@@ -16,7 +17,7 @@ namespace nechto::ide
 		return sf::Vector2<T>(v.x, v.y);
 	}
 	template<class T>
-	glm::vec2 SFML_GLM(sf::Vector2<T> v)
+	glm::vec2 GLM_SFML(sf::Vector2<T> v)
 	{
 		return glm::vec2(v.x, v.y);
 	}
@@ -27,26 +28,70 @@ namespace nechto::ide
 			std::to_wstring(vec.y) + L']';
 	}
 	using color = sf::Color;
-	using geometricShape = std::vector<glm::vec2>;
-	enum conType
+
+	glm::vec2 textSize(const sf::Text text)
 	{
-		Hub,
-		Group,
-		N0,
-		N1,
-		N2,
-		N3
-	};
+		auto bounds = text.getLocalBounds();
+		return glm::vec2(bounds.width, bounds.height);
+	}
+	glm::vec2 textSize(const std::wstring& string, const sf::Font font, float size)
+	{
+		sf::Text text(string, font, size);
+		return textSize(text);
+	}
+	glm::vec2 randomOffset(float max)
+	{
+		return glm::vec2
+		(
+			static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / max / 2)) - max,
+			static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / max / 2)) - max
+		);
+	}
+	using namespace std::chrono;
+
+	milliseconds currentTime()
+	{
+		return duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	}
+	
+
+	using geometricShape = std::vector<glm::vec2>;
+//	
 	namespace col
 	{
-		color sel[]
+		color illuminationColor[]
 		{
-			color(0x002846FF),
-			color(0x20415AFF),
-			color(0x004F8BFF),
-			color(0x4D9EDCFF),
-			color(0x8BB9DCFF),
-			color(0xFFFFFFFF)
+			color(0x00000000), //none
+			color(0x7CC800FF), //error
+			color(0xB3EF53FF), //tip0
+			color(0xCDEF96FF), //tip1
+			color(0xB30058FF), //tip2
+			color(0x002846FF), //sel4
+			color(0x20415AFF), //sel3
+			color(0x004F8BFF), //sel2
+			color(0x4D9EDCFF), //sel1
+			color(0x8BB9DCFF), //sel0
+			color(0xFFFFFFFF)  //mOver  
+		};
+		color lineColor[]
+		{
+			color(0xB30058FF), //error
+			color(0xE892BDFF), //weak
+			color(0xE8519BFF), 
+			//weak && (readOnly || последовательное || групповое)
+			color(0x74294EFF), //strong
+			color(0x5B002CFF), //strong && (readOnly || group)
+		};
+		color blockColor[]
+		{
+			color(0x00000000), //none
+			color(0x3E6500FF), //backGroundColor
+			color(0x61812EFF), //vNodeBackGroundColor
+			color(0x6D3F00FF),
+			color(0x8C6531FF),
+			color(0xD97C00FF),
+			color(0xF3B055FF),
+			color(0xF3CD99FF)
 		};
 
 		color background = color(0x3E6500FF);
@@ -67,9 +112,17 @@ namespace nechto::ide
 		color weak = color(0xE892BDFF);
 		color weakReadOnly = color(0xE8519BFF);
 	}
-
+//	
 	namespace vnShape
 	{
+		enum shapeType
+		{
+			noShape,
+			rectanleShape,
+			rhombeShape,
+			octagonShape,
+			circleShape
+		};
 		constexpr geometricShape rectangle()
 		{
 			return geometricShape
@@ -118,5 +171,28 @@ namespace nechto::ide
 			}
 			return temp;
 		}
+		constexpr geometricShape getShape(shapeType type)
+		{
+			switch (type)
+			{
+			case nechto::ide::vnShape::rectanleShape:
+				return rectangle();
+			case nechto::ide::vnShape::rhombeShape:
+				return rhombe();
+			case nechto::ide::vnShape::octagonShape:
+				return octagon();
+			case nechto::ide::vnShape::circleShape:
+				return circle();
+			default:
+				return geometricShape();
+			}
+		}
 	}
+	enum class buttonStatus
+	{
+		None,
+		Press,
+		BeginClick,
+		EndClick
+	};
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "nodeBoard.h"
-#include "GLM/glm.hpp"
+//#include "nodeBoard.h"
+//#include "GLM/glm.hpp"
 
 namespace nechto::ide
 {

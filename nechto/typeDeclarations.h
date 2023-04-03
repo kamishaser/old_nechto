@@ -3,13 +3,14 @@
 #include <string>
 #include <iostream>
 #include "enums.h"
-#include "connectionPosition.h"
+#include "reverseConnectionPosition.h"
 namespace nechto
 {
 	using ushort = unsigned short;
 	using i64 = long long;
 	using f64 = double;
 	using ui32 = unsigned long;
+	using uchar = unsigned char;
 
 	namespace nodeStorage
 	{
@@ -26,12 +27,19 @@ namespace nechto
 	struct pointer;
 	class portPointer;
 	class groupPointer;
+	class path;
 
 	class garbageCollector;
 
 	class serializationBuffer;
 	class serializer;
 	class deserializer;
+
+	class factory;
+	class sType;
+
+	template<class TCon>
+	concept essT = true;
 
 	//базовый класс идентификатора ноды
 	struct nodeId
@@ -100,17 +108,21 @@ namespace nechto
 	struct nodeData
 	{
 		i64 data = 0;
-		ushort bottomLevel = 0;
 		unsigned char type = 0;
 		unsigned char subtype = 0;
+		unsigned char bottomLevel = 0;
+		reverseConnectionPosition reversePosition;
 		nodeId hubPort;
 		nodeId port[4];
+		nodeId reverseAddress[4];
+		
 		template <class TCon>
 		TCon* getDataPtr()
 		{
 			return static_cast<TCon*>(static_cast<void*>(&data));
 		}
 	};
+	static_assert(sizeof(nodeData) <= 48);
 	struct operationData
 	{
 		bool correctNoTransitConnection[3]{ false, false, false };
@@ -131,6 +143,10 @@ namespace nechto
 		{
 			assert(tCon.exist());
 		}
+	protected:
+		existing<TCon>(nullptr_t)//когда нельзя, но очень хочется выстрелить себе в ногу
+			:TCon(nullptr)
+		{}
 	};
 	
 	class entityInterface;
@@ -146,9 +162,7 @@ namespace nechto
 	class methodPtr;
 	class mathOperationPtr;
 	class entityNullPtr;
-
-	class namedExCon;
-	class namedExConGroup;
+	class entityPtr;
 	
 	bool hasSubType(unsigned char type)
 	{
@@ -175,7 +189,7 @@ namespace nechto
 			return false;
 		}
 	}
-	bool isOperation(unsigned char type)
+	constexpr bool isOperation(unsigned char type)
 	{
 		return(type > 127);
 	}

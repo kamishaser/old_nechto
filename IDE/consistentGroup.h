@@ -13,7 +13,6 @@ namespace nechto::ide
 			/*в зависимости от horisontal позиционирование справа/сверху или слева/снизу*/
 			bool rightAlignment = false; 
 			bool reverseDirection = false;
-			bool table4 = false; //иначе список
 
 			//отступ по x (зависимость позиции от точки)
 			constexpr bool xSizeOffset() const
@@ -41,177 +40,103 @@ namespace nechto::ide
 			{
 				return horisontal;
 			}
+			arrangeMode(nodePtr cgs)
+			{
+				assert(cgs >> *this);
+			}
+			friend bool operator>>(nodePtr cgs, arrangeMode& gr)
+			{
+				return
+					sPack::vGroup::consistent::horisontal / cgs >> gr.horisontal &&
+					sPack::vGroup::consistent::rightAlignment / cgs >> gr.rightAlignment &&
+					sPack::vGroup::consistent::reverseDirection / cgs >> gr.reverseDirection;
+			}
+			friend bool operator<<(nodePtr cgs, const arrangeMode& gr)
+			{
+				return
+					sPack::vGroup::consistent::horisontal / cgs << gr.horisontal &&
+					sPack::vGroup::consistent::rightAlignment / cgs << gr.rightAlignment &&
+					sPack::vGroup::consistent::reverseDirection / cgs << gr.reverseDirection;
+			}
 		};
 		
 		arrangeMode mode;
-		float distance = 2;
+		float distance = 20;//сохранять пока не планирую
 		////////////////////////////////////////////////////////////////////////////////
-		consistentGroup(teptr<visualGroup> node, glm::vec2 startPoint = glm::vec2(0,0), 
-			arrangeMode Mode = arrangeMode())
-			:visualGroup(node, startPoint), mode(Mode)
+		consistentGroup(nodePtr node, ideFactory& fact)
+			:visualGroup(node, fact), mode(sPack::vGroup::data / node)
 		{}
 		void setPositionByStartPoint(glm::vec2 pos)
 		{
+			rect frame{ frameNode() };
 			frame.position.x = (mode.xSizeOffset()) ? pos.x - frame.size.x : pos.x;
 			frame.position.y = (mode.ySizeOffset()) ? pos.y - frame.size.y : pos.y;
+			frameNode() << frame;
 		}
 		void resizeVithSaveStartPoint(glm::vec2 size)
 		{
+			rect frame{ frameNode() };
 			if (mode.xSizeOffset())
 				frame.position.x -= size.x - frame.size.x;
 			if (mode.ySizeOffset())
 				frame.position.y -= size.y - frame.size.y;
 			frame.size = size;
+			frameNode() << frame;
 		}
 		//расставить ноды в группе согласно mode на расстоянии distance друг от друга
-		virtual void update(teptr<visualGroup> node)
+		virtual void update()
 		{
-			groupPointer gi(vNodeGroup(node));
+			groupPointer gi(vNodeGroup());
+			rect frame{ frameNode() };
 			glm::vec2 startPos = mode.startPoint(frame);//точка установки первой ноды
+			float oldLenght = frame.size[mode.lenght()];
 			frame.size = glm::vec2{ 0, 0 };
 			float lenghtPos{ startPos[mode.lenght()]};//точка установки
-			if (!mode.table4)//с табличным отображением отдельная история
+			if (mode.reverseDirection)//реверс идёт с последней к первой
+				gi.stepBack();
+			do
 			{
-				if (mode.reverseDirection)//реверс идёт с последней к первой
-					gi.stepBack();
-				do
+				if (!gi.get().exist())
+					continue;
+				glm::vec2 pos;//позиция установки ноды
+				pos[mode.lenght()] = lenghtPos;
+				pos[mode.width()] = startPos[mode.width()];
+				glm::vec2 size = arrangeOne("0210"_np / gi.get(), pos);
+				lenghtPos += size[mode.lenght()] + distance;
+				if (size[mode.width()] > frame.size[mode.width()])
 				{
-					glm::vec2 pos;//позиция установки ноды
-					pos[mode.lenght()] = lenghtPos;
-					pos[mode.width()] = startPos[mode.width()];
-					glm::vec2 size = arrangeOne(gi, pos);
-					lenghtPos += size[mode.lenght()] + distance;
-					if (size[mode.width()] > frame.size[mode.width()])
-					{
-						if (mode.rightAlignment)
-							frame.position[mode.width()] -=
-							size[mode.width()] - frame.size[mode.width()];
-						frame.size[mode.width()] = size[mode.width()];
-					}
+					frame.size[mode.width()] = size[mode.width()];
+				}
 
-				} while ((mode.reverseDirection) ? gi.stepBack() : gi.stepForward());
-			}
-			else
-			{
-				std::array<float, 4> rPos =
-					rowPos(startPos[mode.width()], distance);
-				if (mode.reverseDirection)//реверс идёт с последней к первой
-					gi.goToPreviousHub();
-				do
-				{
-					glm::vec2 size = arrangeRow(node, gi, rPos, lenghtPos);
-					lenghtPos += size[mode.lenght()] + distance;
-					if (size[mode.width()] > frame.size[mode.width()])
-					{
-						if (mode.rightAlignment)
-							frame.position[mode.width()] -=
-							size[mode.width()] - frame.size[mode.width()];
-						frame.size[mode.width()] = size[mode.width()];
-					}
-				} while ((mode.reverseDirection) ? gi.goToPreviousHub() : gi.goToNextHub());
-			}
+			} while ((mode.reverseDirection) ? gi.stepBack() : gi.stepForward());
 			lenghtPos -= distance;
-			if (lenghtPos > frame.size[mode.lenght()])
-			{
-				if (mode.rightAlignment)
-					frame.position[mode.lenght()] -=
-					lenghtPos - frame.size[mode.lenght()];
-				frame.size[mode.lenght()] = lenghtPos;
-			}
+			frame.size[mode.lenght()] = lenghtPos - startPos[mode.lenght()];
+			frame.position[mode.lenght()] = mode.reverseDirection ?
+				startPos[mode.lenght()] - frame.size[mode.lenght()] + oldLenght : 
+				startPos[mode.lenght()];
+			frame.position[mode.width()] = mode.rightAlignment ?
+				startPos[mode.width()] - frame.size[mode.width()] :
+				startPos[mode.width()];
+			frameNode() << frame;
 		}
 	protected:
-		void replaceRect(rect* r1, glm::vec2 pos) const
+		void replaceRect(nodePtr rNode, glm::vec2 pos) const
 		{
-			r1->position.x = (mode.xSizeOffset()) ? (pos.x - r1->size.x) : pos.x;
-			r1->position.y = (mode.ySizeOffset()) ? (pos.y - r1->size.y) : pos.y;
+			rect r1(rNode);
+			r1.position.x = (mode.xSizeOffset()) ? (pos.x - r1.size.x) : pos.x;
+			r1.position.y = (mode.ySizeOffset()) ? (pos.y - r1.size.y) : pos.y;
+			rNode << r1;
 		}
-		glm::vec2 arrangeOne(groupPointer gi, glm::vec2 pos) const
+		glm::vec2 arrangeOne(nodePtr rNode, glm::vec2 pos) const
 		{
-			rect* r1 = getRect(gi.get());
-			if (r1)
+			if (sPack::rect::match(rNode))
 			{
-				replaceRect(r1, pos);
-				return r1->size;
+				rect r1(rNode);
+				replaceRect(rNode, pos);
+				return r1.size;
 			}
 			else
 				return glm::vec2{ 0,0 };
 		}
-		glm::vec2 arrangeRow(teptr<visualGroup> node, groupPointer gi,
-			std::array<float, 4>widthPos, float lenghtPos) const
-		{
-			glm::vec2 size{ 0,0 };
-			for (int i = 0; i < 4; ++i)
-			{
-				gi.setLocalPos(i);
-				rect* r1 = getRect(gi.get());
-				if (r1)
-				{
-					glm::vec2 pos;
-					pos[mode.lenght()] = lenghtPos;
-					pos[mode.width()] = widthPos[i];
-					replaceRect(r1, pos);
-					if (r1->size[mode.lenght()] > size[mode.lenght()])
-						size[mode.lenght()] = r1->size[mode.lenght()];
-				}
-			}
-			size[mode.width()] += (mode.rightAlignment) ? maxSizeInRow(node, 0) : maxSizeInRow(node, 3);
-			return size;
-		}
-		float maxSizeInRow(teptr<visualGroup> node, int rowNumber) const
-		{
-			groupPointer gi = groupPointer(groupPtr(vNodeGroup(node)));
-			gi.setLocalPos(rowNumber);
-			float maxRSize = 0;//поиск максимального размера
-			do
-			{
-				rect* r1 = getRect(gi.get());
-				if (r1)
-				{
-					float rSize = (mode.horisontal) ? r1->size.y : r1->size.x;
-					if (rSize > maxRSize)
-						maxRSize = rSize;
-				}
-			} while (gi.goToNextHub());
-			return maxRSize;
-		}
-		//получение стартовой точки каждого ряда для 4table
-		std::array<float, 4> rowPos(teptr<visualGroup> node, float startPoint, float distance) const
-		{
-			std::array<float, 4> rowPos;
-			//в каждом ряду, кроме последнего
-			if (mode.rightAlignment)
-			{
-				rowPos[3] = startPoint;
-				for (int i = 2; i >= 0; --i)
-					rowPos[i] = rowPos[i + 1] - maxSizeInRow(node, i + 1) - distance;
-			}
-			else
-			{
-				rowPos[0] = startPoint;
-				for (int i = 0; i < 3; ++i)
-					rowPos[i + 1] = rowPos[i] + maxSizeInRow(node, i) + distance;
-			}
-			return rowPos;
-		}
-	public:
-		const static std::wstring typeName;
-		/*virtual const std::wstring& getTypeName() const override
-		{
-			return typeName;
-		}
-		virtual const operation& getMethod(unsigned char number)const override
-		{
-			return methodSet.getOperation(number);
-		}*/
-	};
-	const std::wstring consistentGroup::typeName = L"nechtoIde.consistentGroup";
-	{
-		/*visualGroup::methodSet,
-		namedOperation(L"nothing", operation{
-				connectionRule(conRule::ExternalEntity, conRule::Input, nullptr),
-				[](nodePtr v0, nodePtr v1, nodePtr v2)
-			{
-				return true;
-			}})*/
 	};
 }

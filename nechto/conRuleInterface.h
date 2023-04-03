@@ -45,6 +45,11 @@ namespace nechto
 		{
 			return false;
 		}
+		//является ли соединие нетранзитным и неизменным при измении данных
+		virtual bool constant(nodePtr node) const//и подлежит ли оптимизации
+		{
+			return false;
+		}
 		virtual ~conRuleInterface()
 		{}
 	};

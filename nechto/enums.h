@@ -11,24 +11,24 @@ namespace nechto
 			Hub
 			= 1,	//разветвитель
 			Group
-			= 2,	//группа объектов
-			Pointer
-			= 3,	//указатель на объект
+			= 2,	//группа нод
 			Struct
-			= 4,	//структурна€ нода
+			= 3,	//структурна€ нода
+			Pointer
+			= 4,	//указатель на порт
+			Path
+			= 5,	//путь до ноды
 			Variable
-			= 5,	//объект-переменна€ базового типа
+			= 6,	//объект-переменна€ базового типа
 			Vector
-			= 6,	//вектор<subtype>
+			= 7,	//вектор<subtype>
 			Entity
-			= 7,	//внешн€€ сущность
+			= 8,	//внешн€€ сущность
 			Text
-			= 8,	//текст
+			= 9,	//текст
 			Operator
-			= 9,	//оператор
+			= 10,	//оператор
 
-			Method
-			= 128,	//метод Entity
 			Condition
 			= 129,	//if
 			MathOperation
@@ -193,7 +193,7 @@ namespace nechto
 			
 			firstEmptyPort,
 			firstEmtpyHubPort,
-			backPort,
+			reversePort,
 			emptyPortAtFirstHub,
 			findNearestConnection,
 			emtpyAfterCurrent,

@@ -24,6 +24,9 @@
     <Filter Include="Исходные файлы\serializer">
       <UniqueIdentifier>{7e67edad-87be-4395-a415-f96a003e0990}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\structure">
+      <UniqueIdentifier>{8b242a01-cf48-4a56-8f89-d7fb78a6d5a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="connecter.h">
@@ -80,9 +83,6 @@
     <ClInclude Include="mathOperation.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
-    <ClInclude Include="method.h">
-      <Filter>Исходные файлы\node</Filter>
-    </ClInclude>
     <ClInclude Include="nodePtr.h">
       <Filter>Исходные файлы\node</Filter>
     </ClInclude>
@@ -137,9 +137,6 @@
     <ClInclude Include="entity.h">
       <Filter>Исходные файлы\entity</Filter>
     </ClInclude>
-    <ClInclude Include="numberedConnectionHandling.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="conRuleInterface.h">
       <Filter>Исходные файлы\connectionRule</Filter>
     </ClInclude>
@@ -155,8 +152,26 @@
     <ClInclude Include="serializer.h">
       <Filter>Исходные файлы\serializer</Filter>
     </ClInclude>
-    <ClInclude Include="connectionPosition.h">
+    <ClInclude Include="path.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="enSerInterface.h">
+      <Filter>Исходные файлы\serializer</Filter>
+    </ClInclude>
+    <ClInclude Include="correctnessVerification.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="reverseConnectionPosition.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="factory.h">
+      <Filter>Исходные файлы\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="structure.h">
+      <Filter>Исходные файлы\structure</Filter>
+    </ClInclude>
+    <ClInclude Include="pExchange.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

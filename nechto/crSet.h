@@ -1,5 +1,6 @@
 #pragma once
 #include "standartConRule.h"
+#include <vector>
 #include <array>
 
 namespace nechto

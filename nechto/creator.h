@@ -9,7 +9,6 @@
 #include "MathOperation.h"
 #include "entity.h"
 #include "condition.h"
-#include "method.h"
 #include "text.h"
 #include "textOperation.h"
 #include "operatorManagement.h"
@@ -28,6 +27,7 @@ namespace nechto
 	class creator
 	{
 		friend class hubManager;
+		friend class deserializer;
 	public:
 		static std::array<i64, 255> numberOfTypedNodes;
 		static i64VariablePtr createI64()
@@ -78,11 +78,6 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::MathOperation, operationType);
 			return node;
 		}
-		static methodPtr createMethod(unsigned char operationType)
-		{
-			existing<nodePtr> node = allocate(nodeT::Method, operationType);
-			return node;
-		}
 		static conditionPtr createCondition()
 		{
 			existing<nodePtr> node = allocate(nodeT::Condition);
@@ -94,19 +89,27 @@ namespace nechto
 			textPtr(node).setData<std::wstring*>(nullptr);
 			return node;
 		}
-		static groupPtr createGroup(bool own = true)
+		static groupPtr createGroup(uchar subtype = groupT::strong, ui32 size = 1)
 		{
-			existing<nodePtr> node = allocate(nodeT::Group, own);
+			assert(size != 0);
+			existing<nodePtr> node = allocate(nodeT::Group, subtype);
 			hubPtr hub = createHub(1);
-			hub.connect(hub);
+			hub.connect(hub, -1);
 			groupPtr(node).setFirstGroupHub(hub);
-			groupPtr(node).setSize(1);
+			for (ui32 i = 0; i < size - 1; ++i)
+			{
+				hubPtr temp = createHub(1);
+				temp.connect(hub, i);
+				hub = temp;
+			}
+			groupPtr(node).setSize(size);
 			return node;
 		}
 		/////////////////////////////////////////////
 		static structPtr createStruct(unsigned char subtype)
 		{
 			existing<nodePtr> node = allocate(nodeT::Struct, subtype);
+			structPtr(node).setStructData(structData());
 			return node;
 		}
 		static vectorPtr createVector(unsigned char subtype)
@@ -159,13 +162,13 @@ namespace nechto
 			existing<nodePtr> node = allocate(nodeT::OperatorManagement, subtype);
 			return node;
 		}
-		static entityPtr createEntity(unsigned char subtype, entityInterface* ent)
+		static entityPtr createEntity(unsigned char subtype, entityInterface* ent = nullptr)
 		{
 			existing<nodePtr> node = allocate(nodeT::Entity, subtype);
 			if (ent == nullptr)
 				node.setData(nullptr);
 			else
-				ent->connect(node);
+				ent->eConnect(node);
 			return node;
 		}
 		/*static TYPENAMEPtr createTYPENAME(unsigned char subtype)
@@ -198,8 +201,6 @@ namespace nechto
 			case nechto::nodeT::Text:
 				textPtr(node).reset();
 				break;
-			case nechto::nodeT::Method:
-				break;
 			case nodeT::Struct:
 				assert(false);
 				break;
@@ -219,6 +220,8 @@ namespace nechto
 			{
 			case nechto::nodeT::Group:
 				return createGroup(subtype);
+			case nechto::nodeT::Struct:
+				return createStruct(subtype);
 			case nechto::nodeT::Pointer:
 				return createPointer(subtype);
 			case nechto::nodeT::Variable:

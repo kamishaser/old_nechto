@@ -13,8 +13,8 @@ namespace nechto
 		{
 			portPointer pullPointer = begin;
 			portPointer pushPointer = begin;
-			std::map<ui32, portPointerPtr> ptrSet;
-			fillPointerSet(ptrSet, begin.getPurpose());
+			std::map<ui32, nodePtr> ptrSet;
+			fillPortPointerSet(ptrSet, begin.getPurpose());
 			do
 			{
 				if (pullPointer.get().exist())
@@ -22,7 +22,7 @@ namespace nechto
 					connecter::swap(pullPointer, pushPointer);
 					ui32 pos = pullPointer.getGlobalPos();
 					if (ptrSet.contains(pullPointer.getGlobalPos()))
-						ptrSet[pos].setHPPair(pushPointer.getHPPair());
+						portPointerPtr(ptrSet[pos]).setHPPair(pushPointer.getHPPair());
 					pushPointer.stepForward();
 				}
 			} while (pullPointer.stepForward());
@@ -35,8 +35,8 @@ namespace nechto
 		{
 			groupPointer pullPointer = begin;
 			groupPointer pushPointer = begin;
-			std::map<ui32, groupPointerPtr> ptrSet;
-			fillPointerSet(ptrSet, begin.getPurpose());
+			std::map<ui32, nodePtr> ptrSet;
+			fillGroupPointerSet(ptrSet, begin.getPurpose());
 			do
 			{
 				if (pullPointer.get().exist())
@@ -44,7 +44,7 @@ namespace nechto
 					connecter::swap(pullPointer, pushPointer);
 					ui32 pos = pullPointer.getGlobalPos();
 					if (ptrSet.contains(pullPointer.getGlobalPos()))
-						ptrSet[pos].setHPPair(pushPointer.getHPPair());
+						groupPointerPtr(ptrSet[pos]).setHPPair(pushPointer.getHPPair());
 					pushPointer.stepForward();
 				}
 			} while (pullPointer.stepForward());
@@ -93,7 +93,7 @@ namespace nechto
 
 
 
-		static void fillPointerSet(std::map<ui32, portPointerPtr>& ptrSet, nodePtr node)
+		static void fillPortPointerSet(std::map<ui32, nodePtr>& ptrSet, nodePtr node)
 		{
 			portPointer ptr(node);
 			do
@@ -105,7 +105,7 @@ namespace nechto
 				}
 			} while (ptr.stepForward());
 		}
-		static void fillPointerSet(std::map<ui32, groupPointerPtr>& ptrSet, nodePtr node)
+		static void fillGroupPointerSet(std::map<ui32, nodePtr>& ptrSet, nodePtr node)
 		{
 			portPointer ptr(node);
 			do

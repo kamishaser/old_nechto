@@ -1,12 +1,14 @@
 #pragma once
 #include "nodePtr.h"
-
+#include "creator.h"
+#include "connecter.h"
 #include "text.h"
 #include "entity.h"
 #include "connectionPointer.h"
 #include <functional>
 #include <map>
 #include <set>
+#include <stack>
 
 namespace nechto
 {
@@ -32,9 +34,8 @@ namespace nechto
 		//то есть на второй сохраняемой ноде
 	private:
 		using writeFunctionType = std::function<void(const char*, uint32_t)>;
-		using sStage = serialezeStage;
 		writeFunctionType write = nullptr;
-		std::vector<char> buffer;
+		bufferSerInterface entitySerInterface;
 
 		//ноды сохраняются с теми адресами, которые занимали на момент сохранения
 		//соответственно и связи прописаны по ним
@@ -47,11 +48,9 @@ namespace nechto
 		{
 			if (!v1.exist())
 				return;
-			serialezeStage stage = serialezeStage::nodeBegin;
-			writeByPointer(&stage);
 			writeByValue(v1);//запись адреса
 			writeTypeAndSubtype(v1);
-			writeChain(v1);
+			
 			switch (v1.type())
 			{
 			case nodeT::Variable:
@@ -65,20 +64,20 @@ namespace nechto
 				writeGroup(v1);
 				break;
 			case nodeT::Entity:
-				assert(false);
-				//writeEntity(v1);
+				writeEntity(v1);
 				break;
+			case nodeT::Pointer:
+				writePointer(pointerPtr(v1));
 			case nodeT::Operator:
 			case nodeT::Struct:
 				assert(false);
 				break;
+			case nodeT::Hub:
+				assert(false);
 			default:
 				break;
 			}
-		}
-		void end()
-		{
-			writeByValue(sStage::nodeEnd);
+			writeChain(v1);
 		}
 	private:
 		void writeTypeAndSubtype(nodePtr v1)
@@ -89,13 +88,24 @@ namespace nechto
 			writeByPointer(&subtype);
 		}
 		//записывает все нумерованные соединения в ноде или хабе
-		void writeNumConnections(pointer hi)
+		void writeNumConnections(nodePtr node)
 		{
+			nodeData* n1 = node.node();
+			writeByValue(n1->reversePosition);
 			for (int i = 0; i < 4; ++i)
 			{
-				hi.setLocalPos(i);
-				writeByValue<nodePtr>(hi.get());
+				writeByValue(n1->port[i]);
+				writeByValue(n1->reverseAddress[i]);
 			}
+		}
+		void writeHub(hubPtr hub)
+		{
+			writeTypeAndSubtype(hub);
+			writeNumConnections(hub);
+		}
+		void writeAddress(nodePtr address)
+		{
+			writeByValue(address);
 		}
 		void writeWstring(const std::wstring& string)
 		{
@@ -106,42 +116,42 @@ namespace nechto
 		}
 		void writeGroup(groupPtr group)
 		{
-			assert(typeCompare(group, nodeT::Group));
-			groupPointer gi(group);
-			writeNumConnections(gi);//один хаб есть всегда
-			while (gi.goToNextHub()) 
+			writeByValue<ui32>(group.getNumberOfHubs());
+			hubPtr hub = group.firstGroupHub();
+			for (ui32 i = 0; i < group.getNumberOfHubs(); ++i)
 			{
-				writeByValue(true);
-				writeNumConnections(gi);				
+				writeHub(hub);
+				hub = hub.hub();
 			}
-			writeByValue(false);
 		}
-		/*void writeEntity(nonTypedEntityPtr obj)
+		void writePointer(pointerPtr node)
 		{
-			if (obj.dataExist())
+			writeByValue(node.getHPPair());
+		}
+		void writeEntity(entityPtr node)
+		{
+			if (node.entityExist())
 			{
-				writeWstring(obj.getEntityPtr()->getTypeName());
-				buffer.clear();
-				obj.getEntityPtr()->serialize(buffer, obj);
-				writeByValue<ui32>(buffer.size());
-				write(buffer.data(), buffer.size());
+				writeWstring(node.getEntityPtr()->getTypeName());
+				entitySerInterface.buffer.clear();
+				node.getEntityPtr()->serialize(&entitySerInterface, node);
+				writeByValue<ui32>(entitySerInterface.buffer.size());
+				write(entitySerInterface.buffer.data(), ui32(entitySerInterface.buffer.size()));
 			}
 			else
 			{
 				writeWstring(std::wstring());
 				writeByValue<ui32>(0);
 			}
-		}*/
+		}
 		void writeChain(nodePtr v1)
 		{
-			portPointer ci(v1);
-			writeNumConnections(ci);//один хаб есть всегда
-			while (ci.goToNextHub())
+			writeNumConnections(v1);//один хаб есть всегда
+			while ((v1 = v1.hub()).exist())
 			{
-				writeByValue(true);
-				writeNumConnections(ci);
+				writeHub(v1);
 			}
-			writeByValue(false);
+			writeAddress(nullptr);
 		}
 		//тривиальное сохранение чего угодно
 		template<class TCon>
@@ -155,123 +165,139 @@ namespace nechto
 			write(reinterpret_cast<const char*>(&ref), sizeof(ref));
 		}
 	};
-	//class deserializedEntity :public entity
-	//{
-	//public:
-	//	//убрать typeDefinition и заменить их на кучу виртуальных функций, как было раньше
-	//	std::wstring name;
-	//	std::vector<char> buffer;
-	//	deserializedEntity(const std::wstring& n, ui32 size)
-	//		:name(n), buffer(size) {}
-
-	//	virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const override
-	//	{
-	//		buffer = entityPtr<deserializedEntity>(obj)->buffer;
-	//	}
-	//	virtual const std::wstring& getTypeName() const override
-	//	{
-	//		return name;
-	//	}
-	//};
-	//чтение (загрузка) nechto
 	class deserializer
 	{
+	public:
 		using readFunctionType = std::function<void(char*, uint32_t)>;
-		using sStage = serialezeStage;
-		/*map обратных позиций соединений для каждой незагруженной ноды
-		first - старый номер соединения (второй записанной ноды)
-		second->first - старый номер соединения (уже загруженный ноды)
-		second->second - новая позиция соединения*/
-		using conMapType = std::multimap<nodePtr, pointer>;
-
-		//данные от подключениях для каждой ещё не загруженной ноды
-		struct noname//не смог придумать имя этому
-		{
-			conMapType conMap;
-			/*
-			набор итераторов, указывающих на эту ноду.
-			Пара адреса итератора и номера элемента хаб & позиция
-			если итератор группы - адрес - отрицательное число
-			*/
-			std::vector<std::pair<nodePtr, i64>> pointerSet;
-		};
-		std::map<nodePtr, noname> unloadedConnections;
+		using enDeserType = std::function<bool(enDeserInterface*)>;
+	private:
 		readFunctionType  read = nullptr;
+		enDeserType entityDeserCallBack = nullptr;
+		bufferDeserInterface enDeser;
+
+		std::map<nodePtr, nodePtr> oldNewIdMap;
+		struct nonConnectedPointer
+		{
+			pointerPtr node;
+			hubPosPair oldHpp;
+
+			bool connect(std::map<nodePtr, nodePtr>& map)
+			{
+				if (!map.contains(oldHpp.hub))
+					return false;
+				node.setHPPair(hubPosPair(map[oldHpp.hub], oldHpp.getGlobalPos()));
+				return true;
+			}
+		};
+		std::stack<nonConnectedPointer> pointers;
 		
 	public:
-		deserializer(readFunctionType lf)
-			:read(lf) {}
+		deserializer(readFunctionType lf, enDeserType enDeserCallBack)
+			:read(lf), entityDeserCallBack(enDeserCallBack) {}
 		nodePtr deserialize()
 		{
-			serialezeStage stage = readStage();
-			if (stage != sStage::nodeBegin)
-				return nullptr;
-			const nodePtr old = readByValue<nodePtr>();
-			nodePtr v1 = readTypeSubtypeAndCreate();
-			conMapType& conMap = unloadedConnections.emplace(old, noname()).first->second.conMap;
-			readChain(conMap, v1, old);
-			switch (v1.type())
+			const nodePtr old = readAddress();
+			char type = readUchar();
+			char subtype = readUchar();
+			nodePtr node;
+			if (!isOperation(type))
 			{
-			case nodeT::Variable:
-			case nodeT::Vector:
-				v1.setData<i64>(readByValue<i64>());
-				break;
-			case nodeT::Text:
-				textPtr(v1).set(readWstring());
-				break;
-			case nodeT::Group:
-				readGroup(conMap, v1, old);
-				break;
-			case nodeT::Entity:
-				//readEntity(nonTypedEntityPtr(v1));
-				assert(false);
-				break;
-			case nodeT::Operator:
-			case nodeT::Struct:
-				assert(false);
-				break;
-			default:
-				break;
+				switch (type)
+				{
+				case nechto::nodeT::Group:
+					node = creator::createGroup(subtype, readByValue<ui32>());
+					oldNewIdMap.emplace(old, node);
+					readGroup(node);
+					break;
+				case nechto::nodeT::Pointer:
+					node = creator::createPointer(subtype);
+					oldNewIdMap.emplace(old, node);
+					readPointer(pointerPtr(node));
+					break;
+				case nechto::nodeT::Struct:
+					node = creator::createStruct(subtype);
+					oldNewIdMap.emplace(old, node);
+					//readStruct(node);
+					break;
+				case nechto::nodeT::Variable:
+					node = creator::createVariable(subtype);
+					oldNewIdMap.emplace(old, node);
+					node.setData(readByValue<i64>());//тут без разницы, i64 или f64
+					break;
+				case nechto::nodeT::Vector:
+					node = creator::createVector(subtype);
+					oldNewIdMap.emplace(old, node);
+					node.setData(readByValue<i64>());//тут без разницы, i64 или f64 или vector
+					break;
+				case nechto::nodeT::Entity:
+					node = creator::createEntity(subtype);
+					oldNewIdMap.emplace(old, node);
+					readEntity(node);
+					break;
+				case nechto::nodeT::Text:
+					node = creator::createText(subtype);
+					oldNewIdMap.emplace(old, node);
+					readText(node);
+					break;
+				case nechto::nodeT::Operator:
+					node = creator::createOperator(subtype);
+					oldNewIdMap.emplace(old, node);
+					//readOperator(node);
+					break;
+				default:
+					assert(false);
+				}
 			}
-			return v1;
+			else
+			{
+				node = creator::createNode(type, subtype);
+				oldNewIdMap.emplace(old, node);
+				readOperation(node);
+			}
+		}
+		void end()
+		{
+			while (!pointers.empty())
+			{
+				pointers.top().connect(oldNewIdMap);
+				pointers.pop();
+			}
 		}
 	private:
-		//свитать стадию сериализации
-		serialezeStage readStage()
+		void readOperation(nodePtr node)//тут пока ничего не происходит
 		{
-			serialezeStage temp;
-			read(reinterpret_cast<char*>(&temp), sizeof(temp));
-			return temp;
+		
 		}
-		nodePtr readTypeSubtypeAndCreate()
+		uchar readUchar()
 		{
-			unsigned char type = readByValue<unsigned char>();
-			unsigned char subtype = readByValue<unsigned char>();
-			return creator::createNode(type, subtype);
+			return readByValue<uchar>();
+		};
+		pointer reversePort(nodePtr revNode, nodePtr revHub, ui32 revLocPos)
+		{
+			if (revHub == revNode)
+				return pointer(revNode, hubPosPair(revHub, revLocPos));
+			return pointer(revNode, hubPosPair(revHub,
+				hubPtr(revHub).number() * 4 + revLocPos));
 		}
 		/*считать нумерованные соединения ноды или хаба*/
-		void readNumConnections(conMapType& conMap, pointer hi, nodePtr v1old)
+		void readNumConnections(nodePtr node, nodePtr hub, ui32 hubNumber)
 		{
+			nodeData* h1 = hub.node();
+			h1->reversePosition = readByValue<reverseConnectionPosition>();
 			for (int i = 0; i < 4; ++i)
 			{
-				hi.setLocalPos(i);
-				nodePtr old = readAddress();//старый адрес
-				if (old.exist())
+				ui32 globalPos = (hubNumber << 2) + i;
+				nodePtr oldConnectionAddress = readAddress();
+				nodePtr oldReverseHubAddress = readAddress();
+				pointer p1(node, hubPosPair(hub, globalPos));
+				if (oldNewIdMap.contains(oldConnectionAddress) &&
+					((oldNewIdMap[oldConnectionAddress] != node) ||
+						oldNewIdMap.contains(oldReverseHubAddress)))
 				{
-					conMapType::iterator mapI = conMap.find(old);
-					if (mapI != conMap.end())//если обратное соединение уже загружено
-					{//тут должна быть какая-то проверка
-						connecter::connect(hi, mapI->second);//производится подключение
-						conMap.erase(mapI);
-					}
-					else
-					{
-						auto mapI2 = unloadedConnections.find(old);
-						//если этот адрес ни разу не упомянался
-						if (mapI2 == unloadedConnections.end())
-							mapI2 = unloadedConnections.emplace(old, noname()).first;
-						mapI2->second.conMap.emplace(v1old, hi);
-					}
+					nodePtr content = oldNewIdMap[oldConnectionAddress];
+					pointer revPort = reversePort(content,
+						oldNewIdMap[oldReverseHubAddress], hub.reverseLocalPos(i));
+					connecter::connect(p1, revPort);
 				}
 			}
 		}
@@ -292,42 +318,58 @@ namespace nechto
 			return string;
 		}
 		
-
-		void readGroup(conMapType& conMap, nodePtr group, nodePtr groupOld)
+		void readPointer(pointerPtr node)
 		{
-			assert(typeCompare(group, nodeT::Group));
-			groupPointer gi(group);
-			
-			readNumConnections(conMap, gi, groupOld);//один хаб есть всегда
-			while (readByValue<bool>())
+			pointers.emplace(nonConnectedPointer{ node, readByValue<hubPosPair>() });
+		}
+		void readGroup(groupPtr group)
+		{
+			hubPtr hub = group.firstGroupHub();
+			for (int i = 0; i < group.getNumberOfHubs(); ++i)
 			{
-				hubManager::insertHub(gi, 1);
-				gi.goToNextHub();
-				readNumConnections(conMap, gi, groupOld);
+				nodePtr old = readAddress();
+				oldNewIdMap.emplace(old, hub);
+				uchar type = readUchar();
+				uchar subtype = readUchar();
+				assert(type == nodeT::Hub);
+				assert(subtype == 1);
+				readNumConnections(group, hub, i);
 			}
 		}
-		/*void readEntity(nonTypedEntityPtr obj)
+		void readEntity(entityPtr entity)
 		{
-			std::wstring name = readWstring();
+			enDeser.typeName = readWstring();
 			ui32 dataSize = readByValue<ui32>();
-			if (name.empty() && dataSize == 0)
+			if (enDeser.typeName.empty() && dataSize == 0)
 				return;
-			assert(!obj.dataExist());
-			auto desObj = new deserializedEntity(name, dataSize);
-			obj.set(desObj);
-			if (dataSize != 0)
-				read(desObj->buffer.data(), dataSize);
-		}*/
-		void readChain(conMapType& conMap, nodePtr v1, nodePtr v1Old)
+			assert(!entity.entityExist());
+			enDeser.buffer.resize(dataSize);
+			enDeser.enNode = entity;
+
+			read(&enDeser.buffer[0], dataSize);
+			entityDeserCallBack(&enDeser);
+		}
+		void readChain(nodePtr node)
 		{
-			portPointer ci(v1);
-			readNumConnections(conMap, ci, v1Old);//один хаб есть всегда
-			while (readByValue<bool>())
+			readNumConnections(node, node, 0);
+			nodePtr oldhub = readAddress();
+			nodePtr previousHub = node;
+			ui32 previousNumber = 0;
+			while (oldhub != nullptr)
 			{
-				hubManager::insertHub(ci, 1);
-				ci.goToNextHub();
-				readNumConnections(conMap, ci, v1Old);
+				uchar type = readUchar();
+				uchar subtype = readUchar();
+				hubPtr hub = creator::createHub(0);
+				oldNewIdMap.emplace(oldhub, hub);
+				hub.connect(previousHub, previousNumber);
+				++previousNumber;
+				readNumConnections(node, hub, previousNumber);
+				oldhub = readAddress();
 			}
+		}
+		void readText(textPtr node)
+		{
+			node.set(readWstring());
 		}
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "nodePtr.h"
 #include "conRuleInterface.h"
+#include "enSerInterface.h"
 
 namespace nechto
 {
@@ -16,50 +17,14 @@ namespace nechto
 			return false;
 		}
 	}
-	template<class TCon>
-	concept essT = true;
-
-
-
-	//////////////////////////////////////////////////////////////////////////////
-	class entityInterface
-	{
-	protected:
-		entityInterface() { ++numberOfEntities; }//сущность существует отдельно
-		static void setEntityPtr(existing<nodePtr> esNode, entityInterface* es);
-	public:
-		/*virtual const operation& getMethod(unsigned char number) const
-		{
-			return operation();
-		}*/
-		virtual void serialize(std::vector<char>& buffer, existing<nodePtr> obj) const
-		{
-			buffer.clear();
-		}
-		virtual void disconnect(nodePtr esNode)
-		{}
-		virtual void connect(nodePtr esNode)
-		{}
-		virtual constexpr const std::wstring& getTypeName() const
-		{
-			return L"nonTypedEntity";
-		}
-		virtual ~entityInterface()
-		{
-			--numberOfEntities;
-		}
-		static i64 numberOfEntities;
-	};
-	i64 entityInterface::numberOfEntities = 0;
-
-
+	
 
 	/////////////////////////////////////////////////////////////////////entityPtr
 	//////////////////////////////////////////////////////////////////////////////
 	class entityPtr : public existing<nodePtr>
 	{
 	protected:
-		
+
 		friend class entityInterface;
 		friend class creator;
 		void setEntityPtr(entityInterface* obj) const
@@ -98,95 +63,127 @@ namespace nechto
 			return getData<entityInterface*>();
 		}
 		template<essT ECon>
-		ECon* getEntity();//получить конкретного типа сущность
+		ECon* getEntity() const;//получить конкретного типа сущность
 		template<essT ECon>
-		ECon* confidentlyGetEntity();//тоже самое, но только с reinterept_cast
-		void resetEntity()
-		{
-			if (entityExist())
-			{
-				getEntityPtr()->disconnect(*this);
-			}
-		}
+		ECon* confidentlyGetEntity() const;//тоже самое, но только с reinterept_cast
+		void resetEntity();
 	};
-	void entityInterface::setEntityPtr(existing<nodePtr> esNode, entityInterface* es)
-	{
-		entityPtr(esNode).setEntityPtr(es);
-	}
-
-
-
-	////////////////////////////////////////////////////////////////////////entity
 	//////////////////////////////////////////////////////////////////////////////
-	template<essT ECon>
-	class entity : public entityInterface
+	class entityInterface
 	{
 	protected:
-		entity(const ECon& d)
-			:entityInterface(), data(d) {}
-		entity(ECon&& d)
-			:entityInterface(), data(std::move(d)) {}
-
-	public:
-		ECon data;
-		virtual constexpr const std::wstring& getTypeName() const override final
+		entityInterface() { ++numberOfEntities; }//сущность существует отдельно
+		static void setEntityPtr(existing<nodePtr> esNode, entityInterface* es)
 		{
-			return typeid(ECon).name();
+			entityPtr(esNode).setEntityPtr(es);
 		}
+	public:
+		/*virtual const operation& getMethod(unsigned char number) const
+		{
+			return operation();
+		}*/
+		virtual void serialize(enSerInteface*, nodePtr) const
+		{}
+		virtual void eDisconnect(nodePtr esNode)
+		{}
+		virtual void eConnect(nodePtr esNode)
+		{}
+		virtual constexpr const std::wstring& getTypeName() const
+		{
+			return L"nonTypedEntity";
+		}
+		virtual ~entityInterface()
+		{
+			--numberOfEntities;
+		}
+		static i64 numberOfEntities;
 	};
+	i64 entityInterface::numberOfEntities = 0;
+
+	void entityPtr::resetEntity()
+	{
+		if (entityExist())
+		{
+			getEntityPtr()->eDisconnect(*this);
+		}
+	}
+
 	
 
 	///////////////////////////////////////////////////////////oneSideLinkedEntity
 	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
-	class oneSideLinkedEntity :public entity<ECon>
+	class oneSideLinked :public entityInterface
 	{
 	public:
-		oneSideLinkedEntity(const ECon& d)
-			:entity<ECon>(d) {}
-		oneSideLinkedEntity(ECon&& d)
-			:entity<ECon>(std::move(d)) {}
-		virtual void disconnect(nodePtr enNode) override
+		ECon data;
+		oneSideLinked(const ECon& d)
+			:data(d) {}
+		oneSideLinked(ECon&& d)
+			:data(std::move(d)) {}
+		virtual void eDisconnect(nodePtr enNode) override
 		{
 			assert(entityPtr::match(enNode));
 			assert(enNode.subtype() == entityT::oneSideLink);
+			if constexpr (requires(const ECon ec)
+			{
+				{ec.eDisconnect(entityPtr)};
+			})
+				data.eDisconnect(enNode);
 			delete this;
 		}
-		virtual void connect(nodePtr enNode) override
+		virtual void eConnect(nodePtr enNode) override
 		{
 			if (enNode.exist())
 			{
 				entityInterface::setEntityPtr(enNode, this);
 				assert(entityPtr::match(enNode));
 				assert(enNode.subtype() == entityT::oneSideLink);
+				if constexpr (requires(const ECon ec)
+				{
+					{ec.eConnect(entityPtr)};
+				})
+					data.eConnect(enNode);
 			}
 		}
-		
+		virtual constexpr const std::wstring& getTypeName() const override
+		{
+			if constexpr (requires(const ECon ec)
+			{
+				{ec.getTypeName()} -> std::convertible_to<const std::wstring&>;
+			})
+				return data.getTypeName();
+			return L"left noname";// typeid(ECon).name();
+		}
+		virtual void serialize(enSerInteface* serInterface, nodePtr node) const override
+		{
+			if constexpr (requires(const ECon ec)
+			{
+				{ec.serialize(serInterface, node)};
+			})
+				data.serialize(serInterface, node);
+		}
 	};
+	
 
 	/////////////////////////////////////////////////////////singleConnectedEntity
 	//////////////////////////////////////////////////////////////////////////////
-	template<essT ECon>
-	class singleConnectedEntity :public entity<ECon>
+	class singleConnectedEntity :public entityInterface
 	{
 	public:
-		singleConnectedEntity(const ECon& d, entityPtr esNode)
-			:entity<ECon>(d) { connect(esNode); }
-		singleConnectedEntity(ECon&& d, entityPtr esNode)
-			:entity<ECon>(std::move(d)) { connect(esNode); }
-		singleConnectedEntity(const ECon& d)
-			:entity<ECon>(d), enNode(nullptr) {}
-		singleConnectedEntity(ECon&& d)
-			:entity<ECon>(std::move(d)), enNode(nullptr) {}
+		singleConnectedEntity(entityPtr esNode)
+			{ eConnect(esNode); }
+		singleConnectedEntity()
+			:enNode(nullptr) {}
 
-		virtual void disconnect(nodePtr entityNode) override
+		virtual void eDisconnect(nodePtr entityNode) override final
 		{
 			assert(entityPtr::match(entityNode));
 			assert(entityNode == enNode);
 			entityInterface::setEntityPtr(entityNode, nullptr);
 			enNode = nullptr;
 		}
-		virtual void connect(nodePtr entityNode) override
+		virtual void eConnect(nodePtr entityNode) override final
 		{
 			if (enNode.exist())
 				entityPtr(enNode).resetEntity();
@@ -199,7 +196,7 @@ namespace nechto
 				entityInterface::setEntityPtr(enNode, this);
 			}
 		}
-		nodePtr node()
+		nodePtr node() const
 		{
 			return enNode;
 		}
@@ -208,20 +205,30 @@ namespace nechto
 	};
 	//////////////////////////////////////////////////////////////////////////////
 	template<essT ECon>
-	ECon* entityPtr::getEntity()
+	ECon* entityPtr::getEntity() const
 	{
-		auto ptr = dynamic_cast<entity<ECon>*>(getEntityPtr());
-		if (ptr == nullptr)
-			return nullptr;
-		return &ptr->data;
+		if (isOneSideLink())
+		{
+			auto ptr = dynamic_cast<oneSideLinked<ECon>*>(getEntityPtr());
+			if (ptr == nullptr)
+				return nullptr;
+			return &ptr->data;
+		}
+		else
+			return dynamic_cast<ECon*>(getEntityPtr());
 	}
 	template<essT ECon>
-	ECon* entityPtr::confidentlyGetEntity()
+	ECon* entityPtr::confidentlyGetEntity() const
 	{
-		auto ptr = reinterpret_cast<entity<ECon>*>(getEntityPtr());
-		if (ptr == nullptr)
-			return nullptr;
-		return &ptr->data;
+		if (isOneSideLink())
+		{
+			auto ptr = reinterpret_cast<oneSideLinked<ECon>*>(getEntityPtr());
+			if (ptr == nullptr)
+				return nullptr;
+			return &ptr->data;
+		}
+		else
+			return reinterpret_cast<ECon*>( getEntityPtr());
 	}
 	//////////////////////////////////////////////////////////////////////////////
 	//указатель на несуществующую сущность
@@ -257,7 +264,7 @@ namespace nechto
 		}
 		static bool match(const entityPtr& ptr)
 		{
-			return entityPtr::getEntity<ECon>() != nullptr;
+			return ptr.getEntity<ECon>() != nullptr;
 		}
 		static bool match(const existing<nodePtr>& eptr)
 		{
@@ -268,7 +275,7 @@ namespace nechto
 			return ptr.exist() && match(existing<nodePtr>(ptr));
 		}
 		//получение сущности
-		ECon* get()
+		ECon* get() const
 		{
 			return entityPtr::confidentlyGetEntity<ECon>();
 		}
@@ -280,5 +287,18 @@ namespace nechto
 	ECon* getEntity(teptr<ECon> node)
 	{
 		return node.confidentlyGetEntity();
+	}
+	template<essT ECon>
+	teptr<ECon> createOneSideLinkedEntity(const ECon& entity)
+	{
+		return creator::createEntity(entityT::oneSideLink,
+			new oneSideLinked<ECon>(entity));
+	}
+	template<essT ECon, class ... Args>
+	teptr<ECon> createOneSideLinkedEntity(entityPtr eptr, Args... arg)
+	{
+		oneSideLinked<ECon>* ent = new oneSideLinked<ECon>(ECon(eptr, arg...));
+		ent->eConnect(eptr);
+		return eptr;
 	}
 }

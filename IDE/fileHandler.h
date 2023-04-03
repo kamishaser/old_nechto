@@ -1,9 +1,9 @@
 #pragma once
-#include "GUI.h"
-#include "fileSerializer.h"
-#include "periodLimiter.h"
-#include "button.h"
-#include <filesystem>
+//#include "GUI.h"
+//#include "fileSerializer.h"
+//#include "periodLimiter.h"
+//#include "button.h"
+//#include <filesystem>
 
 namespace nechto::ide
 {

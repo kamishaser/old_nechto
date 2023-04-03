@@ -31,18 +31,18 @@ namespace nechto::groupOperations
 	}
 
 	
-	void nearestGroupDisconnectAll(groupPtr group)
+	void groupDisconnectAll(groupPtr group)
 	{
 		groupPointer gi(group);
 		do
 		{
 			if (gi.get().exist())
-				nearestDisconnect(gi);
+				disconnect(gi);
 		} while (gi.stepForward());
 	}
 	void clear(groupPtr group)
 	{
-		nearestGroupDisconnectAll(group);
+		groupDisconnectAll(group);
 		groupPointer gi(group);
 		gi.goToNextHub();
 		hubManager::eraseHub(gi, -1);

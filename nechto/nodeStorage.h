@@ -104,7 +104,11 @@ namespace nechto::nodeStorage
 	nodeAllocator* getAllocator(const ushort number)
 	{
 		assert((number > 0) && (number < maxNumOfAllocators));
-		assert(content[number]);
+		if (!content[number])
+		{
+			std::wcout << L"allocator number " << number << L" does not exist" << std::endl;
+			assert(false);
+		}
 		return content[number].get();
 	}
 

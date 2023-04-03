@@ -132,9 +132,9 @@ namespace nechto
 				assert(inGroup());
 			}
 		}
+		
 		groupPointer(nodePtr Purpose, hubPosPair hpp)
 			:pointer(Purpose, hpp) {}
-
 		groupPtr group()
 		{
 			return groupPtr(purpose);
@@ -196,7 +196,9 @@ namespace nechto
 			do
 			{
 				if (!stepBack())
+				{
 					return false;
+				}
 			} while (get().exist());
 			return true;
 		}
@@ -223,4 +225,17 @@ namespace nechto
 	};
 	const portPointer nullPortPointer = portPointer(nullptr, hubPosPair());
 	const groupPointer nullGroupPointer = groupPointer(nullptr, hubPosPair());
+
+	pointer reversePort(pointer p1)
+	{
+		if (!p1.get().exist())
+			return pointer();
+		ui32 locPos = p1.getLocalPos();
+		ui32 revLocPos = p1.hub.reverseLocalPos(locPos);
+		nodePtr reversehub = p1.hub.reverseAddress(locPos);
+		if (reversehub.type() == nodeT::Hub)
+			return pointer(p1.getPurpose(), hubPosPair(reversehub, revLocPos));
+		return pointer(p1.getPurpose(), hubPosPair(reversehub,
+			(reversehub.type() == nodeT::Hub) ? (hubPtr(reversehub).number() * 4 + revLocPos) : revLocPos));
+	}
 }

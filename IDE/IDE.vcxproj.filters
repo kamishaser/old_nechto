@@ -1,117 +1,140 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Файлы ресурсов">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\handler">
+    <Filter Include="устаревшее">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="устаревшее\handler">
       <UniqueIdentifier>{c84072d8-1b7a-442c-930f-99a408158049}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\handler\userH">
+    <Filter Include="устаревшее\handler\userH">
       <UniqueIdentifier>{40bb2083-c990-4e59-a66d-915ef86d407e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\display">
+    <Filter Include="устаревшее\display">
       <UniqueIdentifier>{f4cf8127-21a0-4577-b5ea-66475f647fd0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Исходные файлы\visual">
-      <UniqueIdentifier>{9a51527a-4e89-4276-9bef-85b485417525}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\visual\visualGroup">
-      <UniqueIdentifier>{9e21a627-55ca-4d1f-9840-8b9bd169ec6b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\display\button">
+    <Filter Include="устаревшее\display\button">
       <UniqueIdentifier>{a4e601cc-19e0-41a9-a332-248670b7a1c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="устаревшее\visual">
+      <UniqueIdentifier>{9a51527a-4e89-4276-9bef-85b485417525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы">
+      <UniqueIdentifier>{a29e5d92-f361-44bd-9f4e-b40ed6e06877}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\inteface">
+      <UniqueIdentifier>{774b9931-f674-4afe-9205-b208b006052d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\inteface\drawer">
+      <UniqueIdentifier>{eb5537f2-f3be-43e2-a673-1eb340e305bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\inteface\visualGroup">
+      <UniqueIdentifier>{9e21a627-55ca-4d1f-9840-8b9bd169ec6b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="nodeBoard.h">
+      <Filter>устаревшее</Filter>
+    </ClInclude>
+    <ClInclude Include="autoExpandHandler.h">
+      <Filter>устаревшее\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="spreadHandler.h">
+      <Filter>устаревшее\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="vnDataUpdateH.h">
+      <Filter>устаревшее\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="userH.h">
+      <Filter>устаревшее\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="keyboardHandler.h">
+      <Filter>устаревшее\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="selectHandler.h">
+      <Filter>устаревшее\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="textInputBox.h">
+      <Filter>устаревшее\display</Filter>
+    </ClInclude>
+    <ClInclude Include="visualConnection.h">
+      <Filter>устаревшее\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="consistentGroup.h">
+      <Filter>исходные файлы\inteface\visualGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNode.h">
+      <Filter>устаревшее\visual</Filter>
+    </ClInclude>
+    <ClInclude Include="visualGroup.h">
+      <Filter>исходные файлы\inteface\visualGroup</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI.h">
+      <Filter>устаревшее</Filter>
+    </ClInclude>
+    <ClInclude Include="fileHandler.h">
+      <Filter>устаревшее\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>устаревшее\handler\userH</Filter>
+    </ClInclude>
+    <ClInclude Include="buttonList.h">
+      <Filter>устаревшее\display\button</Filter>
+    </ClInclude>
+    <ClInclude Include="nechtoIde.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="visual.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="display.h">
+      <Filter>устаревшее\display</Filter>
+    </ClInclude>
+    <ClInclude Include="ideFactory.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="ideStructurePack.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="commandLine.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="drawableLine.h">
+      <Filter>исходные файлы\inteface\drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="drawableBlock.h">
+      <Filter>исходные файлы\inteface\drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="drawer.h">
+      <Filter>исходные файлы\inteface\drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="windowEntity.h">
+      <Filter>исходные файлы\inteface</Filter>
+    </ClInclude>
+    <ClInclude Include="rect.h">
+      <Filter>исходные файлы\inteface</Filter>
+    </ClInclude>
+    <ClInclude Include="visualNodeFill.h">
+      <Filter>исходные файлы\inteface</Filter>
+    </ClInclude>
+    <ClInclude Include="interactiveElement.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainFail.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>исходные файлы</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="nechtoIde.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="periodLimiter.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="rect.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="visualNodeFill.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="nodeBoard.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="MainFail.h" />
-    <ClInclude Include="autoExpandHandler.h">
-      <Filter>Исходные файлы\handler</Filter>
-    </ClInclude>
-    <ClInclude Include="spreadHandler.h">
-      <Filter>Исходные файлы\handler</Filter>
-    </ClInclude>
-    <ClInclude Include="vnDataUpdateH.h">
-      <Filter>Исходные файлы\handler</Filter>
-    </ClInclude>
-    <ClInclude Include="userH.h">
-      <Filter>Исходные файлы\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="mouseHandler.h">
-      <Filter>Исходные файлы\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="keyboardHandler.h">
-      <Filter>Исходные файлы\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="selectHandler.h">
-      <Filter>Исходные файлы\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="display.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
-    <ClInclude Include="textInputBox.h">
-      <Filter>Исходные файлы\display</Filter>
-    </ClInclude>
-    <ClInclude Include="visualConnection.h">
-      <Filter>Исходные файлы\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="consistentGroup.h">
-      <Filter>Исходные файлы\visual\visualGroup</Filter>
-    </ClInclude>
-    <ClInclude Include="visual.h">
-      <Filter>Исходные файлы\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="visualNode.h">
-      <Filter>Исходные файлы\visual</Filter>
-    </ClInclude>
-    <ClInclude Include="visualGroup.h">
-      <Filter>Исходные файлы\visual\visualGroup</Filter>
-    </ClInclude>
-    <ClInclude Include="GUI.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="fileHandler.h">
-      <Filter>Исходные файлы\handler</Filter>
-    </ClInclude>
-    <ClInclude Include="editor.h">
-      <Filter>Исходные файлы\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="settingList.h">
-      <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="buttonList.h">
-      <Filter>Исходные файлы\display\button</Filter>
-    </ClInclude>
-    <ClInclude Include="button.h">
-      <Filter>Исходные файлы\display\button</Filter>
-    </ClInclude>
-    <ClInclude Include="dipSwitch.h">
-      <Filter>Исходные файлы\display\button</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

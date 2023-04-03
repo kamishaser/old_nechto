@@ -1,104 +1,92 @@
 #pragma once
-#include "namedExConGroup.h"
-#include "visualNode.h"
 #include "rect.h"
 #include "group.h"
+#include "ideFactory.h"
+#include "ideStructurePack.h"
+
 namespace nechto::ide
 {
-
-	//соединение 0 - подконтрольная группа нод (обр номер 0)
-	//connection 1 - использующий группу
-	//cоединение 3 - vGroupGroup от nodeBoard
-	//набор правил и действий (что делать, если допустим на ноду нажал пользователь)
-	//группа visualNode
-	struct visualGroup :public namedExConGroup
+	struct visualGroup
 	{
-		rect frame;
-		visualGroup(nodePtr emptyExternalObject, const std::wstring& name,
-			glm::vec2 startPoint = glm::vec2{ 0,0 })
-			:namedExConGroup(emptyExternalObject, name),
-			frame(startPoint, glm::vec2{ 1.f, 1.f }) {}
-		nodePtr vNodeGroup() const
+		const path imp = "0"_np; //проход через посредника
+		nodePtr vgNode;
+		ideFactory& fact;
+		visualGroup(nodePtr node, ideFactory& f)
+			:vgNode(node), fact(f)
+		{}
+		bool isCorrect()
 		{
-			return getGroup();
+			return
+				groupPtr::match(sPack::vGroup::vBlockGroup / vgNode) &&
+				groupPtr::match(sPack::vGroup::vConnectionGroup / vgNode) &&
+				(sPack::vGroup::nodeBoard / vgNode).exist() &&
+				allNodeOnOneNodeBoard();
+		}
+		groupPtr vNodeGroup() const
+		{
+			return sPack::vGroup::vBlockGroup / vgNode;
+		}
+		groupPtr vConnectionGroup() const
+		{
+			return sPack::vGroup::vBlockGroup / vgNode;
+		}
+		groupPtr vGroupGroup() const
+		{
+			return sPack::vGroup::vBlockGroup / vgNode;
 		}
 		nodePtr getNodeBoard() const
 		{
-			nodePtr temp = node().connection(3);
-			if (!temp.exist())
-				return nullptr;
-			return temp.connection(0);
+			return sPack::vGroup::nodeBoard / vgNode;
 		}
-		bool contains(objectPtr<visualNode> vNode) const
+		nodePtr frameNode() const
 		{
-			return (vNodeGroup() == vNode.connection(0));
+			return sPack::vGroup::frame / vgNode;
 		}
-		//обновить группу
-		virtual void update() {}
-		//добавляет ноду в первый свободный порт
-		void addNode(objectPtr<visualNode> vNode) const
+		bool contains(nodePtr vNode) const
 		{
-			//vNodeGroup может содержать ноды только из одного nodeBoard
-			assert(vNode->getNodeBoard() == getNodeBoard());
-			IterIterConnect(portIterator(vNode, 1),
-				firstEmptyGroupPort(getGroup()));
+			return (sPack::vNode::vGroup / vNode) == vgNode;
 		}
-		void addGroup(objectPtr<visualGroup> vGroup) const
+		nodePtr addNode() const
 		{
-			//vNodeGroup может содержать ноды только из одного nodeBoard
-			assert(vGroup->getNodeBoard() == getNodeBoard());
-			IterHubConnect(firstEmptyGroupPort(vNodeGroup()), vGroup);
+			return fact.fabricateVNode(getNodeBoard(), vgNode);
 		}
-		i64 numberOfVNodes() const
-		{
-			return groupOperations::numberOfMembers(vNodeGroup());
-		}
+		//nodePtr addGroup(nodePtr vGroup) const
+		//{
+		//	//vNodeGroup может содержать ноды только из одного nodeBoard
+		//	assert(vGroup->getNodeBoard() == getNodeBoard());
+		//	IterHubConnect(firstEmptyGroupPort(vNodeGroup()), vGroup);
+		//}
 		bool allNodeOnOneNodeBoard() const
 		{
-			nodePtr nBoardNode = getNodeBoard();
-			groupIterator gi(vNodeGroup());
+			nodePtr nBoard = getNodeBoard();
+			groupPointer gi(vNodeGroup());
 			do
 			{
-				auto vNode = getObject<visualNode>(gi.get());
-				if (vNode)
-				{
-					if (vNode->getNodeBoard() != nBoardNode)
-						return false;
-				}
+				nodePtr vNode = imp / gi.get();
+				if (!vNode.exist())
+					continue;
+				if ((sPack::vNode::nodeBoard / vNode) != nBoard)
+					return false;
 			} while (gi.stepForward());
 			return true;
 		}
-
-		//получение рамки ноды или группы
-		static rect* getRect(nodePtr v1)
-		{
-			if (objectPtr<visualNode>::match(v1))
-				return &objectPtr<visualNode>(v1)->frame;
-			if (objectPtr<visualGroup>::match(v1))
-				return &objectPtr<visualGroup>(v1)->frame;
-			return nullptr;
+		//обновить группу
+		virtual bool update() const
+		{//true, если требуется обновлять вверх (изменился фрейм группы)
+			return true;
 		}
-		const static std::wstring typeName;
-		const static staticNodeOperationSet methodSet;
-		const static connectionRule cRule;
-		virtual const std::wstring& getTypeName() const override
+		//перемещение всех блоков в группе
+		void shift(glm::vec2 offset) const
 		{
-			return typeName;
-		}
-		virtual const operation& getMethod(unsigned char number)const override
-		{
-			return methodSet.getOperation(number);
-		}
-	};
-	const std::wstring visualGroup::typeName = L"nechtoIde.visualGroup";
-	const staticNodeOperationSet visualGroup::methodSet
-	{
-		/*namedOperation(L"nothing", operation{
-				connectionRule(conRule::ExternalObject, conRule::Input, nullptr),
-				[](nodePtr v0, nodePtr v1, nodePtr v2)
+			groupPointer gi(vNodeGroup());
+			do
 			{
-				return true;
-			}})*/
+				if (!gi.get().exist())
+					continue;
+				"0"_np / sPack::vNode::position / gi.get() += offset;
+
+			} while (gi.stepForward());
+		}
+	protected:
 	};
-	
 }

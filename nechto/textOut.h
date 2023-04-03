@@ -18,7 +18,7 @@ namespace nechto
 			std::to_wstring(hpp.getGlobalPos()) + std::wstring(L" ") +
 			((hpp.hub.exist()) ? to_string(hpp.follow()) : std::wstring(L"___")) + std::wstring(L"}");
 	}
-	std::wstring getUstrEntityData(nonTypedEntityPtr entityNode); //реализация в namedExCon
+	//std::wstring getUstrEntityData(entityPtr entityNode); //реализация в singleConnectedEntity
 	const std::wstring nodeData(nodePtr v1)
 	{
 		if (v1 == nullptr)
@@ -38,8 +38,6 @@ namespace nechto
 				return textPtr(v1);
 			else
 				return L"nullTextPtr";
-		case nodeT::Entity:
-			return getUstrEntityData(v1);
 		default:
 			return L"";
 		}
@@ -109,7 +107,6 @@ namespace nechto
 		buffer += getStringNumberOfNodes(nodeT::Text);
 		buffer += getStringNumberOfNodes(nodeT::MathOperation);
 		buffer += getStringNumberOfNodes(nodeT::Condition);
-		buffer += getStringNumberOfNodes(nodeT::Method);
 		return buffer;
 	}
 }
