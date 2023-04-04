@@ -20,18 +20,31 @@ namespace nechto::ide
 		mouseEntity() 
 		{
 			eConnect(creator::createEntity(entityT::singleConnection));
-			factory fact;
-			fact.fabricate(sPack::mouse::getPlan(), node());
+			fabricate(sPack::mouse::getPlan(), node());
 		}
-		bool updatePosition(nodePtr ideNode, windowEntity* fwindow, bool freeMode)
+		bool updatePosition(nodePtr ideNode, bool freeMode)
 		{
-			if (!updatemWindow(ideNode, fwindow))
-				return false;
-			sPack::mouse::winPos / node() << wMousePos;
-			if (freeMode)
+			i64 pressMoveMode;
+			sPack::mouse::pressMoveMode / node() >> pressMoveMode;
+			if (!updatemWindow(ideNode))
 			{
-				freeUpdateVBlock(fwindow);
+				if (pressMoveMode)
+				{
+					sPack::mouse::pressMoveMode / node() << 0ll;
+					event(sPack::mouse::eventType_PressMoveMode);
+				}
+				return false;
+			}
+			sPack::mouse::winPos / node() << wMousePos;
+			if (!pressMoveMode)
+			{
+				freeUpdateVBlock();
 				sPack::mouse::velPos / node() << eMousePos;
+			}
+			else if (!isButtonPressed(sPack::mouse::leftButton))
+			{
+				sPack::mouse::pressMoveMode / node() << 0ll;
+				event(sPack::mouse::eventType_PressMoveMode);
 			}
 			return true;
 		}
@@ -60,13 +73,22 @@ namespace nechto::ide
 			return updateButton(sPack::mouse::x2Button / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::XButton2));
 		}
-
-		//источник событий и тип событий
-		nodePtr evSource = fabricate(sPack::eventSource::getPlan());
-		nodePtr evType = fabricate(sPack::eventType::getPlan());
-		groupPtr evStorage = creator::createGroup(groupT::strong);
+		bool isButtonPressed(path p)
+		{
+			i64 temp;
+			if (!(p / node() >> temp))
+				return false;
+			return (temp % 2 == 1);
+		}
 
 	private:
+		windowEntity* fwindow = nullptr;
+		nodePtr evSource() const { return sPack::mouse::eventSource / node(); };
+		nodePtr evStorage() const { return nullptr; }//!!!!!!!!!Ќадо вставить
+		void event(path type, nodePtr content = nullptr) const
+		{
+			addEvent(evStorage(), evSource(), type / node(), content);
+		}
 		buttonStatus updateButton(nodePtr bnode, bool nStatus) const
 		{
 			i64 clickStatusNumber = 0;
@@ -83,30 +105,38 @@ namespace nechto::ide
 				sPack::mouse::clickStartPoint / node() << wMousePos;
 				return buttonStatus::BeginClick;
 			}
-			else
+			else 
+			{
+				event(sPack::mouse::eventType_ButtonClicked);
 				return buttonStatus::EndClick;
+			}
 		}
-		bool updatemWindow(nodePtr ideNode, windowEntity*& fwindow)
+		bool updatemWindow(nodePtr ideNode)
 		{
-			getmWindow(ideNode, fwindow);//проверка окна
+			windowEntity* temp = fwindow;
+			getmWindow(ideNode);//проверка окна
 			if (fwindow == nullptr)
 			{
 				disconnect(sPack::mouse::current / node(), 0);
 				disconnect(sPack::mouse::current / node(), 1);
+				if(temp != nullptr)
+					event(sPack::mouse::eventType_WindowChanged);
 				mOverEl = None;
 				return false;
 			}
+			if(temp != fwindow)
+				event(sPack::mouse::eventType_WindowChanged);
 			NumHubConnect(sPack::mouse::current / node(), fwindow->node(), 0);
 			return true;
 		}
-		void getmWindow(nodePtr ideNode, windowEntity*& fWindow)
+		void getmWindow(nodePtr ideNode)
 		{
-			if (fWindow != nullptr)
+			if (fwindow != nullptr)
 			{
-				if (mWindow(fWindow))
+				if (mWindow(fwindow))
 					return;
 			}
-			fWindow = nullptr;
+			fwindow = nullptr;
 			nodePtr wgNode = sPack::nechtoIde::windowGroup / ideNode;
 			if (!groupPtr::match(wgNode))
 				return;
@@ -118,7 +148,7 @@ namespace nechto::ide
 					auto temp = teptr<windowEntity>(gi.get()).get();
 					if (mWindow(temp))
 					{
-						fWindow = temp;
+						fwindow = temp;
 						return;
 					}
 				}
@@ -141,40 +171,51 @@ namespace nechto::ide
 			Node,
 		} mOverEl;
 		
-		nodePtr freeUpdateVBlock(windowEntity* win)
+		nodePtr freeUpdateVBlock()
 		{
-
-			nodePtr vEl = findvBlock(win, wMousePos);
+			if (isButtonPressed(sPack::mouse::leftButton)/* ||
+				isButtonPressed(sPack::mouse::rightButton)*/)
+			{
+				glm::vec2 clickStartPos{ 0., 0. };
+				glm::vec2 currentPos{ 0., 0. };
+				sPack::mouse::clickStartPoint / node() >> clickStartPos;
+				sPack::mouse::winPos / node() >> currentPos;
+				if (glm::abs(clickStartPos.x - currentPos.x) < 5 ||
+					glm::abs(clickStartPos.y - currentPos.y) < 5)
+				{
+					event(sPack::mouse::eventType_PressMoveMode);
+					sPack::mouse::pressMoveMode / node() << 1ll;
+				}
+			}
+			
+			nodePtr vEl = findvBlock(wMousePos);
 			if (vEl != sPack::mouse::curVel / node())
 			{
-				//nodePtr drablock = sPack::vNode::drawableBlock
-				//sPack::vNode::drawableBlock / sPack::draBlock::illuminationThinkness
-				//какое-то действие с элементом // запуск событи€
+				//оповещение о изменении наведЄнного элемента
+				event(sPack::mouse::eventType_OveredChanged, vEl);
 				if (vEl.exist())
 				{
 					NumHubConnect(sPack::mouse::current / node(), vEl, 1);
-					std::wcout << to_string(vEl) << std::endl;
-					addEvent(evStorage, evSource, evType);
 				}
 				else
 					disconnect(sPack::mouse::current / node(), 1);
 			}
 			return vEl;
 		}
-		nodePtr findvBlock(windowEntity* win, glm::vec2 point)
+		nodePtr findvBlock(glm::vec2 point)
 		{
 			atInterfaceBoard = true;
-			win->interfaceBoardView();
-			glm::vec2 pointAtBoard = win->getPointAtBoard(point);
+			fwindow->interfaceBoardView();
+			glm::vec2 pointAtBoard = fwindow->getPointAtBoard(point);
 			nodePtr activeVEl = findVELAtNodeBoard(
-				sPack::window::interfaceBoard / win->node(), pointAtBoard);
+				sPack::window::interfaceBoard / fwindow->node(), pointAtBoard);
 			if (activeVEl.exist())
 				return activeVEl;
 			atInterfaceBoard = false;
-			win->workBoardView();
-			pointAtBoard = win->getPointAtBoard(point);
+			fwindow->workBoardView();
+			pointAtBoard = fwindow->getPointAtBoard(point);
 			return findVELAtNodeBoard(
-				sPack::window::workBoard / win->node(), pointAtBoard);
+				sPack::window::workBoard / fwindow->node(), pointAtBoard);
 		}
 		nodePtr findVELAtNodeBoard(nodePtr nBoard, glm::vec2 point)
 		{

@@ -80,8 +80,9 @@ namespace nechto::ide
 				notifySubscriptionAboutEvent(subscription, event);
 		} while (gi.stepForward());
 	}
+	i64 numberOfCreatedEvents = 0;//количество произошдших событий
 	//создать, зарегистрировать событие, и сообщить о нём слушателям
-	nodePtr addEvent(groupPtr storage, nodePtr source/*источник*/, nodePtr type)
+	nodePtr addEvent(nodePtr storage, nodePtr source/*источник*/, nodePtr type, nodePtr content = nullptr)
 	{
 		nodePtr event = fabricate(sPack::event::getPlan());
 		if (storage.exist())
@@ -96,6 +97,9 @@ namespace nechto::ide
 			"0"_np / event, 0);
 		notifySubscriptionsBySourceAboutEvent(source, event);
 		notifySubscriptionsByTypeAboutEvent(type, event);
+		if (+content)
+			NumHubConnect("0"_np / event, content, 1);
+		++numberOfCreatedEvents;
 		return event;
 	}
 	void subscribeToSource(nodePtr subscription, nodePtr source)
@@ -143,5 +147,16 @@ namespace nechto::ide
 		connecter::connect(revPort,
 			backGroupPort(sPack::eventSubscription::handledEvent / subscription));
 	}
-
+	void deleteEvent(nodePtr event)
+	{
+		nodePtr data = "0"_np / event;
+		nodePtr subscrGroup = "1"_np / event;
+		creator::deleteNode(data);
+		creator::deleteNode(subscrGroup);
+		creator::deleteNode(event);
+	}
+	void deleteEvent(groupPointer eventIter)
+	{
+		deleteEvent("3"_np / eventIter.get());
+	}
 }

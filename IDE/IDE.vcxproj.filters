@@ -86,9 +86,6 @@
     <ClInclude Include="buttonList.h">
       <Filter>устаревшее\display\button</Filter>
     </ClInclude>
-    <ClInclude Include="nechtoIde.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="visual.h">
       <Filter>исходные файлы</Filter>
     </ClInclude>
@@ -130,6 +127,12 @@
     </ClInclude>
     <ClInclude Include="event.h">
       <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="illuminationHandler.h">
+      <Filter>исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="nechtoIde.h">
+      <Filter>исходные файлы\inteface\drawer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

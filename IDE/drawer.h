@@ -91,22 +91,20 @@ namespace nechto::ide
 		bool readVConnection(nodePtr nodeBoard, nodePtr vConnection, 
 			std::unique_ptr<sf::Drawable>& drawableElement) const
 		{//считывает информацию о соединении и заполн€ет drawableTextLine
-			f64 fX, fY, sX, sY, lineThinkness;
-			nodePtr v0 = sPack::vConnection::verticle0 / vConnection;
-			nodePtr v1 = sPack::vConnection::verticle1 / vConnection;
-			if (!(
-				sPack::vec2::x / v0 >> fX &&
-				sPack::vec2::y / v0 >> fY &&
-				sPack::vec2::x / v1 >> sX &&
-				sPack::vec2::y / v1 >> sY))
+			f64 lineThinkness = 5.;
+			nodePtr vNode0 = sPack::vConnection::vNode0 / vConnection;
+			nodePtr vNode1 = sPack::vConnection::vNode1 / vConnection;
+			nodePtr rectNode0 = sPack::vNode::frame / vNode0;
+			nodePtr rectNode1 = sPack::vNode::frame / vNode1;
+			rect rect0, rect1;
+			if (!(rectNode0 >> rect0 && rectNode1 >> rect1))
 				return false;
 			sPack::vConnection::thinkness / vConnection >> lineThinkness;
 			i64 lineColor = 1;
 			sPack::vConnection::color / vConnection >> lineColor;
 
 			drawableElement = std::make_unique<drawableLine>(
-				glm::vec2(fX, fY), glm::vec2(sX, sY),
-				lineColor, lineThinkness);
+				rect0.center(), rect1.center(),	lineColor, lineThinkness);
 			return true;
 		}
 		

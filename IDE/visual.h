@@ -59,6 +59,20 @@ namespace nechto::ide
 //	
 	namespace col
 	{
+		enum ilColorEnum
+		{
+			None,
+			Error,
+			Tip0,
+			Tip1,
+			Tip2,
+			Sel4,
+			Sel3,
+			Sel2,
+			Sel1,
+			Sel0,
+			Mouse
+		};
 		color illuminationColor[]
 		{
 			color(0x00000000), //none
@@ -71,7 +85,8 @@ namespace nechto::ide
 			color(0x004F8BFF), //sel2
 			color(0x4D9EDCFF), //sel1
 			color(0x8BB9DCFF), //sel0
-			color(0xFFFFFFFF)  //mOver  
+			color(0xDDDDDDFF), //mOver  
+			color(0xFFFFFFFF)  //clickMOver 
 		};
 		color lineColor[]
 		{

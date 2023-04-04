@@ -157,6 +157,7 @@
     <ClInclude Include="event.h" />
     <ClInclude Include="fileHandler.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="illuminationHandler.h" />
     <ClInclude Include="interactiveElement.h" />
     <ClInclude Include="ideFactory.h" />
     <ClInclude Include="ideStructurePack.h" />

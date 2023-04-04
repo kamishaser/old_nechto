@@ -60,8 +60,8 @@ namespace nechto::ide::sPack
 			textColor{ "201"_np },
 			illuminationColor{ "202"_np },
 			blockShape{ "21"_np },
-			charSize{ "221"_np },
-			illuminationThinkness{ "222"_np };
+			charSize{ "221"_np };
+			//illuminationThinkness{ "222"_np };
 		constexpr serialPlan getPlan()
 		{
 			return serialPlan
@@ -137,8 +137,8 @@ namespace nechto::ide::sPack
 	namespace vConnection
 	{
 		const path
-			vNode0{ "003"_np },
-			vNode1{ "103"_np },
+			vNode0{ "03"_np },
+			vNode1{ "13"_np },
 			verticle0{ /*"210"_np*/ "032100"_np },
 			verticle1{ /*"211"_np*/ "132100"_np },
 			color{ "221"_np },
@@ -302,125 +302,9 @@ namespace nechto::ide::sPack
 			{
 				{L"interface",
 				{
-					{nullptr},
+					{L"devices", sType::structNode(0, structData())},
 					{L"services", {{nullptr}, {nullptr}, {nullptr}}},//различные встроенные сервисы
 					{L"windowGroup", sType::weakGroup()}
-				}}
-			};
-		}
-	}
-	namespace uh
-	{
-		const path
-			input{ "0"_np },
-			keyboard{ "00"_np },
-			mouse{ "01"_np },
-			selectH{ "100"_np },
-			shiftingH{ "101"_np },
-			interactiveH{ "110"_np },
-			dropBlockH{ "111"_np },
-			textField{ "112"_np };
-		constexpr serialPlan getPlan()
-		{
-			return
-			{
-				{L"inputDevices",
-				{
-					{nullptr},//keyBoard
-					{nullptr},//mouse
-				}},
-				{L"inputInstruments",
-				{
-					{L"workBoard",
-					{
-						{nullptr},//selectH,
-						{nullptr}//shiftingH
-					}},
-					{L"interfaceBoard",
-					{
-						{nullptr},//interactiveH
-						{nullptr},//dropBlockH
-						{nullptr}//textField
-					}}
-				}}
-			};
-		}
-	}
-	namespace mouse
-	{
-		enum class workMode
-		{
-			free,//свободный
-			frameSelection,//выделение рамкой
-			nodeMoving,//перемещение ноды
-			interactionWElement//взаимодействие с интерактивным элементом
-		};
-		const path
-			current{ "00"_np },
-			curBoard{ "000"_np },//текущий nodeBoard
-			curVel{ "001"_np },//текущий visualElement
-			winPos{ "010"_np },//позиция относительно окна
-			velPos{ "011"_np },//позиция относительно текущего элемента
-			leftButton{ "1000"_np },
-			rightButton{ "1001"_np },
-			x1Button{ "1010"_np },
-			x2Button{ "1011"_np },
-			middleButton{ "1020"_np },
-			wheel{ "1021"_np },
-			workMode{ "110"_np },
-			clickStartPoint{ "111"_np },
-			selectManager{ "120"_np },//возможно будет изменён
-			textInputField{ "121"_np },//возможно будет изменён
-			mouseLog{ "122"_np };//возможно будет изменён
-
-		constexpr serialPlan getPlan()
-		{
-			return
-			{
-				{L"position",
-				{
-					{L"current",
-					{
-						{nullptr},//nodeBoard
-						{nullptr},//visualElement//механизм реализации временно отстутствует
-					}},
-					{L"coordinates",
-					{
-						{L"window", vec2::getPlan()},
-						{L"vel", vec2::getPlan()}
-					}},
-				}},
-				{L"status",
-				{
-					{L"button",
-					{
-						{L"general",
-						{
-							{L"left", sType::i64v(0)},
-							{L"right", sType::i64v(0)},
-						}},
-						{L"additional",
-						{
-							{L"x1", sType::i64v(0)},
-							{L"x2", sType::i64v(0)}
-						}},
-						{L"wheel",
-						{
-							{L"x1", sType::i64v(0)},
-							{L"x2", sType::i64v(0)}
-						}}
-					}},
-					{L"workMode",
-					{
-						{L"id", sType::i64v(0)},
-						{L"clickStartPos", vec2::getPlan()}
-					}},
-					{L"tools", //название стоит поменять
-					{
-						{nullptr},//selectManager
-						{nullptr},//textInputField
-						{nullptr}//mouseLog
-					}}
 				}}
 			};
 		}
@@ -429,7 +313,7 @@ namespace nechto::ide::sPack
 	{
 		const path
 			type("00"_np),
-			data("01"_np),
+			content("01"_np),
 			subscriptionGroup("1"_np),
 			source("2"_np),
 			eventStorage("3"_np);
@@ -513,6 +397,183 @@ namespace nechto::ide::sPack
 				}}
 			};
 		}
+	}
+	namespace mouse
+	{
+		enum class workMode
+		{
+			free,//свободный
+			frameSelection,//выделение рамкой
+			nodeMoving,//перемещение ноды
+			interactionWElement//взаимодействие с интерактивным элементом
+		};
+		const path
+			current{ "00"_np },
+			curBoard{ "000"_np },//текущий nodeBoard
+			curVel{ "001"_np },//текущий visualElement
+			winPos{ "010"_np },//позиция относительно окна
+			velPos{ "011"_np },//позиция относительно текущего элемента
+			leftButton{ "1000"_np },
+			rightButton{ "1001"_np },
+			x1Button{ "1010"_np },
+			x2Button{ "1011"_np },
+			middleButton{ "1020"_np },
+			wheel{ "1021"_np },
+			pressMoveMode{ "110"_np },
+			clickStartPoint{ "111"_np },
+			eventType_illuminationChange{ "120"_np },//источник события изменения выделения
+			eventSource{ "20"_np },
+			eventType_OveredChanged{ "2100"_np },
+			eventType_WindowChanged{ "2101"_np },
+			eventType_ButtonClicked{ "2110"_np },
+			eventType_WheelMoved{ "2111"_np },
+			eventType_PressMoveMode{ "2112"_np };
+
+		constexpr serialPlan getPlan()
+		{
+			return
+			{
+				{L"position",
+				{
+					{L"current",
+					{
+						{nullptr},//nodeBoard
+						{nullptr},//visualElement//механизм реализации временно отстутствует
+					}},
+					{L"coordinates",
+					{
+						{L"window", vec2::getPlan()},
+						{L"vel", vec2::getPlan()}
+					}},
+				}},
+				{L"status",
+				{
+					{L"button",
+					{
+						{L"general",
+						{
+							{L"left", sType::i64v(0)},
+							{L"right", sType::i64v(0)},
+						}},
+						{L"additional",
+						{
+							{L"x1", sType::i64v(0)},
+							{L"x2", sType::i64v(0)}
+						}},
+						{L"wheel",
+						{
+							{L"x1", sType::i64v(0)},
+							{L"x2", sType::i64v(0)}
+						}}
+					}},
+					{L"workMode",
+					{
+						{L"pressMoveMode", sType::i64v(0)},
+						{L"clickStartPos", vec2::getPlan()}
+					}},
+					{L"tools", //название стоит поменять
+					{
+						{nullptr},//selectManager
+						{nullptr},//textInputField
+						{nullptr}//mouseLog
+					}}
+				}},
+				{L"events",
+				{
+					{L"source", eventSource::getPlan()},
+					{L"types",
+					{
+						{L"move",
+						{
+							{L"mOverElChanged", eventType::getPlan()},
+							{L"windowChanged", eventType::getPlan()}
+						}},
+						{L"buttons",
+						{
+							{L"buttonClicked", eventType::getPlan()},
+							{L"wheelMoved", eventType::getPlan()},
+							{L"pressMoveMode", eventType::getPlan()}
+						}}
+					}}
+				}}
+			};
+		}
+	}
+	namespace illuminationHandler
+	{
+		const path
+			warningGroup{ "000"_np },
+			errorGroup{ "001"_np },
+			mouseCurVel{ "002"_np },
+			tip0Group{ "010"_np },
+			tip1Group{ "011"_np },
+			tip2Group{ "012"_np },
+			eventType_illGExchenge{ "10"_np },
+			mOverSubcription{ "11"_np },
+			illGExchengeSubscription{ "12"_np };
+		const serialPlan getPlan()
+		{
+			return
+			{
+				{L"illuminElem",
+				{
+					{L"weR",
+					{
+						{L"warningGroup", sType::weakGroup()},
+						{L"errorGroup", sType::weakGroup()}
+					}},
+					{L"tips",
+					{
+						{L"tip0", sType::weakGroup()},
+						{L"tip1", sType::weakGroup()},
+						{L"tip2", sType::weakGroup()}
+					}}
+				}},
+				{L"events",
+				{
+					{L"illGExchengeEventType", sPack::eventType::getPlan()},
+					{L"mOverChangeSubscription", sPack::eventSubscription::getPlan()},
+					{L"illGExchengeSubscription", sPack::eventSubscription::getPlan()}
+				}}
+			};
+		}
+	}
+	namespace uh
+	{
+		//const path
+		//	input{ "0"_np },
+		//	keyboard{ "00"_np },
+		//	mouse{ "01"_np },
+		//	selectH{ "100"_np },
+		//	shiftingH{ "101"_np },
+		//	interactiveH{ "110"_np },
+		//	dropBlockH{ "111"_np },
+		//	textField{ "112"_np };
+		//constexpr serialPlan getPlan()
+		//{
+		//	return
+		//	{
+		//		{L"inputDevices",
+		//		{
+		//			{nullptr},//keyBoard
+		//			{nullptr},//mouse
+		//		}},
+		//		{L"inputInstruments",
+		//		{
+		//			{L"workBoard",
+		//			{
+		//				{nullptr},//selectH,
+		//				{nullptr}//shiftingH
+		//			}},
+		//			{L"interfaceBoard",
+		//			{
+		//				{nullptr},//interactiveH
+		//				{nullptr},//dropBlockH
+		//				{nullptr}//textField
+		//			}}
+		//		}}
+		//	};
+		//}
 	}
 	
 }

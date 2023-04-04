@@ -16,7 +16,7 @@ namespace nechto::ide
 		rect frame;
 		static i64 numberOfDraBlock;
 
-		float illuminationThinkness = 0;
+		static const int illuminationThinkness = 4;
 		ui32 frameColor = 4;
 		ui32 illuminationColor = 0;
 		vnShape::shapeType shape = vnShape::rectanleShape;
@@ -33,15 +33,29 @@ namespace nechto::ide
 				glm::vec2 pointPosition(glm::vec2(x, y) + frame.center());
 				nShape.setPoint(i, GLM_SFML(pointPosition));
 			}
-			nShape.setOutlineColor(col::illuminationColor[illuminationColor]);
-			nShape.setOutlineThickness(illuminationThinkness);
+			
+			if (illuminationColor != 0)
+			{
+				if (illuminationColor == col::Mouse && sf::Mouse::isButtonPressed(sf::Mouse::Left))\
+				{
+					nShape.setOutlineColor(col::illuminationColor[illuminationColor + 1]);
+					nShape.setOutlineThickness(illuminationThinkness + 1);
+				}
+				else
+				{
+					nShape.setOutlineColor(col::illuminationColor[illuminationColor]);
+					nShape.setOutlineThickness(illuminationThinkness);
+				}
+				
+			}
+
 
 			target.draw(nShape);
 		}
 		drawableBlock(rect fr, ui32 frCol = 5, float ilThin = 0, 
 			ui32 ilCol = 0)
 			:frame(fr), frameColor(frCol),
-			illuminationThinkness(ilThin), illuminationColor(ilCol)
+			/*illuminationThinkness(ilThin),*/ illuminationColor(ilCol)
 		{}
 		~drawableBlock() {--numberOfDraBlock;}
 	protected:
@@ -101,7 +115,7 @@ namespace nechto::ide
 			sPack::draBlock::textColor / node << drablock.textColor;
 			
 			sPack::draBlock::text / node << drablock.blockText;
-			sPack::draBlock::illuminationThinkness / node << drablock.illuminationThinkness;
+			//sPack::draBlock::illuminationThinkness / node << drablock.illuminationThinkness;
 			return true;
 		}
 		friend bool operator>>(nodePtr node, drawableTextBlock& drablock)
@@ -122,7 +136,7 @@ namespace nechto::ide
 
 
 			sPack::draBlock::text / node >> drablock.blockText;
-			sPack::draBlock::illuminationThinkness / node >> drablock.illuminationThinkness;
+			//sPack::draBlock::illuminationThinkness / node >> drablock.illuminationThinkness;
 			return true;
 		}
 		drawableTextBlock(nodePtr node, const sf::Font& f)

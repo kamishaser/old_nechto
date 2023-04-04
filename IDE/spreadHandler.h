@@ -4,6 +4,10 @@
 
 namespace nechto::ide
 {
+	class spreadHandler
+	{
+
+	};
 	//class spreadHandler
 	//{
 	//public:

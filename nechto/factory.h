@@ -298,24 +298,20 @@ namespace nechto
 			assert(!finishedParts.contains(L""));
 			if (node != nullptr)
 				finishedParts.emplace(L"", node);
-			std::wcout << L"factrory start" << std::endl;
 			for (auto i = plan.cbegin(); i != plan.cend(); ++i)
 			{
 				const std::wstring& nodeName = i->nodeName;
 				if (finishedParts.contains(nodeName))
 				{
-					std::wcout << L"node " << i->nodeName << L" found" << std::endl;
 					fabricateConnections(finishedParts[nodeName], *i);
 				}
 				else
 				{
 					nodePtr node = i->node.create();
-					std::wcout << L"node " << i->nodeName << L" fabricated" << std::endl;
 					fabricateConnections(node, *i);
 					finishedParts.emplace(i->nodeName, node);
 				}
 			}
-			std::wcout << L"factrory finish" << std::endl;
 		}
 		
 		void clearAndFabricate(const serialPlan& plan, nodePtr node = nullptr)
@@ -337,9 +333,6 @@ namespace nechto
 					continue;
 				nodePtr node2 = finishedParts[con->name];
 				fabricateConnection(node, node2, con->firstConType, con->secondConType);
-				std::wcout << L"connected to " << con->name << L"		" << 
-					fstep::connection::getWcharByConType(con->firstConType) <<
-					fstep::connection::getWcharByConType(con->secondConType) << std::endl;
 			}
 		}
 		void fabricateConnection(existing<nodePtr> fNode, existing<nodePtr> sNode, connectionType c1, connectionType c2)

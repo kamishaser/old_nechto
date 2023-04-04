@@ -16,7 +16,7 @@ namespace nechto::ide
 		//editor//редактор элементов
 		//illuminationHandler//обработчик подсветки
 		//logger//сохранение действий для возможной последующей их отмены
-		mouseEntity mouse;
+		
 		enum class actionMode
 		{
 			free,
@@ -29,34 +29,17 @@ namespace nechto::ide
 		};
 		actionMode mode = actionMode::free;
 	public: 
+		mouseEntity mouse;
 		userH()
 		{
 			eConnect(creator::createEntity(entityT::singleConnection));
-			factory().fabricate(sPack::uh::getPlan(), node());
-			NumNumConnect(sPack::uh::input / node(), mouse.node(), 1, 3);
-			subscription = fabricateSubscription(mouse.evSource, mouse.evType);
 		}
-		nodePtr subscription;
 		bool update(nodePtr ideNode)
 		{
 			if (activeWindow == nullptr || !activeWindow->window.hasFocus())
 				if (!findActiveWindow(ideNode))
 					return false;//обновить не удалось, так как нет активного окна
-			mouse.updatePosition(ideNode, activeWindow, mode == actionMode::free);
-			if (numberOfNewEvents(subscription) > 0)
-			{
-				groupPointer gi(sPack::eventSubscription::nonHandledEvent / subscription);
-				do
-				{
-					if (gi.get().exist())
-					{
-						std::wcout << L"EVENT!!!" << std::endl;
-						std::wcout << to_string(gi.get()) << std::endl;
-						std::wcout << drawableBlock::numberOfDraBlock << std::endl;
-						moveToHandled(subscription, gi);
-					}
-				} while (gi.stepForward());
-			}
+			mouse.updatePosition(ideNode, mode == actionMode::free);
 			switch (mode)
 			{
 			case nechto::ide::userH::actionMode::free:
