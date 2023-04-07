@@ -39,7 +39,7 @@ namespace nechto::ide
 			if (activeWindow == nullptr || !activeWindow->window.hasFocus())
 				if (!findActiveWindow(ideNode))
 					return false;//обновить не удалось, так как нет активного окна
-			mouse.updatePosition(ideNode, mode == actionMode::free);
+			mouse.update(ideNode);
 			switch (mode)
 			{
 			case nechto::ide::userH::actionMode::free:
@@ -108,45 +108,6 @@ namespace nechto::ide
 		void updateFree()
 		{
 			
-			switch (mouse.updateLeftButton())
-			{
-			case buttonStatus::EndClick:
-				leftClick();
-				break;
-			case buttonStatus::Press:
-				if (sStart())
-				{
-					if (+(sPack::mouse::curVel / mouse.node()))
-						if (!mouse.atInterfaceBoard)
-							mode = actionMode::shifting;
-						else;//тут возможно выделение текста и 
-					//взаимодействие с интерактивными инструментами
-					else
-						mode = actionMode::frameSelection;
-					return;
-				}
-				break;
-			default:
-				break;
-			}
-			if (mouse.updateRightButton() == buttonStatus::EndClick)
-				righitClick();
-			switch (mouse.updateMiddleButton())
-			{
-			case buttonStatus::EndClick:
-				middleClick();
-				break;
-			case buttonStatus::Press:
-				if (sStart())
-				{
-					mode = actionMode::scroll;
-					return;
-				}
-				break;
-			default:
-				break;
-			}
-			//тут надобно обновить сочетани€ клавиш
 		}
 		void updateScroll()
 		{
@@ -202,53 +163,6 @@ namespace nechto::ide
 		{
 			mode = actionMode::free;
 		}
-	
-		void leftClick()
-		{
-			if (+(sPack::mouse::curVel / mouse.node()))
-			{
-				if (mouse.atInterfaceBoard)
-				{
-					//обновл€ю кнопку
-				}
-				else
-				{
-					//обрабатываю выделение
-				}
-			}
-			else
-			{
-				//ничего
-			}
-		}
-		void righitClick()
-		{
-			if (+(sPack::mouse::curVel / mouse.node()))
-			{
-				if (mouse.atInterfaceBoard)
-				{
-					//список возможных действий +
-					//запрашиваю информацию по активному элементу (ещЄ не определилс€)
-				}
-				else
-				{
-					//список возможный действий + включение режима редактировани€
-				}
-			}
-			else
-			{
-				//взаимодействие с пустотой, способ перехода или 
-				//создание объекта вне настроек редактора
-			}
-
-		}
-		void middleClick()
-		{
-			if (!+ (sPack::mouse::curVel / mouse.node()))
-			{
-				//создаю новую ноду или группу по настройкам редактора
-			}
-		}
 		bool findActiveWindow(nodePtr ideNode)
 		{
 			nodePtr grNode = sPack::nechtoIde::windowGroup / ideNode;
@@ -268,7 +182,7 @@ namespace nechto::ide
 		}
 		bool sResetEvent() const//сброс scroll и selection
 		{
-			buttonStatus lb = mouse.updateLeftButton();
+			/*buttonStatus lb = mouse.updateLeftButton();
 			buttonStatus rb = mouse.updateRightButton();
 			buttonStatus mb = mouse.updateMiddleButton();
 			buttonStatus x1b = mouse.updateXButton1Button();
@@ -276,7 +190,7 @@ namespace nechto::ide
 			if (lb > buttonStatus::Press ||
 				rb > buttonStatus::Press ||
 				mb > buttonStatus::Press)
-				return true;
+				return true;*/
 			return false;
 		}
 		const float sLenght = 6.f;

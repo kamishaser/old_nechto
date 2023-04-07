@@ -35,7 +35,7 @@ namespace nechto
 
 			h2->port[lp2] = ptr1.getPurpose();
 			h2->reverseAddress[lp2] = ptr1.hub;
-			h2->reversePosition.setLocalPos(lp1, lp2);
+			h2->reversePosition.setLocalPos(lp2, lp1);
 			
 			
 			/*ptr1.getHPPair().hub.node()->port[ptr1.getLocalPos()] = ptr2.getPurpose();

@@ -147,10 +147,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="autoExpandHandler.h" />
+    <ClInclude Include="button.h" />
     <ClInclude Include="buttonList.h" />
     <ClInclude Include="commandLine.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="drawableBlock.h" />
+    <ClInclude Include="drawableEntity.h" />
     <ClInclude Include="drawableLine.h" />
     <ClInclude Include="drawer.h" />
     <ClInclude Include="editor.h" />
@@ -161,13 +163,14 @@
     <ClInclude Include="interactiveElement.h" />
     <ClInclude Include="ideFactory.h" />
     <ClInclude Include="ideStructurePack.h" />
-    <ClInclude Include="keyboardHandler.h" />
+    <ClInclude Include="interactiveHanler.h" />
+    <ClInclude Include="keyboard.h" />
     <ClInclude Include="mouse.h" />
     <ClInclude Include="nechtoIde.h" />
     <ClInclude Include="consistentGroup.h" />
     <ClInclude Include="rect.h" />
     <ClInclude Include="selectHandler.h" />
-    <ClInclude Include="textInputBox.h" />
+    <ClInclude Include="textInputField.h" />
     <ClInclude Include="userH.h" />
     <ClInclude Include="visual.h" />
     <ClInclude Include="visualConnection.h" />

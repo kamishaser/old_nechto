@@ -36,6 +36,18 @@
     <Filter Include="исходные файлы\inteface\visualGroup">
       <UniqueIdentifier>{9e21a627-55ca-4d1f-9840-8b9bd169ec6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="исходные файлы\devices">
+      <UniqueIdentifier>{2daed77e-2737-4045-8c89-b9b9fad54dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\base">
+      <UniqueIdentifier>{ebe39b35-3a16-40b9-ba73-789ea3a7925d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\inteface\interactiveElement">
+      <UniqueIdentifier>{86e70fda-0361-47c5-b713-bd8740e98a93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="исходные файлы\inteface\handler">
+      <UniqueIdentifier>{be9d2cfd-2b50-4d15-9d37-01512bf07eb4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nodeBoard.h">
@@ -44,23 +56,11 @@
     <ClInclude Include="autoExpandHandler.h">
       <Filter>устаревшее\handler</Filter>
     </ClInclude>
-    <ClInclude Include="spreadHandler.h">
-      <Filter>устаревшее\handler</Filter>
-    </ClInclude>
     <ClInclude Include="vnDataUpdateH.h">
       <Filter>устаревшее\handler</Filter>
     </ClInclude>
     <ClInclude Include="userH.h">
       <Filter>устаревшее\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="keyboardHandler.h">
-      <Filter>устаревшее\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="selectHandler.h">
-      <Filter>устаревшее\handler\userH</Filter>
-    </ClInclude>
-    <ClInclude Include="textInputBox.h">
-      <Filter>устаревшее\display</Filter>
     </ClInclude>
     <ClInclude Include="visualConnection.h">
       <Filter>устаревшее\visual</Filter>
@@ -86,16 +86,10 @@
     <ClInclude Include="buttonList.h">
       <Filter>устаревшее\display\button</Filter>
     </ClInclude>
-    <ClInclude Include="visual.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="display.h">
       <Filter>устаревшее\display</Filter>
     </ClInclude>
     <ClInclude Include="ideFactory.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="ideStructurePack.h">
       <Filter>исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="commandLine.h">
@@ -119,20 +113,45 @@
     <ClInclude Include="visualNodeFill.h">
       <Filter>исходные файлы\inteface</Filter>
     </ClInclude>
-    <ClInclude Include="interactiveElement.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="mouse.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="event.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="illuminationHandler.h">
-      <Filter>исходные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="nechtoIde.h">
       <Filter>исходные файлы\inteface\drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="mouse.h">
+      <Filter>исходные файлы\devices</Filter>
+    </ClInclude>
+    <ClInclude Include="event.h">
+      <Filter>исходные файлы\base</Filter>
+    </ClInclude>
+    <ClInclude Include="ideStructurePack.h">
+      <Filter>исходные файлы\base</Filter>
+    </ClInclude>
+    <ClInclude Include="visual.h">
+      <Filter>исходные файлы\inteface\drawer</Filter>
+    </ClInclude>
+    <ClInclude Include="illuminationHandler.h">
+      <Filter>исходные файлы\inteface\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="spreadHandler.h">
+      <Filter>устаревшее\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="selectHandler.h">
+      <Filter>исходные файлы\inteface\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="interactiveHanler.h">
+      <Filter>исходные файлы\inteface\handler</Filter>
+    </ClInclude>
+    <ClInclude Include="interactiveElement.h">
+      <Filter>исходные файлы\inteface\interactiveElement</Filter>
+    </ClInclude>
+    <ClInclude Include="button.h">
+      <Filter>исходные файлы\inteface\interactiveElement</Filter>
+    </ClInclude>
+    <ClInclude Include="drawableEntity.h" />
+    <ClInclude Include="keyboard.h">
+      <Filter>исходные файлы\devices</Filter>
+    </ClInclude>
+    <ClInclude Include="textInputField.h">
+      <Filter>исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

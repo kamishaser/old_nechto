@@ -203,11 +203,4 @@ namespace nechto::ide
 			}
 		}
 	}
-	enum class buttonStatus
-	{
-		None,
-		Press,
-		BeginClick,
-		EndClick
-	};
 }

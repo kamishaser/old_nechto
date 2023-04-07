@@ -64,30 +64,36 @@ namespace nechto::ide
 	i64 drawableBlock::numberOfDraBlock = 0;
 	class drawableTextBlock : public drawableBlock
 	{
+	public:
 		std::wstring blockText;
 		const sf::Font& font;
 		ui32 textColor = 7;
 		float charSize = 18.;
-	public:
+	
 		drawableTextBlock(const drawableBlock& block, const std::wstring& text,
-			const sf::Font f, ui32 tCol = 7, float chSize = 18.)
+			const sf::Font& f, ui32 tCol = 7, float chSize = 18.)
 			:drawableBlock(block), blockText(text), font(f), 
 			charSize(chSize), textColor(tCol){}
 
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 		{
 			drawableBlock::draw(target, states);
+			sf::Text text = getText();
+			target.draw(text);
+		}
+		sf::Text getText() const
+		{
 			sf::Text text(blockText, font, charSize);
 			text.setStyle(1);
 			text.setPosition(0, 0);
 			text.setFillColor(col::illuminationColor[textColor]);
 			//////////////////////////////////////////////////////////////////
-			
+
 			glm::vec2 size = textSize(text);
 			text.setPosition(sf::Vector2f(
 				frame.position.x + charSize / 4,
 				frame.position.y + charSize / 6));
-			target.draw(text);
+			return text;
 		}
 		void setSizeByText()
 		{
@@ -142,7 +148,8 @@ namespace nechto::ide
 		drawableTextBlock(nodePtr node, const sf::Font& f)
 			:font(f)
 		{
-			assert(node >> *this);
+			if (!(node >> *this))
+				assert(false);
 		}
 	};
 }

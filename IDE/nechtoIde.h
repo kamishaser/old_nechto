@@ -7,7 +7,12 @@
 #include "textOut.h"
 #include "consistentGroup.h"
 #include "illuminationHandler.h"
+#include "interactiveHanler.h"
+#include "selectHandler.h"
+#include "textInputField.h"
 #include "userH.h"
+
+#include "button.h"
 
 namespace nechto::ide
 {
@@ -22,15 +27,18 @@ namespace nechto::ide
 		drawer draw;
 		userH uh;
 		illuminationHandler ilh;
+		selectHandler sh;
+		interactiveHandler inh;
+		textInputField tef;
 	public:
 		nodePtr consisGr;
+		nodePtr button;
 		nechtoIDE()
 		{
 			eConnect(creator::createEntity(entityT::singleConnection));
 			fact.clearAndFabricate(sPack::nechtoIde::getPlan(), node());
 			fact.clearAndFabricate(sPack::window::getPlan(), we.node());
 			we.connectToIde(node());
-			std::wcout << to_string(node()) << std::endl;
 			fact.clear();
 			connectAllServices();
 			testStart();
@@ -40,10 +48,13 @@ namespace nechto::ide
 		}
 		bool update()
 		{
-			consistentGroup(consisGr, fact).update();
-			windowEntity* fwindow = &we;
+			
+			testUpdate();
 			uh.update(node());
 			ilh.update();
+			inh.update();
+			sh.update();
+			tef.update();
 			draw.update(&we.window, we.node());
 			return we.update();
 		}
@@ -54,6 +65,9 @@ namespace nechto::ide
 			PointerNumConnect(backGroupPort(sPack::nechtoIde::windowGroup / node()),
 				we.node(), 3);
 			ilh.finalConnect(node());
+			sh.finalConnect(node());
+			inh.finalConnect(node());
+			tef.finalConnect(node());
 		}
 		void testStart()
 		{
@@ -78,6 +92,19 @@ namespace nechto::ide
 				oldNode = vNode;
 				sPack::vNode::drawableBlock / sPack::draBlock::frame / vNode << r;
 			}
+			r.position = glm::vec2(10., 10);
+			fact.clear();
+			nodePtr vNode = fact.fabricateVNode(sPack::window::interfaceBoard / we.node());
+			sPack::vNode::drawableBlock / sPack::draBlock::text / vNode << L"testButton";
+			sPack::vNode::drawableBlock / sPack::draBlock::frame / vNode << r;
+
+			button = button::fabricate(inh.node(), vNode);
+		}
+		void testUpdate()
+		{
+			consistentGroup(consisGr, fact).update();
+			if (button::isClicked(button))
+				std::wcout << L"click" << std::endl;
 		}
 	};
 

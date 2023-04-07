@@ -15,6 +15,8 @@ namespace nechto::ide
 		}
 		void finalConnect(nodePtr ideNode)
 		{
+			NumNumConnect(-sPack::nechtoIde::illuminationHandler / ideNode,
+				node(), sPack::nechtoIde::illuminationHandler.last(), 3);//подключение к системе
 			nodePtr mouse = sPack::nechtoIde::mouse / ideNode;
 			nodePtr mOverSubscription = 
 				sPack::illuminationHandler::mOverSubcription / node();
@@ -29,10 +31,6 @@ namespace nechto::ide
 			subscribeToType(
 				illGExchangeSubscription, eventType);
 		}
-		void connectMouse(nodePtr mouse)
-		{
-			NumHubConnect("0"_np / node(), mouse, 2);
-		}
 		void update()
 		{
 			updateMOver();
@@ -42,10 +40,8 @@ namespace nechto::ide
 		void updateMOver()
 		{
 			nodePtr subscription = sPack::illuminationHandler::mOverSubcription / node();
-			groupPointer gi(sPack::eventSubscription::nonHandledEvent / subscription);
-			do
+			for (nodePtr event; +(event = readEvent(subscription));)
 			{
-				nodePtr event = "3"_np / gi.get();
 				if (+event)
 				{
 					nodePtr oldMOver = sPack::illuminationHandler::mouseCurVel / node();
@@ -60,9 +56,8 @@ namespace nechto::ide
 						NumHubConnect("00"_np / node(), mOver, 2);
 						updateVelIllumination(mOver);
 					}
-					moveToHandled(subscription, gi);
 				}
-			} while (gi.stepForward());
+			}
 		}
 		void updateIllGroupExchange()
 		{
@@ -91,7 +86,7 @@ namespace nechto::ide
 			{
 				if (groupPtr::match(pi.get()))
 				{
-					i64 temp = compareGroup(pi.get());
+					i64 temp = compareGroup(pi.get(), vel);
 					if (temp > max)
 						max = temp;
 				}
@@ -104,7 +99,7 @@ namespace nechto::ide
 			sPack::vNode::drawableBlock / sPack::draBlock::illuminationColor / vel << 
 				findVElIlluminationNumber(vel);
 		}
-		i64 compareGroup(groupPtr group, nodePtr selGroup = nullptr)
+		i64 compareGroup(groupPtr group, nodePtr vel)
 		{
 			if (group == sPack::illuminationHandler::errorGroup / node())
 				return col::Error;
@@ -116,10 +111,13 @@ namespace nechto::ide
 				return col::Tip1;
 			if (group == sPack::illuminationHandler::tip2Group / node())
 				return col::Tip2;
+			groupPtr selGroup = sPack::illuminationHandler::selectGroup / node();
 			if (group != selGroup)
 				return 0;
+			if (lastConnectedGroupPort(selGroup).get() == vel)
+				return col::Sel1;
 			//обработка номера selection
-			return 0;
+			return col::Sel3;
 		}
 	};
 }

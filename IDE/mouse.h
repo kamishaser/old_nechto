@@ -22,7 +22,7 @@ namespace nechto::ide
 			eConnect(creator::createEntity(entityT::singleConnection));
 			fabricate(sPack::mouse::getPlan(), node());
 		}
-		bool updatePosition(nodePtr ideNode, bool freeMode)
+		bool update(nodePtr ideNode)
 		{
 			i64 pressMoveMode;
 			sPack::mouse::pressMoveMode / node() >> pressMoveMode;
@@ -46,32 +46,18 @@ namespace nechto::ide
 				sPack::mouse::pressMoveMode / node() << 0ll;
 				event(sPack::mouse::eventType_PressMoveMode);
 			}
-			return true;
-		}
-		buttonStatus updateLeftButton() const
-		{
-			return updateButton(sPack::mouse::leftButton / node(),
+			updateButton(sPack::mouse::leftButton / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::Left));
-		}
-		buttonStatus updateRightButton() const
-		{
-			return updateButton(sPack::mouse::rightButton / node(),
+			updateButton(sPack::mouse::rightButton / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::Right));
-		}
-		buttonStatus updateMiddleButton() const
-		{
-			return updateButton(sPack::mouse::middleButton / node(),
+			updateButton(sPack::mouse::middleButton / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::Middle));
-		}
-		buttonStatus updateXButton1Button() const
-		{
-			return updateButton(sPack::mouse::x1Button / node(),
+			updateButton(sPack::mouse::x1Button / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::XButton1));
-		}
-		buttonStatus updateXButton2Button() const
-		{
-			return updateButton(sPack::mouse::x2Button / node(),
+			updateButton(sPack::mouse::x2Button / node(),
 				sf::Mouse::isButtonPressed(sf::Mouse::XButton2));
+			updatePressMoveMode();
+			return true;
 		}
 		bool isButtonPressed(path p)
 		{
@@ -89,26 +75,26 @@ namespace nechto::ide
 		{
 			addEvent(evStorage(), evSource(), type / node(), content);
 		}
-		buttonStatus updateButton(nodePtr bnode, bool nStatus) const
+		void updateButton(nodePtr bnode, bool nStatus) const
 		{
 			i64 clickStatusNumber = 0;
 			bnode >> clickStatusNumber;
 			bool clickStatus = clickStatusNumber & 1ll;
 			if (nStatus == clickStatus)
-				if (nStatus)
-					return buttonStatus::Press;
-				else
-					return buttonStatus::None;
+				return;
 			bnode << ++clickStatusNumber;
 			if (nStatus)
 			{
 				sPack::mouse::clickStartPoint / node() << wMousePos;
-				return buttonStatus::BeginClick;
 			}
 			else 
 			{
-				event(sPack::mouse::eventType_ButtonClicked);
-				return buttonStatus::EndClick;
+				i64 pressMoveMode = 0;
+				sPack::mouse::pressMoveMode / node() >> pressMoveMode;
+				if (!pressMoveMode)
+					event(sPack::mouse::eventType_ButtonClicked, bnode);
+				else
+					sPack::mouse::pressMoveMode / node() << 0ll;
 			}
 		}
 		bool updatemWindow(nodePtr ideNode)
@@ -172,22 +158,7 @@ namespace nechto::ide
 		} mOverEl;
 		
 		nodePtr freeUpdateVBlock()
-		{
-			if (isButtonPressed(sPack::mouse::leftButton)/* ||
-				isButtonPressed(sPack::mouse::rightButton)*/)
-			{
-				glm::vec2 clickStartPos{ 0., 0. };
-				glm::vec2 currentPos{ 0., 0. };
-				sPack::mouse::clickStartPoint / node() >> clickStartPos;
-				sPack::mouse::winPos / node() >> currentPos;
-				if (glm::abs(clickStartPos.x - currentPos.x) < 5 ||
-					glm::abs(clickStartPos.y - currentPos.y) < 5)
-				{
-					event(sPack::mouse::eventType_PressMoveMode);
-					sPack::mouse::pressMoveMode / node() << 1ll;
-				}
-			}
-			
+		{			
 			nodePtr vEl = findvBlock(wMousePos);
 			if (vEl != sPack::mouse::curVel / node())
 			{
@@ -201,6 +172,24 @@ namespace nechto::ide
 					disconnect(sPack::mouse::current / node(), 1);
 			}
 			return vEl;
+		}
+		void updatePressMoveMode()
+		{
+			i64 pressMoveMode = 0;
+			sPack::mouse::pressMoveMode / node() >> pressMoveMode;
+			if (!pressMoveMode && isButtonPressed(sPack::mouse::leftButton))
+			{
+				glm::vec2 clickStartPos{ 0., 0. };
+				glm::vec2 currentPos{ 0., 0. };
+				sPack::mouse::clickStartPoint / node() >> clickStartPos;
+				sPack::mouse::winPos / node() >> currentPos;
+				if (glm::abs(clickStartPos.x - currentPos.x) > 5 ||
+					glm::abs(clickStartPos.y - currentPos.y) > 5)
+				{
+					event(sPack::mouse::eventType_PressMoveMode);
+					sPack::mouse::pressMoveMode / node() << 1ll;
+				}
+			}
 		}
 		nodePtr findvBlock(glm::vec2 point)
 		{

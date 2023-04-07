@@ -4,6 +4,7 @@
 #include "creator.h"
 #include "visual.h"
 #include "ideStructurePack.h"
+#include <queue>
 
 namespace nechto::ide
 {
@@ -13,7 +14,7 @@ namespace nechto::ide
 		sf::RenderWindow window;
 		glm::vec2 workBoardViewPos = { 500, 500 };
 		float workBoardViewScale = 1;
-
+		static std::queue<wchar_t> inputTextEvents;//список введённых символов
 		windowEntity()
 			:window(sf::VideoMode(1000, 1000), "nechtoIDE")
 		{
@@ -32,16 +33,18 @@ namespace nechto::ide
 			sf::Event event;
 			while (window.pollEvent(event))
 			{
-				if (event.type == sf::Event::Closed)
+				switch (event.type)
 				{
-					window.close();
+				case sf::Event::EventType::Closed:
 					return false;
+					break;
+				case sf::Event::EventType::TextEntered:
+					//по хорошему тут должно вызываться событие записи символа
+					if(window.hasFocus())
+						inputTextEvents.push(event.text.unicode);
+				default:
+					break;
 				}
-				/*else if (event.type == sf::Event::Resized)
-				{
-					glm::vec2 size = GLM_SFML(window.getSize());
-					
-				}*/
 			}
 			return true;
 		}
@@ -63,4 +66,5 @@ namespace nechto::ide
 			return GLM_SFML(window.mapPixelToCoords(GLM_SFML<int>(point)));
 		}
 	};
+	std::queue<wchar_t> windowEntity::inputTextEvents{};
 }

@@ -103,6 +103,10 @@ namespace nechto
 		textPtr(node).set(text);
 		return true;
 	}
+	bool operator<<(nodePtr node, const wchar_t* value)
+	{
+		return node << std::wstring(value);
+	}
 	template <class TCon>
 	bool operator>>(nodePtr node, TCon*& object)
 	{

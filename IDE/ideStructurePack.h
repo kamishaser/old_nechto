@@ -269,6 +269,30 @@ namespace nechto::ide::sPack
 			};
 		}
 	}
+	namespace textMark
+	{
+		const path
+			type{ "0"_np },//тип drawableEntity
+			vNode{ "10"_np },
+			beginNumber{ "11"_np },
+			endNumber{ "12"_np },
+			data{ "2"_np };//данные в зависимости от типа
+		constexpr serialPlan getPlan(serialPlan data = serialPlan(nullptr))
+		{
+			return
+			{
+				{nullptr},//type
+				{L"position",
+				{
+					{nullptr},//vNode
+					{L"beginNumber", sType::i64v(0)},
+					{L"endNumber", sType::i64v(0)}
+				}},
+				{nullptr}//data
+			};
+		}
+
+	}
 	namespace window
 	{
 		const path
@@ -294,6 +318,21 @@ namespace nechto::ide::sPack
 			mouse{ "000"_np },
 			keyboard{ "001"_np },
 			services{ "01"_np },
+			display{ "010"_np },
+			workZone{ "0100"_np },
+			workZoneContentHdl{ "01000"_np },
+			nodePositionHdl{ "01001"_np },
+			interfaceHdl{ "0101"_np },
+			interfaceTreeHdl{ "01010"_np },
+			interactiveHandler{ "01011"_np },
+			general{ "0102"_np },
+			textHandler{ "01020"_np },
+			illuminationHandler{ "01021"_np },
+			baseInput{ "011"_np },
+			selectHanlder{ "0110"_np },
+			textInputField{ "0111"_np },
+			nodeMoveHandler{ "0112"_np },
+			userH{ "012"_np },
 			windowGroup{ "02"_np };
 
 		constexpr serialPlan getPlan()
@@ -303,8 +342,36 @@ namespace nechto::ide::sPack
 				{L"interface",
 				{
 					{L"devices", sType::structNode(0, structData())},
-					{L"services", {{nullptr}, {nullptr}, {nullptr}}},//различные встроенные сервисы
-					{L"windowGroup", sType::weakGroup()}
+					{L"services", 
+					{
+						{L"display",
+						{
+							{L"workZone", 
+							{
+								{nullptr},//обработчик контента
+								{L"nodePositionHdl", {{nullptr}, {nullptr}}},
+							}},
+							{L"interface",
+							{
+								{nullptr},//interfaceTree
+								{nullptr},//interactiveElTree
+							}},
+							{L"general",
+							{
+								{nullptr},//textHandler
+								{nullptr},//illuminationHanlder
+
+							}}
+						}},
+						{L"baseInput",
+						{
+							{nullptr},//selectHandler
+							{nullptr},//textInpurField
+							{nullptr}//nodeMoveHandler
+						}},
+						{nullptr}//userH
+					}},//различные встроенные сервисы
+					{L"windowGroup", sType::weakGroup()},
 				}}
 			};
 		}
@@ -499,6 +566,10 @@ namespace nechto::ide::sPack
 			};
 		}
 	}
+	namespace keyboard
+	{
+		
+	}
 	namespace illuminationHandler
 	{
 		const path
@@ -508,6 +579,7 @@ namespace nechto::ide::sPack
 			tip0Group{ "010"_np },
 			tip1Group{ "011"_np },
 			tip2Group{ "012"_np },
+			selectGroup{ "02"_np },
 			eventType_illGExchenge{ "10"_np },
 			mOverSubcription{ "11"_np },
 			illGExchengeSubscription{ "12"_np };
@@ -527,7 +599,8 @@ namespace nechto::ide::sPack
 						{L"tip0", sType::weakGroup()},
 						{L"tip1", sType::weakGroup()},
 						{L"tip2", sType::weakGroup()}
-					}}
+					}},
+					{L"selectGroup", sType::weakGroup()}
 				}},
 				{L"events",
 				{
@@ -538,6 +611,101 @@ namespace nechto::ide::sPack
 			};
 		}
 	}
+	namespace selectHandler
+	{
+		const path
+			selectGroup("00"_np),
+			eventType_illGExchenge{ "01"_np },
+			eventSource{ "02"_np },
+			mClickSubscription{ "10"_np },
+			mouse{ "11"_np };
+		constexpr serialPlan getPlan()
+		{
+			return
+			{
+				{L"illHdl",
+				{
+					{nullptr},//selectGroup
+					{nullptr},//eventType
+					{L"eventSource", eventSource::getPlan()}//eventSource
+				}},
+				{L"mouse",
+				{
+					{L"subscription", eventSubscription::getPlan()},//подписка на клик
+					{nullptr}//статус левой кнопки мыши
+				}}
+			};
+		}
+	}
+	namespace interactiveHandler
+	{
+		const path
+			mOverChSubscription{ "00"_np },//подписка на наведение
+			mClickSubscription{ "01"_np },	//подписка на клик
+			et_mOver{ "10"_np },//тип события: наведения мыши
+			et_lClick{ "110"_np },
+			et_rClick{ "111"_np },
+			et_mClick{ "112"_np },
+			mouse{ "20"_np },
+			curIElEventSource{ "211"_np },
+			currentIEl{ "213"_np };//текущий интеркативный элемент
+
+		constexpr serialPlan getPlan()
+		{
+			return
+			{
+				{L"subscriptions",
+				{
+					{L"mOverChSubscription", sPack::eventSubscription::getPlan()},
+					{L"clickSubscription", sPack::eventSubscription::getPlan()}
+				}},
+				{L"eventTypes",
+				{
+					{L"et_mOver", sPack::eventType::getPlan()},
+					{L"click",
+					{
+						{L"et_lClick", sPack::eventType::getPlan()},
+						{L"et_rClick", sPack::eventType::getPlan()},
+						{L"et_mClick", sPack::eventType::getPlan()}
+					}}
+				}},
+				{L"other",
+				{
+					{nullptr},//mouse
+					{nullptr},//curentInteractiveElement
+				}}
+			};
+		}
+	}
+	namespace interEl//интерактивный элемент
+	{
+		const path
+			interactiveHandler{ "003"_np },//сработает только если элемент активен
+			mouse{ "000"_np },//сработает только если элемент активен
+			eventSource{ "01"_np },
+			type{ "02"_np },
+			data{ "1"_np },
+			vNode{ "2"_np };
+		constexpr serialPlan getPlan(serialPlan data = serialPlan{ nullptr })
+		{
+			return
+			{
+				{L"general",
+				{
+					{nullptr},//interactiveHandler
+					{L"eventSource", sPack::eventSource::getPlan()},
+					{nullptr}//eventType
+				}},
+				{L"data", data},
+				{nullptr}//vNode
+			};
+		}
+
+	}
+	namespace textInputField
+	{
+	}
+
 	namespace uh
 	{
 		//const path

@@ -140,6 +140,18 @@ namespace nechto
 		{
 			return operator+(p2);
 		}
+		path operator-()const
+		{
+			path temp = *this;
+			if (temp.size > 0)
+				--temp.size;
+			return temp;
+		}
+		constexpr uchar last() const
+		{
+			assert(size > 0);
+			return transitionSequence[size - 1];
+		}
 		nodePtr operator/(nodePtr node) const
 		{
 			return follow(node);

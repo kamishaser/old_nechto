@@ -159,4 +159,18 @@ namespace nechto::ide
 	{
 		deleteEvent("3"_np / eventIter.get());
 	}
+	nodePtr readEvent(nodePtr subscription)
+	{
+		groupPointer gi(sPack::eventSubscription::nonHandledEvent / subscription);
+		do
+		{
+			nodePtr event = "3"_np / gi.get();
+			if (+event)
+			{
+				moveToHandled(subscription, gi);
+				return event;
+			}
+		} while (gi.stepForward());
+		return nullptr;
+	}
 }

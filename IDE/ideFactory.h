@@ -9,7 +9,7 @@ namespace nechto::ide
 	class ideFactory : public factory
 	{
 	public:
-		nodePtr fabricateVNode(nodePtr nodeBoard, nodePtr vGroup)
+		nodePtr fabricateVNode(nodePtr nodeBoard, nodePtr vGroup = nullptr)
 		{
 			nodePtr intermed = creator::createStruct(0);
 			fabricate(sPack::vNode::getPlan(), intermed);
@@ -23,7 +23,7 @@ namespace nechto::ide
 		}
 		//создание нового соединения. !Внимание!, отсутствует защита
 		nodePtr fabricateVConnection(nodePtr vNode0, 
-			nodePtr vNode1, nodePtr nodeBoard, nodePtr vGroup)
+			nodePtr vNode1, nodePtr nodeBoard, nodePtr vGroup = nullptr)
 		{
 			nodePtr intermed = creator::createStruct(0);
 			fabricate(sPack::vConnection::getPlan(), intermed);
@@ -38,7 +38,7 @@ namespace nechto::ide
 			PointerNumConnect(sPack::vNode::newConnectionPort(vNode1), vConNode, 1);
 			return vConNode;
 		}
-		nodePtr fabricateVGroup(nodePtr nodeBoard, nodePtr vGroup, 
+		nodePtr fabricateVGroup(nodePtr nodeBoard, nodePtr vGroup = nullptr, 
 			sPack::vGroup::gType t = sPack::vGroup::gType::simple)
 		{
 			nodePtr intermed = creator::createStruct(0);

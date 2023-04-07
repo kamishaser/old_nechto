@@ -105,19 +105,19 @@ namespace nechto::ide
 			assert(node >> *this);
 		}
 	};
-	bool operator <<(nodePtr node, glm::vec2 vec)
+	bool operator <<(nodePtr node, const glm::vec2& vec)
 	{
 		return
 			sPack::vec2::x / node << vec.x &&
 			sPack::vec2::y / node << vec.y;
 	}
-	bool operator >>(nodePtr node, glm::vec2 vec)
+	bool operator >>(nodePtr node, glm::vec2& vec)
 	{
 		return
 			sPack::vec2::x / node >> vec.x &&
 			sPack::vec2::y / node >> vec.y;
 	}
-	bool operator += (nodePtr node, glm::vec2 vec)
+	bool operator += (nodePtr node, glm::vec2& vec)
 	{
 		glm::vec2 value(0, 0);
 		if (!(node >> value))
